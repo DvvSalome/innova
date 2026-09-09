@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel — Innova Social 5.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#00AFE7; --blue-deep:#0A7CA6; --blue-dark:#06556F; --blue-soft:#E4F6FC;
+    --ink:#132330; --muted:#5D7383; --paper:#FFFFFF; --paper2:#F5F9FB; --line:#E2ECF1;
+    --mint:#7FE3B4; --mint-deep:#1C8F57;
+    --c1:#4EAF9D; --c2:#2F5B81; --c3:#7B236E; --c4:#A8BF3F; --c5:#F67E46; --c6:#DD494E; --c7:#D24D48;
+    --warn:#F67E46; --danger:#DD494E; --ok:#1C8F57;
+    --shadow-sm:0 1px 2px rgba(19,35,48,.06), 0 6px 16px -10px rgba(19,35,48,.18);
+    --shadow:0 2px 4px rgba(19,35,48,.05), 0 16px 34px -18px rgba(19,35,48,.28);
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper2); color:var(--ink); font-family:"Poppins",-apple-system,"Segoe UI",sans-serif; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; }
+  .mono{ font-family:"IBM Plex Mono",ui-monospace,monospace; }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:10px; }
+
+  /* ===== SHELL ===== */
+  .shell{ display:grid; grid-template-columns:250px 1fr; min-height:100vh; }
+  @media (max-width:900px){ .shell{ grid-template-columns:0 1fr; } .sidebar{ position:fixed; z-index:80; height:100vh; transform:translateX(-100%); transition:transform .25s ease; } .sidebar.open{ transform:translateX(0); width:250px; } }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar{ background:var(--paper); color:var(--ink); border-right:1px solid var(--line); display:flex; flex-direction:column; padding:20px 14px; gap:4px; }
+  .brand{ display:flex; align-items:center; gap:10px; padding:8px 8px 20px; }
+  .brand .mark{ width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--blue),var(--mint)); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#fff; flex-shrink:0; }
+  .brand .tx b{ display:block; font-size:14px; font-weight:700; color:var(--ink); line-height:1.2; }
+  .brand .tx span{ font-size:10.5px; color:var(--muted); font-weight:600; letter-spacing:.06em; }
+
+  .navgroup{ margin-top:14px; }
+  .navgroup .glabel{ font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); opacity:.75; padding:0 12px 8px; }
+  .navlink{
+    display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:10px; font-size:13.5px; font-weight:500;
+    color:var(--muted); cursor:pointer; transition:background .15s, color .15s; position:relative;
+  }
+  .navlink:hover{ background:var(--paper2); color:var(--ink); }
+  .navlink.active{ background:var(--blue-soft); color:var(--blue-deep); font-weight:600; }
+  .navlink.active::before{ content:""; position:absolute; left:-14px; top:8px; bottom:8px; width:3px; border-radius:3px; background:var(--blue); }
+  .navlink .ic{ width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center; opacity:.85; }
+  .navlink .badge{ margin-left:auto; font-size:10px; font-weight:700; background:var(--blue-soft); color:var(--blue-deep); padding:1px 7px; border-radius:100px; }
+  .sidebar-foot{ margin-top:auto; padding-top:14px; border-top:1px solid var(--line); }
+
+  /* ===== TOPBAR ===== */
+  .topbar{ background:var(--paper); border-bottom:1px solid var(--line); padding:14px 26px; display:flex; align-items:center; justify-content:space-between; gap:16px; position:sticky; top:0; z-index:40; }
+  .topbar h1{ font-size:17px; font-weight:700; margin:0; }
+  .topbar .crumb{ font-size:11.5px; color:var(--muted); font-weight:600; }
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+  .search-mini{ display:flex; align-items:center; gap:8px; background:var(--paper2); border:1px solid var(--line); border-radius:10px; padding:8px 12px; font-size:13px; color:var(--muted); min-width:220px; }
+  @media (max-width:760px){ .search-mini{ display:none; } }
+  .search-mini input{ border:none; background:none; outline:none; font-family:inherit; font-size:13px; flex:1; }
+  .avatar{ width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--blue),var(--mint)); color:#fff; font-weight:800; font-size:12.5px; display:flex; align-items:center; justify-content:center; }
+  .menu-btn{ display:none; background:none; border:none; cursor:pointer; padding:6px; color:var(--ink); }
+  @media (max-width:900px){ .menu-btn{ display:block; } }
+
+  .content{ padding:26px; max-width:1280px; }
+
+  /* ===== BUTTONS ===== */
+  .btn{ display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:10px; font-weight:600; font-size:13.5px; border:none; cursor:pointer; transition:transform .15s, box-shadow .15s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.solid{ background:var(--blue); color:#fff; box-shadow:var(--shadow-sm); }
+  .btn.solid:hover{ box-shadow:0 10px 20px -10px rgba(0,131,175,.6); }
+  .btn.ghost{ background:var(--paper); border:1.5px solid var(--line); color:var(--ink); }
+  .btn.ghost:hover{ border-color:var(--blue); color:var(--blue-deep); }
+  .btn.danger{ background:color-mix(in srgb, var(--danger) 10%, #fff); color:var(--danger); }
+  .btn.sm{ padding:7px 12px; font-size:12.5px; border-radius:8px; }
+  .icon-btn{ width:32px; height:32px; border-radius:8px; border:1px solid var(--line); background:var(--paper); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--muted); transition:all .15s; }
+  .icon-btn:hover{ border-color:var(--blue); color:var(--blue-deep); }
+
+  /* ===== VIEWS ===== */
+  .view{ display:none; }
+  .view.active{ display:block; animation:fadein .35s ease; }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(6px); } }
+  .view-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+  .view-head h2{ font-size:21px; font-weight:700; margin:0 0 4px; }
+  .view-head p{ margin:0; font-size:13.5px; color:var(--muted); }
+
+  /* ===== CARDS / STAT TILES ===== */
+  .card{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow-sm); }
+  .stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+  @media (max-width:900px){ .stat-row{ grid-template-columns:repeat(2,1fr); } }
+  .stat{ padding:18px 20px; }
+  .stat .top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .stat .ic{ width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+  .stat .delta{ font-size:11px; font-weight:700; padding:2px 8px; border-radius:100px; }
+  .stat .delta.up{ color:var(--ok); background:color-mix(in srgb, var(--ok) 12%, #fff); }
+  .stat .n{ font-size:26px; font-weight:800; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+  .stat .l{ font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+  /* ===== TABLE ===== */
+  .table-wrap{ overflow-x:auto; }
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  thead th{ text-align:left; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:12px 16px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  tbody td{ padding:13px 16px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--paper2); }
+  .cell-user{ display:flex; align-items:center; gap:10px; }
+  .cell-user .av{ width:32px; height:32px; border-radius:50%; background:var(--paper2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--blue-deep); flex-shrink:0; }
+  .cell-user b{ display:block; font-size:13px; }
+  .cell-user span{ font-size:11.5px; color:var(--muted); }
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:4px 10px; border-radius:100px; }
+  .pill.green{ background:color-mix(in srgb, var(--ok) 12%, #fff); color:var(--ok); }
+  .pill.grey{ background:var(--paper2); color:var(--muted); border:1px solid var(--line); }
+  .pill.blue{ background:color-mix(in srgb, var(--blue) 12%, #fff); color:var(--blue-deep); }
+  .pill::before{ content:""; width:5px; height:5px; border-radius:50%; background:currentColor; }
+  .table-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; flex-wrap:wrap; }
+  .table-toolbar .search{ display:flex; align-items:center; gap:8px; background:var(--paper2); border:1px solid var(--line); border-radius:9px; padding:8px 12px; font-size:13px; min-width:220px; }
+  .table-toolbar .search input{ border:none; background:none; outline:none; font-family:inherit; font-size:13px; flex:1; }
+  .table-foot{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; font-size:12px; color:var(--muted); }
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--muted); }
+  .empty-state .em{ font-size:34px; margin-bottom:10px; }
+
+  /* ===== FORM ELEMENTS ===== */
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:12.5px; font-weight:600; }
+  .field .hint{ font-weight:400; color:var(--muted); }
+  input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],input[type=url],select,textarea{
+    font-family:"Poppins",sans-serif; font-size:13.5px; padding:10px 12px; border-radius:9px; border:1.5px solid var(--line); background:#fff; color:var(--ink); width:100%;
+  }
+  input:focus, select:focus, textarea:focus{ outline:none; border-color:var(--blue); }
+  textarea{ resize:vertical; min-height:70px; font-family:inherit; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .grid2{ grid-template-columns:1fr; } }
+
+  /* ===== MODAL ===== */
+  .modal-bg{ position:fixed; inset:0; background:rgba(11,29,39,.55); backdrop-filter:blur(2px); z-index:100; display:none; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto; }
+  .modal-bg.open{ display:flex; }
+  .modal{ background:#fff; border-radius:18px; width:100%; max-width:640px; box-shadow:0 40px 80px -20px rgba(0,0,0,.4); }
+  .modal-head{ display:flex; align-items:flex-start; justify-content:space-between; padding:22px 24px 16px; border-bottom:1px solid var(--line); }
+  .modal-head h3{ font-size:17px; font-weight:700; margin:0 0 4px; }
+  .modal-head p{ font-size:12.5px; color:var(--muted); margin:0; }
+  .modal-close{ background:none; border:none; cursor:pointer; font-size:18px; color:var(--muted); }
+  .modal-body{ padding:20px 24px; display:flex; flex-direction:column; gap:14px; max-height:60vh; overflow-y:auto; }
+  .modal-foot{ display:flex; justify-content:flex-end; gap:10px; padding:16px 24px 22px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ font-size:12px; font-weight:600; padding:7px 13px; border-radius:100px; background:var(--paper2); border:1.5px solid var(--line); color:var(--muted); cursor:pointer; }
+  .chip.on{ background:color-mix(in srgb, var(--blue) 14%, #fff); border-color:var(--blue); color:var(--blue-deep); }
+
+  /* ===== CHARTS (canvas) ===== */
+  .chart-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-bottom:16px; }
+  @media (max-width:900px){ .chart-grid{ grid-template-columns:1fr; } }
+  .chart-card{ padding:20px; }
+  .chart-card h4{ font-size:13.5px; font-weight:700; margin:0 0 14px; }
+  .legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--muted); margin-top:10px; }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend i{ width:9px; height:9px; border-radius:3px; }
+
+  /* ===== TOAST ===== */
+  #toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120%); background:var(--ink); color:#fff; padding:13px 22px; border-radius:11px; font-size:13.5px; font-weight:600; box-shadow:var(--shadow); z-index:200; transition:transform .3s cubic-bezier(.2,.8,.2,1); display:flex; align-items:center; gap:10px; }
+  #toast.show{ transform:translateX(-50%) translateY(0); }
+  #toast .dot{ width:8px; height:8px; border-radius:50%; background:var(--mint); }
+
+  /* ===== EDITOR TOOLBAR (visual) ===== */
+  .fake-editor{ border:1.5px solid var(--line); border-radius:10px; overflow:hidden; }
+  .fake-editor .toolbar{ display:flex; gap:4px; padding:8px 10px; border-bottom:1px solid var(--line); background:var(--paper2); }
+  .fake-editor .toolbar button{ width:28px; height:28px; border-radius:6px; border:none; background:none; cursor:pointer; color:var(--muted); font-size:12px; font-weight:700; }
+  .fake-editor .toolbar button:hover{ background:#fff; color:var(--ink); }
+  .fake-editor textarea{ border:none; border-radius:0; min-height:110px; }
+  .fake-editor textarea:focus{ outline:none; }
+
+  .etapa-row{ display:grid; grid-template-columns:50px 1.4fr 1fr 40px; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
+  .etapa-row:last-child{ border-bottom:none; }
+  .etapa-row .num{ width:32px; height:32px; border-radius:9px; background:var(--paper2); color:var(--blue-deep); font-weight:800; font-size:12.5px; display:flex; align-items:center; justify-content:center; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="mark">IS</span>
+      <div class="tx"><b>Innova Social</b><span>PANEL · 5.0</span></div>
+    </div>
+
+    <div class="navgroup">
+      <div class="navlink active" data-view="inicio"><span class="ic">🏠</span> Inicio</div>
+    </div>
+
+    <div class="navgroup">
+      <div class="glabel">Programa</div>
+      <div class="navlink" data-view="participantes"><span class="ic">👥</span> Participantes <span class="badge" id="navParticipantesCount">24</span></div>
+      <div class="navlink" data-view="ups"><span class="ic">🏷️</span> Unidades productivas</div>
+      <div class="navlink" data-view="cursos"><span class="ic">🎓</span> Cursos</div>
+    </div>
+
+    <div class="navgroup">
+      <div class="glabel">Contenido web</div>
+      <div class="navlink" data-view="resultados"><span class="ic">📊</span> Resultados</div>
+      <div class="navlink" data-view="convocatoria"><span class="ic">🗓️</span> Convocatoria</div>
+      <div class="navlink" data-view="momentos"><span class="ic">📰</span> Momentos</div>
+      <div class="navlink" data-view="sliders"><span class="ic">🖼️</span> Sliders del hero</div>
+    </div>
+
+    <div class="navgroup">
+      <div class="glabel">Reportes</div>
+      <div class="navlink" data-view="analiticas"><span class="ic">📈</span> Analíticas web</div>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="navlink"><span class="ic">⚙️</span> Ayuda</div>
+    </div>
+  </aside>
+
+  <div>
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <div>
+          <div class="crumb" id="crumb">Panel / Inicio</div>
+          <h1 id="pageTitle">Bienvenido a Innova Social</h1>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-mini">🔍 <input placeholder="Buscar en el panel..."></div>
+        <div class="avatar">CT</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ============ INICIO ============ -->
+      <section class="view active" id="view-inicio">
+        <div class="stat-row">
+          <div class="card stat">
+            <div class="top"><span class="ic" style="background:color-mix(in srgb, var(--blue) 14%, #fff); color:var(--blue-deep);">👥</span><span class="delta up">+3 esta semana</span></div>
+            <div class="n">24</div><div class="l">Participantes registrados</div>
+          </div>
+          <div class="card stat">
+            <div class="top"><span class="ic" style="background:var(--blue-soft); color:var(--blue-deep);">🏷️</span><span class="delta up">100% publicadas</span></div>
+            <div class="n">10</div><div class="l">Unidades productivas</div>
+          </div>
+          <div class="card stat">
+            <div class="top"><span class="ic" style="background:var(--blue-soft); color:var(--blue-deep);">📰</span></div>
+            <div class="n">4</div><div class="l">Momentos publicados</div>
+          </div>
+          <div class="card stat">
+            <div class="top"><span class="ic" style="background:var(--blue-soft); color:var(--blue-deep);">📈</span><span class="delta up">+18%</span></div>
+            <div class="n">312</div><div class="l">Visitas este mes</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:22px; margin-bottom:20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+            <h4 style="margin:0; font-size:14.5px; font-weight:700;">Comparativa de avance de formadores</h4>
+            <div class="search-mini" style="min-width:200px;">🔍 <input placeholder="Nombre del formador"></div>
+          </div>
+          <canvas id="chartFormadores" height="90"></canvas>
+        </div>
+
+        <div class="card" style="padding:8px 0;">
+          <div style="padding:14px 22px 6px; font-weight:700; font-size:14.5px;">Últimas postulaciones</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Emprendedor</th><th>Emprendimiento</th><th>Municipio</th><th>Estado</th></tr></thead>
+              <tbody id="tblInicioPostulaciones"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PARTICIPANTES ============ -->
+      <section class="view" id="view-participantes">
+        <div class="view-head">
+          <div><h2>Participantes</h2><p>Personas registradas en la convocatoria — datos de ejemplo, sin conexión a base de datos aún.</p></div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn ghost" onclick="toast('Exportación simulada — sin backend todavía')">⬇ Exportar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-toolbar">
+            <div class="search">🔍 <input id="searchParticipantes" placeholder="Buscar por nombre, cédula, celular..." oninput="filterParticipantes()"></div>
+            <span class="mono" style="font-size:12px; color:var(--muted);" id="participantesCount">24 participantes</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nombre</th><th>Celular</th><th>N° documento</th><th>Pertenece a</th><th>Estado</th><th></th></tr></thead>
+              <tbody id="tblParticipantes"></tbody>
+            </table>
+          </div>
+          <div class="table-foot"><span>Mostrando <span id="participantesShown">24</span> de 24</span><div style="display:flex; gap:8px;"><button class="btn ghost sm" disabled>‹ Atrás</button><button class="btn ghost sm" disabled>Siguiente ›</button></div></div>
+        </div>
+      </section>
+
+      <!-- ============ UNIDADES PRODUCTIVAS ============ -->
+      <section class="view" id="view-ups">
+        <div class="view-head">
+          <div><h2>Unidades productivas</h2><p>Ficha pública de cada emprendimiento ganador — misión, visión, contacto y productos.</p></div>
+          <button class="btn solid" onclick="openModal('modalUp')">+ Nueva UP</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Unidad productiva</th><th>Categoría</th><th>Vigencia</th><th>Estado</th><th></th></tr></thead>
+              <tbody id="tblUps"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CURSOS ============ -->
+      <section class="view" id="view-cursos">
+        <div class="view-head">
+          <div><h2>Gestión de cursos</h2><p>Rutas de formación y bootcamps del programa.</p></div>
+          <button class="btn solid" onclick="openModal('modalCurso')">+ Nuevo curso</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Categoría</th><th>Descripción</th><th>Acciones</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="empty-state">
+            <div class="em">🎓</div>
+            <p>Aún no hay cursos creados.<br>Crea el primero con <b>+ Nuevo curso</b>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ RESULTADOS (mejora) ============ -->
+      <section class="view" id="view-resultados">
+        <div class="view-head">
+          <div><h2>Resultados de la Home</h2><p><span class="pill blue" style="margin-right:6px;">Nuevo</span>Edita los contadores que se muestran en la sección "Resultados" del sitio público — antes quedaban fijos en el código.</p></div>
+          <button class="btn solid" onclick="toast('Cambios guardados (simulado)')">Guardar cambios</button>
+        </div>
+        <div class="card" style="padding:22px; margin-bottom:16px;">
+          <h4 style="margin:0 0 14px; font-size:14px; font-weight:700;">Edición actual — en curso</h4>
+          <div class="grid2" id="gridResultadosActual"></div>
+        </div>
+        <div class="card" style="padding:22px;">
+          <h4 style="margin:0 0 14px; font-size:14px; font-weight:700;">Histórico 2021–2024</h4>
+          <div class="grid2" id="gridResultadosHistorico"></div>
+        </div>
+      </section>
+
+      <!-- ============ CONVOCATORIA (mejora) ============ -->
+      <section class="view" id="view-convocatoria">
+        <div class="view-head">
+          <div><h2>Etapas de la convocatoria</h2><p><span class="pill blue" style="margin-right:6px;">Nuevo</span>Antes las fechas estaban escritas directo en el código — ahora se editan por edición del programa.</p></div>
+          <button class="btn solid" onclick="addEtapa()">+ Agregar etapa</button>
+        </div>
+        <div class="card" style="padding:8px 22px;">
+          <div id="etapasList"></div>
+        </div>
+        <div style="margin-top:16px; text-align:right;">
+          <button class="btn solid" onclick="toast('Etapas guardadas (simulado)')">Guardar etapas</button>
+        </div>
+      </section>
+
+      <!-- ============ MOMENTOS ============ -->
+      <section class="view" id="view-momentos">
+        <div class="view-head">
+          <div><h2>Gestión de momentos</h2><p>Artículos del blog que aparecen en la Home y en /momento/{slug}.</p></div>
+          <button class="btn solid" onclick="openModal('modalMomento')">+ Nuevo momento</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Descripción</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
+              <tbody id="tblMomentos"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SLIDERS ============ -->
+      <section class="view" id="view-sliders">
+        <div class="view-head">
+          <div><h2>Sliders del hero</h2><p>Fotos del carrusel principal de la Home.</p></div>
+          <button class="btn solid" onclick="toast('Selector de archivo (simulado)')">+ Nueva imagen</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Archivo</th><th>Orden</th><th></th></tr></thead>
+              <tbody id="tblSliders"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ANALÍTICAS ============ -->
+      <section class="view" id="view-analiticas">
+        <div class="view-head">
+          <div><h2>Analíticas web</h2><p>Datos de ejemplo — se conecta a analítica real en la siguiente fase.</p></div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="date" style="width:150px;" value="2026-09-01">
+            <input type="date" style="width:150px;" value="2026-09-09">
+            <button class="btn solid">Consultar</button>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="card chart-card">
+            <h4>Visitas por día</h4>
+            <canvas id="chartVisitasDia" height="110"></canvas>
+          </div>
+          <div class="card chart-card">
+            <h4>Visitas por dispositivo</h4>
+            <canvas id="chartDispositivo" height="110"></canvas>
+            <div class="legend" id="legendDispositivo"></div>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="card chart-card"><h4>Visitas por país</h4><canvas id="chartPais" height="100"></canvas></div>
+          <div class="card chart-card"><h4>Visitas por plataforma</h4><canvas id="chartPlataforma" height="100"></canvas></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Nueva UP ===== -->
+<div class="modal-bg" id="modalUp">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h3>Nueva unidad productiva</h3><p>Ficha pública del emprendimiento ganador.</p></div>
+      <button class="modal-close" onclick="closeModal('modalUp')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid2">
+        <div class="field"><label>Título principal</label><input type="text" placeholder="Nombre del emprendimiento"></div>
+        <div class="field"><label>Categoría</label><select><option>Bioproductos y servicios sostenibles</option><option>Ecoproductos industriales</option><option>Productos para la calidad ambiental</option></select></div>
+        <div class="field"><label>Vigencia</label><select><option>2026</option><option>2025</option></select></div>
+        <div class="field"><label>N° de WhatsApp</label><input type="tel" placeholder="300 000 0000"></div>
+      </div>
+      <div class="field"><label>Misión</label><textarea placeholder="¿Cuál es el propósito del emprendimiento?"></textarea></div>
+      <div class="field"><label>Visión</label><textarea placeholder="¿Hacia dónde quiere llegar?"></textarea></div>
+      <div class="field"><label>Descripción general</label>
+        <div class="fake-editor">
+          <div class="toolbar"><button>B</button><button><i>I</i></button><button>🔗</button><button>🖼</button><button>▤</button></div>
+          <textarea placeholder="Cuenta la historia del emprendimiento..."></textarea>
+        </div>
+      </div>
+      <div class="field"><label>Dirección principal</label><input type="text" placeholder="Dirección de operación"></div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="closeModal('modalUp')">Cancelar</button><button class="btn solid" onclick="closeModal('modalUp'); toast('Unidad productiva guardada (simulado)')">Guardar</button></div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Nuevo curso ===== -->
+<div class="modal-bg" id="modalCurso">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Nuevo curso</h3><p>Se mostrará dentro de la ruta de formación.</p></div><button class="modal-close" onclick="closeModal('modalCurso')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Categoría</label><input type="text" placeholder="Ej: Modelo de negocio"></div>
+      <div class="field"><label>Descripción</label><textarea placeholder="¿Qué aprende el emprendedor en este curso?"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="closeModal('modalCurso')">Cancelar</button><button class="btn solid" onclick="closeModal('modalCurso'); toast('Curso creado (simulado)')">Crear curso</button></div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Nuevo momento ===== -->
+<div class="modal-bg" id="modalMomento">
+  <div class="modal">
+    <div class="modal-head"><div><h3>Nuevo momento</h3><p>Artículo del blog de novedades.</p></div><button class="modal-close" onclick="closeModal('modalMomento')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Título</label><input type="text" placeholder="Título del artículo"></div>
+      <div class="grid2">
+        <div class="field"><label>Fecha de publicación</label><input type="date"></div>
+        <div class="field"><label>Hora</label><input type="text" placeholder="2:00 PM"></div>
+      </div>
+      <div class="field"><label>Resumen (aparece en la tarjeta)</label><textarea placeholder="Resumen corto..."></textarea></div>
+      <div class="field"><label>Cuerpo del artículo</label>
+        <div class="fake-editor">
+          <div class="toolbar"><button>B</button><button><i>I</i></button><button>🔗</button><button>🖼</button><button>▶</button><button>▤</button></div>
+          <textarea placeholder="Escribe el artículo completo..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="closeModal('modalMomento')">Guardar borrador</button><button class="btn solid" onclick="closeModal('modalMomento'); toast('Momento publicado (simulado)')">Publicar</button></div>
+  </div>
+</div>
+
+<div id="toast"><span class="dot"></span><span id="toastText">Listo</span></div>
+
+<script>
+(function(){
+  // ---------- DATA DE EJEMPLO (ficticia, no personas reales) ----------
+  const PARTICIPANTES = [
+    ['Camila Torres Puello','camila.torres@ejemplo.com','300 111 2233','1098765432','Mi Kokito S.A.S','Activo'],
+    ['Fundación Manglar Vivo','contacto@manglarvivo.org','301 222 3344','NIT 900123456','Sin asignar','Activo'],
+    ['Julián Andrés Pacheco','julian.pacheco@ejemplo.com','302 333 4455','1076543210','Forty Love','Activo'],
+    ['Mariana Beltrán Solís','mariana.beltran@ejemplo.com','303 444 5566','1054321098','Soy de Yuca','Activo'],
+    ['Esteban Cárdenas Mier','esteban.cardenas@ejemplo.com','304 555 6677','1032109876','Zoco Market','Pendiente'],
+    ['Valentina Osorio Reyes','valentina.osorio@ejemplo.com','305 666 7788','1021098765','One Fly','Activo'],
+    ['Ricardo Manjarrez Duarte','ricardo.manjarrez@ejemplo.com','306 777 8899','1109876543','Cattle ya','Activo'],
+    ['Sofía Linero Campo','sofia.linero@ejemplo.com','307 888 9900','1087654321','La Mecedora de Darwin','Activo'],
+    ['Andrés Felipe Vergara','andres.vergara@ejemplo.com','308 999 0011','1065432109','Petfly','Pendiente'],
+    ['Daniela Cure Almeida','daniela.cure@ejemplo.com','309 000 1122','1043210987','Mar Verde','Activo'],
+  ];
+  const UPS = [
+    ['Mi Kokito S.A.S','Bioproductos y servicios sostenibles'],
+    ['Forty Love','Ecoproductos industriales'],
+    ['Soy de Yuca','Bioproductos y servicios sostenibles'],
+    ['Zoco Market','Ecoproductos industriales'],
+    ['One Fly','Productos para la calidad ambiental'],
+    ['Cattle ya','Bioproductos y servicios sostenibles'],
+    ['La Mecedora de Darwin','Ecoproductos industriales'],
+    ['Manteca y Migas de Cerdo','Bioproductos y servicios sostenibles'],
+    ['Petfly','Productos para la calidad ambiental'],
+    ['Mar Verde','Productos para la calidad ambiental'],
+  ];
+  const MOMENTOS = [
+    ['De camino al Pitch Day de nuestros emprendedores 🚀','23/01/2026'],
+    ['10 Negocios Sostenibles listos para Escalar.','05/12/2025'],
+    ['Ruta de Formación - Bootcamps Innova Social 4.0','13/11/2025'],
+    ['Lanzamiento Innova Social 4.0','22/09/2025'],
+  ];
+  const SLIDERS = ['hero-emprendedores-01.jpg','hero-bootcamp-02.png','hero-ceremonia-03.png'];
+  const ETAPAS_DEFAULT = [
+    ['Lanzamiento y Convocatoria','22 sep – 22 oct'],
+    ['Preselección','23 – 31 oct'],
+    ['Bootcamps + Encuentros híbridos','10 – 27 nov'],
+    ['Presentación Pitch','28 – 29 nov'],
+    ['Ceremonia de ganadores','5 dic'],
+    ['Incubación – plan de inversión','6 dic – 15 jul'],
+  ];
+  const RESULTADOS_ACTUAL = [['Postulados',82],['Participantes',0],['Unidades productivas',8],['Municipios',1],['Barrios',1],['Formaciones',0],['Formadores',0],['Actividades',0]];
+  const RESULTADOS_HIST = [['Personas vinculadas',63],['Programas desarrollados',3],['Horas de formación',100],['Barrios atendidos',14],['Municipios del Atlántico',14],['Unidades productivas',25]];
+
+  function initials(name){ return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+
+  // ---------- NAV ----------
+  const links = document.querySelectorAll('.navlink[data-view]');
+  const titles = {
+    inicio:['Panel / Inicio','Bienvenido a Innova Social'],
+    participantes:['Panel / Participantes','Participantes'],
+    ups:['Panel / Unidades productivas','Unidades productivas'],
+    cursos:['Panel / Cursos','Gestión de cursos'],
+    resultados:['Panel / Contenido web / Resultados','Resultados de la Home'],
+    convocatoria:['Panel / Contenido web / Convocatoria','Etapas de la convocatoria'],
+    momentos:['Panel / Contenido web / Momentos','Gestión de momentos'],
+    sliders:['Panel / Contenido web / Sliders','Sliders del hero'],
+    analiticas:['Panel / Reportes','Analíticas web'],
+  };
+  links.forEach(l => l.addEventListener('click', () => {
+    links.forEach(x => x.classList.remove('active'));
+    l.classList.add('active');
+    const v = l.dataset.view;
+    document.querySelectorAll('.view').forEach(s => s.classList.remove('active'));
+    document.getElementById('view-'+v).classList.add('active');
+    document.getElementById('crumb').textContent = titles[v][0];
+    document.getElementById('pageTitle').textContent = titles[v][1];
+    document.getElementById('sidebar').classList.remove('open');
+  }));
+  document.getElementById('menuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+
+  // ---------- TOAST ----------
+  window.toast = function(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  };
+
+  // ---------- MODALS ----------
+  window.openModal = function(id){ document.getElementById(id).classList.add('open'); };
+  window.closeModal = function(id){ document.getElementById(id).classList.remove('open'); };
+  document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); }));
+
+  // ---------- RENDER: Inicio ----------
+  document.getElementById('tblInicioPostulaciones').innerHTML = PARTICIPANTES.slice(0,5).map(p => `
+    <tr><td><div class="cell-user"><span class="av">${initials(p[0])}</span><b>${p[0]}</b></div></td>
+    <td>${p[4]}</td><td>Barranquilla</td>
+    <td><span class="pill ${p[5]==='Activo'?'green':'grey'}">${p[5]}</span></td></tr>`).join('');
+
+  // ---------- RENDER: Participantes ----------
+  function renderParticipantes(filterText){
+    const q = (filterText||'').toLowerCase();
+    const rows = PARTICIPANTES.filter(p => !q || p.join(' ').toLowerCase().includes(q));
+    document.getElementById('tblParticipantes').innerHTML = rows.map(p => `
+      <tr><td><div class="cell-user"><span class="av">${initials(p[0])}</span><div><b>${p[0]}</b><span>${p[1]}</span></div></div></td>
+      <td class="mono">${p[2]}</td><td class="mono">${p[3]}</td><td>${p[4]}</td>
+      <td><span class="pill ${p[5]==='Activo'?'green':'grey'}">${p[5]}</span></td>
+      <td><button class="icon-btn" onclick="toast('Detalle de participante (simulado)')">↗</button></td></tr>`).join('');
+    document.getElementById('participantesShown').textContent = rows.length;
+    document.getElementById('participantesCount').textContent = rows.length + ' participantes';
+  }
+  window.filterParticipantes = () => renderParticipantes(document.getElementById('searchParticipantes').value);
+  renderParticipantes();
+  document.getElementById('navParticipantesCount').textContent = PARTICIPANTES.length;
+
+  // ---------- RENDER: UPs ----------
+  document.getElementById('tblUps').innerHTML = UPS.map(u => `
+    <tr><td><div class="cell-user"><span class="av">${initials(u[0])}</span><b>${u[0]}</b></div></td>
+    <td>${u[1]}</td><td class="mono">2026</td>
+    <td><span class="pill green">Publicado</span></td>
+    <td style="display:flex; gap:6px;"><button class="icon-btn" onclick="openModal('modalUp')">✎</button><button class="icon-btn" onclick="toast('Ver productos (simulado)')">📦</button></td></tr>`).join('');
+
+  // ---------- RENDER: Momentos ----------
+  document.getElementById('tblMomentos').innerHTML = MOMENTOS.map(m => `
+    <tr><td><b>${m[0]}</b></td><td class="mono">${m[1]}</td>
+    <td><span class="pill green">Publicado</span></td>
+    <td style="display:flex; gap:6px;"><button class="icon-btn" onclick="openModal('modalMomento')">✎</button><button class="icon-btn" onclick="toast('Momento despublicado (simulado)')">🗑</button></td></tr>`).join('');
+
+  // ---------- RENDER: Sliders ----------
+  document.getElementById('tblSliders').innerHTML = SLIDERS.map((s,i) => `
+    <tr><td class="mono">${s}</td><td>${i+1}</td>
+    <td style="display:flex; gap:6px;"><button class="icon-btn" onclick="toast('Reemplazar imagen (simulado)')">✎</button><button class="icon-btn" onclick="toast('Imagen eliminada (simulado)')">🗑</button></td></tr>`).join('');
+
+  // ---------- RENDER: Resultados ----------
+  function renderResultadoFields(containerId, data){
+    document.getElementById(containerId).innerHTML = data.map(([label,val]) => `
+      <div class="field"><label>${label}</label><input type="number" value="${val}"></div>`).join('');
+  }
+  renderResultadoFields('gridResultadosActual', RESULTADOS_ACTUAL);
+  renderResultadoFields('gridResultadosHistorico', RESULTADOS_HIST);
+
+  // ---------- RENDER: Etapas ----------
+  let etapas = ETAPAS_DEFAULT.slice();
+  function renderEtapas(){
+    document.getElementById('etapasList').innerHTML = etapas.map((e,i) => `
+      <div class="etapa-row">
+        <div class="num">${String(i+1).padStart(2,'0')}</div>
+        <input type="text" value="${e[0]}" oninput="etapas[${i}][0]=this.value">
+        <input type="text" value="${e[1]}" oninput="etapas[${i}][1]=this.value">
+        <button class="icon-btn" onclick="removeEtapa(${i})">🗑</button>
+      </div>`).join('');
+  }
+  window.etapas = etapas;
+  window.addEtapa = () => { etapas.push(['Nueva etapa','Fechas']); renderEtapas(); };
+  window.removeEtapa = (i) => { etapas.splice(i,1); renderEtapas(); };
+  renderEtapas();
+
+  // ---------- CHARTS (canvas simple) ----------
+  function drawBars(canvas, labels, values, color){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (w<=0 || h<=0) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(devicePixelRatio||1,2);
+    canvas.width = w*dpr; canvas.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    const max = Math.max(...values,1);
+    const padL = 28, padB = 22, gap = 14;
+    const bw = (w - padL - gap*values.length)/values.length;
+    ctx.strokeStyle = '#E2ECF1'; ctx.lineWidth = 1; ctx.font = '10.5px Poppins';
+    for (let g=0; g<=3; g++){
+      const y = h - padB - (g/3)*(h-padB-14);
+      ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w,y); ctx.stroke();
+      ctx.fillStyle = '#5D7383'; ctx.fillText(Math.round(max*g/3), 2, y+3);
+    }
+    values.forEach((v,i) => {
+      const x = padL + i*(bw+gap);
+      const bh = (v/max) * (h - padB - 14);
+      const y = h - padB - bh;
+      const grad = ctx.createLinearGradient(0,y,0,h-padB);
+      grad.addColorStop(0,color); grad.addColorStop(1,color+'55');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.roundRect(x,y,bw,bh,[6,6,0,0]); ctx.fill();
+      ctx.fillStyle = '#132330'; ctx.font = '700 11px Poppins'; ctx.textAlign='center';
+      ctx.fillText(v, x+bw/2, y-6);
+      ctx.fillStyle = '#5D7383'; ctx.font = '10px Poppins';
+      ctx.fillText(labels[i], x+bw/2, h-6);
+    });
+  }
+  function drawLine(canvas, labels, values, color){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (w<=0 || h<=0) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(devicePixelRatio||1,2);
+    canvas.width = w*dpr; canvas.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    const max = Math.max(...values,1), padL=26, padB=22, padT=16;
+    const stepX = (w-padL-10)/(values.length-1);
+    ctx.strokeStyle = '#E2ECF1';
+    for (let g=0; g<=3; g++){ const y = padT + (g/3)*(h-padB-padT); ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w,y); ctx.stroke(); }
+    ctx.beginPath();
+    values.forEach((v,i) => {
+      const x = padL + i*stepX, y = h - padB - (v/max)*(h-padB-padT);
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle = color; ctx.lineWidth = 2.4; ctx.lineJoin='round'; ctx.stroke();
+    values.forEach((v,i) => {
+      const x = padL + i*stepX, y = h - padB - (v/max)*(h-padB-padT);
+      ctx.beginPath(); ctx.arc(x,y,3.5,0,6.29); ctx.fillStyle = color; ctx.fill();
+      ctx.fillStyle = '#132330'; ctx.font='700 10.5px Poppins'; ctx.textAlign='center'; ctx.fillText(v,x,y-9);
+      ctx.fillStyle = '#5D7383'; ctx.font='10px Poppins'; ctx.fillText(labels[i],x,h-6);
+    });
+  }
+  function drawDonut(canvas, values, colors, labels, legendEl){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (w<=0 || h<=0) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(devicePixelRatio||1,2);
+    canvas.width = w*dpr; canvas.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    const total = values.reduce((a,b)=>a+b,0);
+    const cx=w/2, cy=h/2, r=Math.min(w,h)/2-6, rin=r*0.6;
+    let a0=-Math.PI/2;
+    values.forEach((v,i) => {
+      const a1 = a0 + (v/total)*6.2832;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,a0,a1); ctx.closePath(); ctx.fillStyle = colors[i]; ctx.fill();
+      a0 = a1;
+    });
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(cx,cy,rin,0,6.29); ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#132330'; ctx.font = '800 18px Poppins'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(total, cx, cy);
+    if (legendEl) legendEl.innerHTML = labels.map((l,i)=>`<span><i style="background:${colors[i]}"></i>${l} · ${values[i]}</span>`).join('');
+  }
+
+  function renderInicioChart(){
+    drawBars(document.getElementById('chartFormadores'), ['Semana 1','Semana 2','Semana 3','Semana 4'], [3,5,4,6], '#00AFE7');
+  }
+  function renderAnalyticsCharts(){
+    drawLine(document.getElementById('chartVisitasDia'), ['Lun','Mar','Mié','Jue','Vie','Sáb'], [22,28,19,31,26,14], '#00AFE7');
+    drawDonut(document.getElementById('chartDispositivo'), [63,29,8], ['#4EAF9D','#2F5B81','#F67E46'], ['Desktop','Android','iPhone'], document.getElementById('legendDispositivo'));
+    drawBars(document.getElementById('chartPais'), ['Colombia','México','España','Otros'], [268,19,14,11], '#0A7CA6');
+    drawBars(document.getElementById('chartPlataforma'), ['Windows','macOS','Linux','iOS'], [34,29,21,16], '#4EAF9D');
+  }
+  renderInicioChart();
+  window.addEventListener('resize', () => { renderInicioChart(); renderAnalyticsCharts(); });
+
+  const analiticasLink = document.querySelector('.navlink[data-view="analiticas"]');
+  if (analiticasLink) analiticasLink.addEventListener('click', () => requestAnimationFrame(renderAnalyticsCharts));
+})();
+</script>
+</body>
+</html>
