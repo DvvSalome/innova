@@ -11,40 +11,548 @@
   :root{
     --blue:#00AFE7; --blue-deep:#0A7CA6; --blue-dark:#06556F;
     --ink:#132330; --muted:#5D7383; --paper:#FFFFFF; --paper2:#F2F8FB; --line:#E2ECF1; --mint:#7FE3B4;
+    --shadow:0 2px 4px rgba(19,35,48,.05), 0 16px 34px -18px rgba(19,35,48,.3);
   }
   *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
   body{
-    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
-    background:radial-gradient(120% 120% at 50% -10%, var(--paper2), var(--paper) 60%);
-    color:var(--ink); font-family:"Poppins",-apple-system,"Segoe UI",sans-serif;
+    margin:0; background:var(--paper2); color:var(--ink);
+    font-family:"Poppins",-apple-system,"Segoe UI",sans-serif; line-height:1.55;
   }
-  .card{
-    max-width:460px; width:100%; background:#fff; border:1px solid var(--line); border-radius:22px;
-    padding:40px 34px; text-align:center; box-shadow:0 20px 50px -24px rgba(19,35,48,.28);
+  a{ color:inherit; }
+  .wrap{ max-width:840px; margin:0 auto; padding:0 22px; }
+
+  nav.top{ background:var(--paper); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:20; }
+  nav.top .row{ max-width:840px; margin:0 auto; padding:16px 22px; display:flex; align-items:center; justify-content:space-between; }
+  .brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:15.5px; text-decoration:none; color:var(--ink); }
+  .brand .mark{ width:28px; height:28px; border-radius:9px; background:linear-gradient(135deg,var(--blue),var(--mint)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px; }
+  .back{ font-size:13.5px; font-weight:600; color:var(--muted); display:flex; align-items:center; gap:6px; }
+  .back:hover{ color:var(--blue-deep); }
+
+  header.top-band{ padding:44px 0 8px; text-align:center; }
+  .eyebrow{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--blue-deep); }
+  header.top-band h1{ font-size:clamp(26px,4vw,36px); font-weight:800; margin:10px 0 8px; letter-spacing:-.02em; }
+  header.top-band p{ color:var(--muted); font-size:14.5px; max-width:52ch; margin:0 auto; }
+
+  form{ padding:30px 0 90px; }
+  .fset{ background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:26px 24px; margin-bottom:16px; box-shadow:var(--shadow); }
+  .fset legend, .fset .lg{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:15.5px; margin-bottom:18px; padding:0; }
+  .fset .lg .no{ width:26px; height:26px; border-radius:8px; background:var(--paper2); color:var(--blue-deep); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px 16px; }
+  @media (max-width:620px){ .grid2{ grid-template-columns:1fr; } }
+  .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .field:last-child{ margin-bottom:0; }
+  .field label{ font-size:13px; font-weight:600; color:var(--ink); }
+  .field .hint{ font-size:11.5px; color:var(--muted); font-weight:400; }
+  input[type=text], input[type=email], input[type=password], input[type=date], input[type=number], input[type=tel], input[type=url], select, textarea{
+    font-family:"Poppins",sans-serif; font-size:14px; padding:11px 13px; border-radius:10px;
+    border:1.5px solid var(--line); background:#fff; color:var(--ink); width:100%; transition:border-color .2s;
   }
-  .badge{
-    display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:700; letter-spacing:.14em;
-    text-transform:uppercase; color:var(--blue-deep); background:color-mix(in srgb, var(--blue) 12%, #fff);
-    padding:7px 14px; border-radius:100px; margin-bottom:18px;
+  input:focus, select:focus, textarea:focus{ outline:none; border-color:var(--blue); }
+  textarea{ resize:vertical; min-height:78px; font-family:inherit; }
+  .pwd-wrap{ position:relative; }
+  .pwd-wrap button{ position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:12px; font-weight:700; color:var(--blue-deep); }
+  .tel-wrap{ display:flex; gap:8px; }
+  .tel-wrap .prefix{ flex:0 0 58px; display:flex; align-items:center; justify-content:center; background:var(--paper2); border-radius:10px; font-weight:700; font-size:13.5px; color:var(--muted); }
+  .tel-wrap input{ flex:1; }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ position:relative; }
+  .chip input{ position:absolute; opacity:0; inset:0; cursor:pointer; margin:0; }
+  .chip span{
+    display:block; font-size:12.5px; font-weight:500; padding:8px 14px; border-radius:100px;
+    background:var(--paper2); border:1.5px solid var(--line); color:var(--muted); transition:all .18s;
   }
-  h1{ font-size:26px; font-weight:800; margin:0 0 12px; letter-spacing:-.02em; }
-  p{ color:var(--muted); font-size:14.5px; line-height:1.6; margin:0 0 26px; }
+  .chip input:checked + span{ background:color-mix(in srgb, var(--blue) 14%, #fff); border-color:var(--blue); color:var(--blue-deep); }
+  .chip input:focus-visible + span{ outline:2px solid var(--blue); outline-offset:1px; }
+  .counter{ font-size:11.5px; color:var(--muted); margin-top:8px; }
+  .counter.limit{ color:#DD494E; font-weight:600; }
+
+  .file{
+    border:1.5px dashed var(--line); border-radius:12px; padding:16px; display:flex; align-items:center; gap:12px;
+    background:var(--paper2); cursor:pointer; transition:border-color .2s;
+  }
+  .file:hover{ border-color:var(--blue); }
+  .file input{ display:none; }
+  .file .ic{ width:36px; height:36px; border-radius:10px; background:#fff; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--blue-deep); }
+  .file .tx b{ display:block; font-size:13px; font-weight:600; }
+  .file .tx span{ font-size:11.5px; color:var(--muted); }
+  .file.has-file{ border-style:solid; border-color:var(--mint); }
+  .file.has-file .tx span{ color:#1C8F57; font-weight:600; }
+
+  .toggle-row{ display:flex; gap:12px; align-items:flex-start; padding:14px 0; border-top:1px solid var(--line); }
+  .toggle-row:first-child{ border-top:none; }
+  .toggle-row input{ width:20px; height:20px; margin-top:2px; accent-color:var(--blue); flex-shrink:0; }
+  .toggle-row p{ margin:0; font-size:13px; color:var(--muted); line-height:1.5; }
+  .toggle-row a{ color:var(--blue-deep); font-weight:600; text-decoration:underline; }
+
+  .submit-bar{ position:sticky; bottom:0; background:linear-gradient(0deg, var(--paper2) 60%, transparent); padding:20px 0 0; }
   .btn{
-    display:inline-flex; align-items:center; gap:8px; padding:13px 24px; border-radius:10px;
-    font-weight:600; font-size:14px; text-decoration:none; background:var(--blue); color:#fff;
-    transition:transform .2s ease, box-shadow .2s ease;
+    display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:15px 26px; border-radius:12px;
+    font-weight:700; font-size:15px; border:none; cursor:pointer; width:100%;
+    background:var(--blue); color:#fff; transition:transform .2s, box-shadow .2s;
   }
   .btn:hover{ transform:translateY(-2px); box-shadow:0 14px 26px -14px rgba(0,131,175,.6); }
-  .fine{ margin-top:22px; font-size:12px; color:var(--muted); }
+  .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+  .err{ font-size:12px; color:#DD494E; font-weight:600; margin-top:4px; display:none; }
+  .field.invalid input, .field.invalid select{ border-color:#DD494E; }
+  .field.invalid .err{ display:block; }
+
+  #successCard{
+    display:none; text-align:center; padding:56px 24px; background:var(--paper); border-radius:20px;
+    border:1px solid var(--line); box-shadow:var(--shadow);
+  }
+  #successCard .check{
+    width:56px; height:56px; border-radius:50%; background:var(--mint); color:#07222E; font-size:26px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
+  }
+  #successCard h2{ font-size:22px; font-weight:800; margin-bottom:8px; }
+  #successCard p{ color:var(--muted); font-size:14px; max-width:44ch; margin:0 auto 22px; }
 </style>
 </head>
 <body>
-  <div class="card">
-    <span class="badge">Postulación · Edición 4.0</span>
-    <h1>El formulario propio va aquí</h1>
-    <p>Esta es la página de postulación del nuevo sitio. El formulario real (datos del emprendedor, del emprendimiento, categoría, ODS, documentos y autorización de datos) se conecta en la siguiente fase del proyecto.</p>
-    <a class="btn" href="index.html">← Volver a la home</a>
-    <div class="fine">Innova Social 4.0 — Triple A + Inngenios</div>
+
+<nav class="top">
+  <div class="row">
+    <a class="brand" href="index.html"><span class="mark">IS</span> Innova Social 4.0</a>
+    <a class="back" href="index.html">← Volver a la home</a>
   </div>
+</nav>
+
+<header class="top-band wrap">
+  <span class="eyebrow">Postulación · Edición 4.0</span>
+  <h1>Postúlate a Innova Social 4.0</h1>
+  <p>El registro de tu cuenta es a la vez tu postulación a la convocatoria. Completa los datos de tu perfil y de tu emprendimiento — toma unos 10 minutos.</p>
+</header>
+
+<div class="wrap">
+  <form id="postulacionForm" novalidate>
+
+    <fieldset class="fset">
+      <div class="lg"><span class="no">01</span> Tu cuenta</div>
+      <div class="grid2">
+        <div class="field">
+          <label for="nombre">Nombre completo *</label>
+          <input type="text" id="nombre" required>
+          <span class="err">Escribe tu nombre completo.</span>
+        </div>
+        <div class="field">
+          <label for="correo">Correo electrónico *</label>
+          <input type="email" id="correo" required>
+          <span class="err">Ingresa un correo válido.</span>
+        </div>
+        <div class="field">
+          <label for="password">Contraseña *</label>
+          <div class="pwd-wrap">
+            <input type="password" id="password" required minlength="6">
+            <button type="button" data-toggle-pwd>Mostrar</button>
+          </div>
+          <span class="err">Mínimo 6 caracteres.</span>
+        </div>
+        <div class="field">
+          <label for="cedula">Cédula *</label>
+          <input type="text" id="cedula" inputmode="numeric" required>
+          <span class="err">Ingresa tu número de cédula.</span>
+        </div>
+        <div class="field">
+          <label for="whatsapp">N° de WhatsApp *</label>
+          <div class="tel-wrap">
+            <span class="prefix">+57</span>
+            <input type="tel" id="whatsapp" required>
+          </div>
+          <span class="err">Ingresa tu número de WhatsApp.</span>
+        </div>
+        <div class="field">
+          <label for="genero">Género *</label>
+          <select id="genero" required>
+            <option value="">Selecciona...</option>
+            <option>Masculino</option><option>Femenino</option><option>Otro</option><option>Prefiero no decirlo</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="nacimiento">Fecha de nacimiento *</label>
+          <input type="date" id="nacimiento" required>
+          <span class="err">Ingresa tu fecha de nacimiento.</span>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fset">
+      <div class="lg"><span class="no">02</span> Tu perfil</div>
+      <div class="grid2">
+        <div class="field">
+          <label for="municipio">Domicilio donde opera el negocio *</label>
+          <select id="municipio" required>
+            <option value="">Selecciona un municipio...</option>
+            <option>Barranquilla</option><option>Soledad</option><option>Puerto Colombia</option><option>Galapa</option>
+            <option>Tubará</option><option>Usiacurí</option><option>Sabanalarga</option><option>Sabanagrande</option>
+            <option>Santo Tomás</option><option>Baranoa</option><option>Palmar de Varela</option><option>Juan de Acosta</option>
+            <option>Piojó</option><option>Polonuevo</option><option>Ponedera</option>
+          </select>
+          <span class="err">Selecciona tu municipio.</span>
+        </div>
+        <div class="field">
+          <label for="estrato">Estrato socioeconómico *</label>
+          <select id="estrato" required>
+            <option value="">Selecciona...</option>
+            <option>Estrato 1</option><option>Estrato 2</option><option>Estrato 3</option>
+            <option>Estrato 4</option><option>Estrato 5</option><option>Estrato 6</option>
+          </select>
+          <span class="err">Selecciona tu estrato.</span>
+        </div>
+        <div class="field">
+          <label for="educacion">Nivel de educación *</label>
+          <select id="educacion" required>
+            <option value="">Selecciona...</option>
+            <option>Primaria</option><option>Bachillerato</option><option>Técnico Profesional</option>
+            <option>Tecnólogo</option><option>Universitario</option><option>Posgrados</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="empleo">¿Tiene un empleo formal adicional? *</label>
+          <select id="empleo" required>
+            <option value="">Selecciona...</option><option>Sí</option><option>No</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fset">
+      <div class="lg"><span class="no">03</span> Tu emprendimiento</div>
+      <div class="grid2">
+        <div class="field" style="grid-column:1/-1;">
+          <label for="empnombre">Nombre del emprendimiento *</label>
+          <input type="text" id="empnombre" required>
+          <span class="err">Escribe el nombre de tu emprendimiento.</span>
+        </div>
+        <div class="field">
+          <label for="tipoemp">Tipo de emprendimiento *</label>
+          <select id="tipoemp" required>
+            <option value="">Selecciona...</option><option>Emprendimiento verde</option><option>Negocio verde</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="formalizacion">Tipo de formalización *</label>
+          <select id="formalizacion" required>
+            <option value="">Selecciona...</option>
+            <option>Persona jurídica</option><option>Persona natural</option><option>Ninguna de las dos</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="categoria">Categoría de negocio verde *</label>
+          <select id="categoria" required>
+            <option value="">Selecciona...</option>
+            <option value="bio">Bioproductos y servicios sostenibles</option>
+            <option value="eco">Ecoproductos industriales</option>
+            <option value="cal">Productos para la calidad ambiental</option>
+          </select>
+          <span class="err">Selecciona una categoría.</span>
+        </div>
+        <div class="field">
+          <label for="subcategoria">Sub categoría *</label>
+          <select id="subcategoria" required disabled>
+            <option value="">Elige primero una categoría</option>
+          </select>
+          <span class="err">Selecciona una sub categoría.</span>
+        </div>
+        <div class="field">
+          <label for="dedicacion">Dedicación de tiempo al emprendimiento *</label>
+          <select id="dedicacion" required>
+            <option value="">Selecciona...</option><option>Completo</option><option>Parcial</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="colaboradores">N° de colaboradores/empleados *</label>
+          <input type="number" id="colaboradores" min="0" value="1" required>
+          <span class="err">Ingresa un número.</span>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fset">
+      <div class="lg"><span class="no">04</span> Impacto y ODS</div>
+      <div class="field">
+        <label>Tu emprendimiento está aliado a un ODS <span class="hint">(elige 1 o más) *</span></label>
+        <div class="chips" id="odsChips">
+          <label class="chip"><input type="checkbox" name="ods" value="1"><span>1 · Fin de la pobreza</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="2"><span>2 · Hambre cero</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="3"><span>3 · Salud y bienestar</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="4"><span>4 · Educación de calidad</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="5"><span>5 · Igualdad de género</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="6"><span>6 · Agua limpia y saneamiento</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="7"><span>7 · Energía asequible y no contaminante</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="8"><span>8 · Trabajo decente y crecimiento económico</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="9"><span>9 · Industria, innovación e infraestructura</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="10"><span>10 · Reducción de las desigualdades</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="11"><span>11 · Ciudades y comunidades sostenibles</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="12"><span>12 · Producción y consumo responsables</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="13"><span>13 · Acción por el clima</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="14"><span>14 · Vida submarina</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="15"><span>15 · Vida de ecosistemas terrestres</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="16"><span>16 · Paz, justicia e instituciones sólidas</span></label>
+          <label class="chip"><input type="checkbox" name="ods" value="17"><span>17 · Alianzas para lograr los objetivos</span></label>
+        </div>
+        <span class="err" id="odsErr">Selecciona al menos un ODS.</span>
+      </div>
+
+      <div class="field">
+        <label for="producto">Describe el producto o servicio que ofrece tu emprendimiento *</label>
+        <textarea id="producto" required></textarea>
+        <span class="err">Cuéntanos qué ofreces.</span>
+      </div>
+      <div class="field">
+        <label for="problema">Describe el problema o necesidad que resuelve *</label>
+        <textarea id="problema" required></textarea>
+        <span class="err">Cuéntanos qué problema resuelves.</span>
+      </div>
+      <div class="field">
+        <label for="impacto">Describe el impacto que genera *</label>
+        <textarea id="impacto" required></textarea>
+        <span class="err">Cuéntanos tu impacto.</span>
+      </div>
+      <div class="field">
+        <label for="clientes">Describe tus clientes actuales / público objetivo *</label>
+        <textarea id="clientes" required></textarea>
+        <span class="err">Cuéntanos quiénes son tus clientes.</span>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="ventas">Promedio de ventas en los últimos 6 meses *</label>
+          <input type="text" id="ventas" placeholder="Ej: $1.500.000 / mes" required>
+          <span class="err">Ingresa un valor aproximado.</span>
+        </div>
+        <div class="field">
+          <label for="redes">Link de tus redes sociales *</label>
+          <input type="url" id="redes" placeholder="https://instagram.com/tu-negocio" required>
+          <span class="err">Ingresa la red con mayor interacción.</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="inversion">¿Por qué necesita y en qué invertiría el recurso otorgado? *</label>
+        <textarea id="inversion" required></textarea>
+        <span class="err">Cuéntanos en qué invertirías el capital.</span>
+      </div>
+    </fieldset>
+
+    <fieldset class="fset">
+      <div class="lg"><span class="no">05</span> Contexto adicional</div>
+      <div class="grid2">
+        <div class="field">
+          <label for="priorizada">¿Pertenece a alguna población priorizada? *</label>
+          <select id="priorizada" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="discapacidad">¿Tiene alguna discapacidad? *</label>
+          <select id="discapacidad" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="etapa">¿En qué etapa se encuentra tu emprendimiento? *</label>
+          <select id="etapa" required>
+            <option value="">Selecciona...</option>
+            <option>Ideación</option><option>Fortalecimiento — prototipo desarrollado y probado</option><option>Consolidación y expansión</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="financiacion">¿Has recibido financiación? *</label>
+          <select id="financiacion" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="vendiendo">¿Estás vendiendo actualmente? *</label>
+          <select id="vendiendo" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Qué es lo que más necesita tu emprendimiento? <span class="hint">(máximo 3) *</span></label>
+        <div class="chips" id="necesitaChips">
+          <label class="chip"><input type="checkbox" name="necesita" value="Capital de trabajo"><span>Capital de trabajo</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Adecuaciones"><span>Adecuaciones</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Honorarios para certificaciones"><span>Honorarios para certificaciones</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Tecnología"><span>Tecnología</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Equipos de cómputo"><span>Equipos de cómputo</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Formación en modelo de negocio"><span>Formación en modelo de negocio</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Estrategia comercial y marketing"><span>Estrategia comercial y marketing</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Asistencia técnica"><span>Asistencia técnica</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Aliados y conexiones"><span>Aliados y conexiones</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Desarrollo organizacional"><span>Desarrollo organizacional</span></label>
+          <label class="chip"><input type="checkbox" name="necesita" value="Medición de impacto"><span>Medición de impacto</span></label>
+        </div>
+        <div class="counter" id="necesitaCounter">0 / 3 seleccionadas</div>
+        <span class="err" id="necesitaErr">Elige entre 1 y 3 opciones.</span>
+      </div>
+    </fieldset>
+
+    <fieldset class="fset">
+      <div class="lg"><span class="no">06</span> Documentos habilitantes</div>
+      <div class="grid2">
+        <div class="field">
+          <label>Copia de documento de identidad *</label>
+          <label class="file" data-file-for="fCedula">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir cédula</b><span>PDF o imagen, máx. 10MB</span></span>
+            <input type="file" id="fCedula" accept=".pdf,.jpg,.jpeg,.png" required>
+          </label>
+          <span class="err">Adjunta tu documento de identidad.</span>
+        </div>
+        <div class="field">
+          <label>RUT *</label>
+          <label class="file" data-file-for="fRut">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir RUT</b><span>PDF o imagen, máx. 10MB</span></span>
+            <input type="file" id="fRut" accept=".pdf,.jpg,.jpeg,.png" required>
+          </label>
+          <span class="err">Adjunta tu RUT.</span>
+        </div>
+        <div class="field">
+          <label>Recibo de servicio Triple A *</label>
+          <label class="file" data-file-for="fRecibo">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir recibo</b><span>Para validar domicilio</span></span>
+            <input type="file" id="fRecibo" accept=".pdf,.jpg,.jpeg,.png" required>
+          </label>
+          <span class="err">Adjunta tu recibo de Triple A.</span>
+        </div>
+        <div class="field">
+          <label>Video del emprendimiento *</label>
+          <label class="file" data-file-for="fVideo">
+            <span class="ic">🎬</span>
+            <span class="tx"><b>Subir video</b><span>Máximo 90 segundos</span></span>
+            <input type="file" id="fVideo" accept="video/*" required>
+          </label>
+          <span class="err">Adjunta tu video (máx. 90s).</span>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fset">
+      <div class="toggle-row">
+        <input type="checkbox" id="terminos" required>
+        <p>Acepto los <a href="#" onclick="return false;">términos y condiciones</a> de la convocatoria Innova Social 4.0. *</p>
+      </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="datos" required>
+        <p>Autorizo el tratamiento de mis datos personales conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013, según la <a href="#" onclick="return false;">Política de Tratamiento de Datos Personales</a>. *</p>
+      </div>
+    </fieldset>
+
+    <div class="submit-bar">
+      <button type="submit" class="btn" id="submitBtn"><span>Postular →</span></button>
+    </div>
+  </form>
+
+  <div id="successCard">
+    <div class="check">✓</div>
+    <h2>¡Postulación registrada!</h2>
+    <p>Esto es una demo — todavía no hay backend conectado. En la siguiente fase, esta pantalla confirma por correo y WhatsApp, y guarda tu postulación en el panel del equipo.</p>
+    <a class="btn" href="index.html" style="display:inline-flex; width:auto; padding-left:22px; padding-right:22px;">Volver a la home</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SUBCATS = {
+    bio: ['Agrosistemas sostenibles','Agroindustria sostenible','Biocomercio','Biotecnología','Turismo sostenible'],
+    eco: ['Aprovechamiento y valoración de residuos','Moda sostenible','Construcción e infraestructura sostenible','Empaques y envases ecológicos'],
+    cal: ['Tecnologías verdes','Negocios asociados con preservación y restauración de ecosistemas','Transporte sostenible'],
+  };
+  const categoria = document.getElementById('categoria');
+  const subcategoria = document.getElementById('subcategoria');
+  categoria.addEventListener('change', () => {
+    const opts = SUBCATS[categoria.value];
+    if (!opts) {
+      subcategoria.innerHTML = '<option value="">Elige primero una categoría</option>';
+      subcategoria.disabled = true;
+      return;
+    }
+    subcategoria.disabled = false;
+    subcategoria.innerHTML = '<option value="">Selecciona...</option>' + opts.map(o => `<option>${o}</option>`).join('');
+  });
+
+  document.querySelectorAll('[data-toggle-pwd]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.previousElementSibling;
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? 'Mostrar' : 'Ocultar';
+    });
+  });
+
+  const necesitaBoxes = [...document.querySelectorAll('input[name="necesita"]')];
+  const necesitaCounter = document.getElementById('necesitaCounter');
+  function updateNecesita(){
+    const checked = necesitaBoxes.filter(b => b.checked);
+    necesitaCounter.textContent = `${checked.length} / 3 seleccionadas`;
+    necesitaCounter.classList.toggle('limit', checked.length >= 3);
+    necesitaBoxes.forEach(b => { if (!b.checked) b.disabled = checked.length >= 3; });
+  }
+  necesitaBoxes.forEach(b => b.addEventListener('change', updateNecesita));
+
+  document.querySelectorAll('.file input[type=file]').forEach(input => {
+    input.addEventListener('change', () => {
+      const label = input.closest('.file');
+      const nameEl = label.querySelector('.tx span');
+      if (input.files[0]) {
+        label.classList.add('has-file');
+        nameEl.textContent = input.files[0].name;
+      } else {
+        label.classList.remove('has-file');
+      }
+    });
+  });
+
+  const form = document.getElementById('postulacionForm');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let firstInvalid = null;
+
+    document.querySelectorAll('.field').forEach(f => f.classList.remove('invalid'));
+    document.getElementById('odsErr').style.display = 'none';
+    document.getElementById('necesitaErr').style.display = 'none';
+
+    document.querySelectorAll('.field').forEach(field => {
+      const input = field.querySelector('input,select,textarea');
+      if (!input || !input.required) return;
+      if (!input.value || (input.type === 'checkbox' && !input.checked)) {
+        field.classList.add('invalid');
+        if (!firstInvalid) firstInvalid = field;
+      }
+    });
+
+    const odsChecked = document.querySelectorAll('input[name="ods"]:checked').length;
+    if (odsChecked === 0) {
+      document.getElementById('odsErr').style.display = 'block';
+      if (!firstInvalid) firstInvalid = document.getElementById('odsChips');
+    }
+    const necesitaChecked = document.querySelectorAll('input[name="necesita"]:checked').length;
+    if (necesitaChecked === 0 || necesitaChecked > 3) {
+      document.getElementById('necesitaErr').style.display = 'block';
+      if (!firstInvalid) firstInvalid = document.getElementById('necesitaChips');
+    }
+    if (!document.getElementById('terminos').checked || !document.getElementById('datos').checked) {
+      if (!firstInvalid) firstInvalid = document.getElementById('terminos');
+    }
+
+    if (firstInvalid) {
+      firstInvalid.scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
+
+    form.style.display = 'none';
+    document.getElementById('successCard').style.display = 'block';
+    document.getElementById('successCard').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+})();
+</script>
 </body>
 </html>
