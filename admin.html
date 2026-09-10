@@ -6,19 +6,19 @@
 <title>Panel — Innova Social 5.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --blue:#00AFE7; --blue-deep:#0A7CA6; --blue-dark:#06556F; --blue-soft:#E4F6FC;
-    --ink:#132330; --muted:#5D7383; --paper:#FFFFFF; --paper2:#F5F9FB; --line:#E2ECF1;
-    --mint:#7FE3B4; --mint-deep:#1C8F57;
+    --blue:#62ABE2; --blue-deep:#2279BA; --blue-dark:#154B73; --blue-soft:#EBF4FB;
+    --ink:#132330; --muted:#4F697A; --paper:#FFFFFF; --paper2:#F5F9FB; --line:#E2ECF1;
+    --mint:#82CA76; --mint-deep:#448F37;
     --c1:#4EAF9D; --c2:#2F5B81; --c3:#7B236E; --c4:#A8BF3F; --c5:#F67E46; --c6:#DD494E; --c7:#D24D48;
-    --warn:#F67E46; --danger:#DD494E; --ok:#1C8F57;
+    --warn:#F67E46; --danger:#DD494E; --ok:#448F37;
     --shadow:0 12px 28px -16px rgba(19,35,48,.22);
     --r-sm:8px; --r-md:12px; --radius:12px;
   }
   *{ box-sizing:border-box; }
-  body{ margin:0; background:var(--paper2); color:var(--ink); font-family:"Poppins",-apple-system,"Segoe UI",sans-serif; }
+  body{ margin:0; background:var(--paper2); color:var(--ink); font-family:"Nunito",-apple-system,"Segoe UI",sans-serif; }
   a{ color:inherit; text-decoration:none; }
   button{ font-family:inherit; }
   .mono{ font-family:"IBM Plex Mono",ui-monospace,monospace; }
@@ -122,7 +122,7 @@
   .field label{ font-size:12.5px; font-weight:600; }
   .field .hint{ font-weight:400; color:var(--muted); }
   input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],input[type=url],select,textarea{
-    font-family:"Poppins",sans-serif; font-size:13.5px; padding:10px 12px; border-radius:var(--r-sm); border:1px solid var(--line); background:#fff; color:var(--ink); width:100%;
+    font-family:"Nunito",sans-serif; font-size:13.5px; padding:10px 12px; border-radius:var(--r-sm); border:1px solid var(--line); background:#fff; color:var(--ink); width:100%;
   }
   input:focus, select:focus, textarea:focus{ outline:none; border-color:var(--blue); }
   textarea{ resize:vertical; min-height:70px; font-family:inherit; }
@@ -642,11 +642,11 @@
     const max = Math.max(...values,1);
     const padL = 28, padB = 22, gap = 14;
     const bw = (w - padL - gap*values.length)/values.length;
-    ctx.strokeStyle = '#E2ECF1'; ctx.lineWidth = 1; ctx.font = '10.5px Poppins';
+    ctx.strokeStyle = '#E2ECF1'; ctx.lineWidth = 1; ctx.font = '10.5px Nunito';
     for (let g=0; g<=3; g++){
       const y = h - padB - (g/3)*(h-padB-14);
       ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w,y); ctx.stroke();
-      ctx.fillStyle = '#5D7383'; ctx.fillText(Math.round(max*g/3), 2, y+3);
+      ctx.fillStyle = '#4F697A'; ctx.fillText(Math.round(max*g/3), 2, y+3);
     }
     values.forEach((v,i) => {
       const x = padL + i*(bw+gap);
@@ -656,9 +656,9 @@
       grad.addColorStop(0,color); grad.addColorStop(1,color+'55');
       ctx.fillStyle = grad;
       ctx.beginPath(); ctx.roundRect(x,y,bw,bh,[6,6,0,0]); ctx.fill();
-      ctx.fillStyle = '#132330'; ctx.font = '700 11px Poppins'; ctx.textAlign='center';
+      ctx.fillStyle = '#132330'; ctx.font = '700 11px Nunito'; ctx.textAlign='center';
       ctx.fillText(v, x+bw/2, y-6);
-      ctx.fillStyle = '#5D7383'; ctx.font = '10px Poppins';
+      ctx.fillStyle = '#4F697A'; ctx.font = '10px Nunito';
       ctx.fillText(labels[i], x+bw/2, h-6);
     });
   }
@@ -682,8 +682,8 @@
     values.forEach((v,i) => {
       const x = padL + i*stepX, y = h - padB - (v/max)*(h-padB-padT);
       ctx.beginPath(); ctx.arc(x,y,3.5,0,6.29); ctx.fillStyle = color; ctx.fill();
-      ctx.fillStyle = '#132330'; ctx.font='700 10.5px Poppins'; ctx.textAlign='center'; ctx.fillText(v,x,y-9);
-      ctx.fillStyle = '#5D7383'; ctx.font='10px Poppins'; ctx.fillText(labels[i],x,h-6);
+      ctx.fillStyle = '#132330'; ctx.font='700 10.5px Nunito'; ctx.textAlign='center'; ctx.fillText(v,x,y-9);
+      ctx.fillStyle = '#4F697A'; ctx.font='10px Nunito'; ctx.fillText(labels[i],x,h-6);
     });
   }
   function drawDonut(canvas, values, colors, labels, legendEl){
@@ -704,18 +704,18 @@
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath(); ctx.arc(cx,cy,rin,0,6.29); ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = '#132330'; ctx.font = '800 18px Poppins'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = '#132330'; ctx.font = '800 18px Nunito'; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(total, cx, cy);
     if (legendEl) legendEl.innerHTML = labels.map((l,i)=>`<span><i style="background:${colors[i]}"></i>${l} · ${values[i]}</span>`).join('');
   }
 
   function renderInicioChart(){
-    drawBars(document.getElementById('chartFormadores'), ['Semana 1','Semana 2','Semana 3','Semana 4'], [3,5,4,6], '#00AFE7');
+    drawBars(document.getElementById('chartFormadores'), ['Semana 1','Semana 2','Semana 3','Semana 4'], [3,5,4,6], '#62ABE2');
   }
   function renderAnalyticsCharts(){
-    drawLine(document.getElementById('chartVisitasDia'), ['Lun','Mar','Mié','Jue','Vie','Sáb'], [22,28,19,31,26,14], '#00AFE7');
+    drawLine(document.getElementById('chartVisitasDia'), ['Lun','Mar','Mié','Jue','Vie','Sáb'], [22,28,19,31,26,14], '#62ABE2');
     drawDonut(document.getElementById('chartDispositivo'), [63,29,8], ['#4EAF9D','#2F5B81','#F67E46'], ['Desktop','Android','iPhone'], document.getElementById('legendDispositivo'));
-    drawBars(document.getElementById('chartPais'), ['Colombia','México','España','Otros'], [268,19,14,11], '#0A7CA6');
+    drawBars(document.getElementById('chartPais'), ['Colombia','México','España','Otros'], [268,19,14,11], '#2279BA');
     drawBars(document.getElementById('chartPlataforma'), ['Windows','macOS','Linux','iOS'], [34,29,21,16], '#4EAF9D');
   }
   renderInicioChart();
