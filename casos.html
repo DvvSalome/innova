@@ -501,7 +501,7 @@
   .proof-card.in{ opacity:1; transform:none; }
   .proof-card:hover{ box-shadow:var(--shadow); border-color:transparent; }
   .pc-photo{ position:relative; height:184px; overflow:hidden; }
-  .pc-photo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.2,.8,.2,1); }
+  .pc-photo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 18%; transition:transform .7s cubic-bezier(.2,.8,.2,1); }
   .proof-card:hover .pc-photo img{ transform:scale(1.07); }
   .pc-photo::after{ content:""; position:absolute; inset:auto 0 0 0; height:60%; background:linear-gradient(0deg, rgba(7,34,46,.75), rgba(7,34,46,0)); }
   .pc-badge{
@@ -609,6 +609,11 @@
     .bnf-body{ padding:20px 18px 28px; }
   }
   .proof-hint{ font-size:12px; color:var(--muted); margin-top:6px; }
+  .proof-foot{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:6px; }
+  .proof-foot .proof-hint{ margin-top:0; }
+  .proof-download{ display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--blue-deep); border:1px solid var(--line); border-radius:100px; padding:8px 16px; white-space:nowrap; transition:border-color .2s, background .2s; }
+  .proof-download:hover{ border-color:var(--blue); background:var(--paper2); }
+  .proof-download::after{ content:"↓"; }
 </style>
 <style>
   .sub-page-head{ padding:64px 0 40px; background:var(--paper2); border-bottom:1px solid var(--line); }
@@ -671,12 +676,6 @@
         <div class="pc-body">
           <span class="pc-cat">Agroindustria sostenible</span>
           <h3>Zoco Market</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:72%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Multiplicó x4 su producción de hummus y abrió su propio centro de producción.</p>
         </div>
       </article>
@@ -690,12 +689,6 @@
         <div class="pc-body">
           <span class="pc-cat">Divulgación científica ambiental</span>
           <h3>La Mecedora de Darwin</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:44%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Hoy le vende a la Cruz Roja Colombiana y llegó a la TV nacional.</p>
         </div>
       </article>
@@ -709,12 +702,6 @@
         <div class="pc-body">
           <span class="pc-cat">Agroindustria sostenible</span>
           <h3>Soy de Yuca</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:51%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Dona sus residuos a otros dos beneficiarios: economía circular real.</p>
         </div>
       </article>
@@ -728,12 +715,6 @@
         <div class="pc-body">
           <span class="pc-cat">Agroindustria sostenible</span>
           <h3>Manteca de Cerdo</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:73%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Obtuvo registro INVIMA y multiplicó x5 su capacidad productiva.</p>
         </div>
       </article>
@@ -747,12 +728,6 @@
         <div class="pc-body">
           <span class="pc-cat">Biotecnología ambiental</span>
           <h3>OneFly</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:6%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Ya procesa 1,6 toneladas de residuos de la Fundación Triple A al mes.</p>
         </div>
       </article>
@@ -766,12 +741,6 @@
         <div class="pc-body">
           <span class="pc-cat">Agroindustria sostenible</span>
           <h3>Mi Kokito</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:41%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Sus snacks de coco ya están en tres colegios de Barranquilla.</p>
         </div>
       </article>
@@ -785,12 +754,6 @@
         <div class="pc-body">
           <span class="pc-cat">Biotecnología</span>
           <h3>Petfly</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:71%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Se expandió a Santa Marta y Cartagena con proteína de insecto.</p>
         </div>
       </article>
@@ -804,12 +767,6 @@
         <div class="pc-body">
           <span class="pc-cat">Aprovechamiento de residuos</span>
           <h3>Mar Verde</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:87%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Formalizó una red de recicladores en Puerto Colombia.</p>
         </div>
       </article>
@@ -823,12 +780,6 @@
         <div class="pc-body">
           <span class="pc-cat">Moda sostenible</span>
           <h3>Catleya</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:55%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Genera empleo directo para cinco mujeres cabeza de hogar.</p>
         </div>
       </article>
@@ -842,18 +793,15 @@
         <div class="pc-body">
           <span class="pc-cat">Moda sostenible</span>
           <h3>Forty Love</h3>
-          <div class="pc-growth">
-            <div class="pc-bars">
-              <div class="pc-bar" style="--h:87%;"><i></i><small>Antes</small></div>
-              <div class="pc-bar after" style="--h:100%;"><i></i><small>Hoy</small></div>
-            </div>
-          </div>
           <p class="pc-hito">Cada prenda reutiliza siete botellas plásticas recicladas.</p>
         </div>
       </article>
 
     </div>
-    <p class="proof-hint">Desliza para ver los 10 casos · Fuente: Informe Final de Ejecución, Innova Social 4.0</p>
+    <div class="proof-foot">
+      <p class="proof-hint">Desliza para ver los 10 casos · Fuente: Informe Final de Ejecución, Innova Social 4.0</p>
+      <a href="#" class="proof-download"><span>Descargar informe completo</span></a>
+    </div>
   </div>
 </section>
 
