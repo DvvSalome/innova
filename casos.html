@@ -812,6 +812,57 @@
   </div>
 </section>
 
+<script>
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 10), { passive:true });
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { threshold:.15 });
+  document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+  /* Beneficiarios: stats + casos reales */
+  (function(){
+    const fmtMoney = n => '$' + Math.round(n).toLocaleString('es-CO');
+    function countUpFmt(el, target, dur, fmt){
+      if (reduce) { el.textContent = fmt(target); return; }
+      const start = performance.now();
+      (function tick(now){
+        const p = Math.min(1, (now - start)/dur);
+        el.textContent = fmt((1 - Math.pow(1-p,3)) * target);
+        if (p < 1) requestAnimationFrame(tick);
+      })(performance.now());
+    }
+    const pDone = new WeakSet();
+    const pstatIO = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting || pDone.has(e.target)) return;
+      pDone.add(e.target);
+      [...e.target.querySelectorAll('.pstat')].forEach((s,i) => setTimeout(() => {
+        s.classList.add('in');
+        const b = s.querySelector('b');
+        const target = parseFloat(b.dataset.count);
+        const suffix = b.dataset.suffix || '';
+        const money = b.dataset.format === 'money';
+        countUpFmt(b, target, 1050, v => money ? fmtMoney(v) : Math.round(v) + suffix);
+      }, reduce ? 0 : i*90));
+      pstatIO.unobserve(e.target);
+    }), { threshold:.3 });
+    const pstats = document.querySelector('.proof-stats');
+    if (pstats) pstatIO.observe(pstats);
+
+    const cardIO = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      [...document.querySelectorAll('.proof-card')].forEach((c,i) =>
+        setTimeout(() => c.classList.add('in'), reduce ? 0 : i*90));
+      cardIO.disconnect();
+    }), { threshold:.15 });
+    const rail = document.getElementById('proofRail');
+    if (rail) cardIO.observe(rail);
+  })();
+})();
+</script>
+
 <footer>
   <div class="watermark">INNOVA SOCIAL 4.0</div>
   <div class="wrap">
