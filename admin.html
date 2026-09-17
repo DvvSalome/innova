@@ -186,7 +186,6 @@
     <div class="navgroup">
       <div class="glabel">Programa</div>
       <div class="navlink" data-view="participantes"><span class="ic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Participantes <span class="badge" id="navParticipantesCount">24</span></div>
-      <div class="navlink" data-view="ups"><span class="ic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M11.5 3H5a2 2 0 0 0-2 2v6.5a1 1 0 0 0 .3.7l9 9a1 1 0 0 0 1.4 0l7.5-7.5a1 1 0 0 0 0-1.4l-9-9a1 1 0 0 0-.7-.3Z"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/></svg></span> Unidades productivas</div>
       <div class="navlink" data-view="cursos"><span class="ic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="m2 9 10-5 10 5-10 5Z"/><path d="M6 11v5c0 1.1 2.7 2 6 2s6-.9 6-2v-5"/><path d="M22 9v6"/></svg></span> Cursos</div>
     </div>
 
@@ -285,22 +284,6 @@
             </table>
           </div>
           <div class="table-foot"><span>Mostrando <span id="participantesShown">24</span> de 24</span><div style="display:flex; gap:8px;"><button class="btn ghost sm" disabled>‹ Atrás</button><button class="btn ghost sm" disabled>Siguiente ›</button></div></div>
-        </div>
-      </section>
-
-      <!-- ============ UNIDADES PRODUCTIVAS ============ -->
-      <section class="view" id="view-ups">
-        <div class="view-head">
-          <div><h2>Unidades productivas</h2><p>Ficha pública de cada emprendimiento ganador — misión, visión, contacto y productos.</p></div>
-          <button class="btn solid" onclick="openModal('modalUp')">+ Nueva UP</button>
-        </div>
-        <div class="card">
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Unidad productiva</th><th>Categoría</th><th>Vigencia</th><th>Estado</th><th></th></tr></thead>
-              <tbody id="tblUps"></tbody>
-            </table>
-          </div>
         </div>
       </section>
 
@@ -418,34 +401,6 @@
 </div>
 
 <!-- ===== MODAL: Nueva UP ===== -->
-<div class="modal-bg" id="modalUp">
-  <div class="modal">
-    <div class="modal-head">
-      <div><h3>Nueva unidad productiva</h3><p>Ficha pública del emprendimiento ganador.</p></div>
-      <button class="modal-close" onclick="closeModal('modalUp')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <div class="grid2">
-        <div class="field"><label>Título principal</label><input type="text" placeholder="Nombre del emprendimiento"></div>
-        <div class="field"><label>Categoría</label><select><option>Bioproductos y servicios sostenibles</option><option>Ecoproductos industriales</option><option>Productos para la calidad ambiental</option></select></div>
-        <div class="field"><label>Vigencia</label><select><option>2026</option><option>2025</option></select></div>
-        <div class="field"><label>N° de WhatsApp</label><input type="tel" placeholder="300 000 0000"></div>
-      </div>
-      <div class="field"><label>Misión</label><textarea placeholder="¿Cuál es el propósito del emprendimiento?"></textarea></div>
-      <div class="field"><label>Visión</label><textarea placeholder="¿Hacia dónde quiere llegar?"></textarea></div>
-      <div class="field"><label>Descripción general</label>
-        <div class="fake-editor">
-          <div class="toolbar"><button>B</button><button><i>I</i></button><button><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="m10 14 4-4"/><path d="M8.5 12.5 6.4 14.6a3 3 0 1 0 4.2 4.2l2.1-2.1"/><path d="M15.5 11.5l2.1-2.1a3 3 0 1 0-4.2-4.2l-2.1 2.1"/></svg></button><button><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.4"/><path d="m21 15.5-5-5L5 21"/></svg></button><button><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12"/><path d="M3.5 6.5h.01M3.5 12h.01M3.5 17.5h.01" stroke-width="2.4"/></svg></button></div>
-          <textarea placeholder="Cuenta la historia del emprendimiento..."></textarea>
-        </div>
-      </div>
-      <div class="field"><label>Dirección principal</label><input type="text" placeholder="Dirección de operación"></div>
-    </div>
-    <div class="modal-foot"><button class="btn ghost" onclick="closeModal('modalUp')">Cancelar</button><button class="btn solid" onclick="closeModal('modalUp'); toast('Unidad productiva guardada (simulado)')">Guardar</button></div>
-  </div>
-</div>
-
-<!-- ===== MODAL: Nuevo curso ===== -->
 <div class="modal-bg" id="modalCurso">
   <div class="modal">
     <div class="modal-head"><div><h3>Nuevo curso</h3><p>Se mostrará dentro de la ruta de formación.</p></div><button class="modal-close" onclick="closeModal('modalCurso')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
@@ -496,18 +451,6 @@
     ['Andrés Felipe Vergara','andres.vergara@ejemplo.com','308 999 0011','1065432109','Petfly','Pendiente'],
     ['Daniela Cure Almeida','daniela.cure@ejemplo.com','309 000 1122','1043210987','Mar Verde','Activo'],
   ];
-  const UPS = [
-    ['Mi Kokito S.A.S','Bioproductos y servicios sostenibles'],
-    ['Forty Love','Ecoproductos industriales'],
-    ['Soy de Yuca','Bioproductos y servicios sostenibles'],
-    ['Zoco Market','Ecoproductos industriales'],
-    ['One Fly','Productos para la calidad ambiental'],
-    ['Cattle ya','Bioproductos y servicios sostenibles'],
-    ['La Mecedora de Darwin','Ecoproductos industriales'],
-    ['Manteca y Migas de Cerdo','Bioproductos y servicios sostenibles'],
-    ['Petfly','Productos para la calidad ambiental'],
-    ['Mar Verde','Productos para la calidad ambiental'],
-  ];
   const MOMENTOS = [
     ['De camino al Pitch Day de nuestros emprendedores 🚀','23/01/2026'],
     ['10 Negocios Sostenibles listos para Escalar.','05/12/2025'],
@@ -533,7 +476,6 @@
   const titles = {
     inicio:['Panel / Inicio','Bienvenido a Innova Social'],
     participantes:['Panel / Participantes','Participantes'],
-    ups:['Panel / Unidades productivas','Unidades productivas'],
     cursos:['Panel / Cursos','Gestión de cursos'],
     resultados:['Panel / Contenido web / Resultados','Resultados de la Home'],
     convocatoria:['Panel / Contenido web / Convocatoria','Etapas de la convocatoria'],
@@ -588,13 +530,6 @@
   window.filterParticipantes = () => renderParticipantes(document.getElementById('searchParticipantes').value);
   renderParticipantes();
   document.getElementById('navParticipantesCount').textContent = PARTICIPANTES.length;
-
-  // ---------- RENDER: UPs ----------
-  document.getElementById('tblUps').innerHTML = UPS.map(u => `
-    <tr><td><div class="cell-user"><span class="av">${initials(u[0])}</span><b>${u[0]}</b></div></td>
-    <td>${u[1]}</td><td class="mono">2026</td>
-    <td><span class="pill green">Publicado</span></td>
-    <td style="display:flex; gap:6px;"><button class="icon-btn" onclick="openModal('modalUp')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M12.5 19.5H21"/><path d="M17 4a1.9 1.9 0 0 1 2.7 2.7L8.5 18l-4 1 1-4Z"/></svg></button><button class="icon-btn" onclick="toast('Ver productos (simulado)')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></button></td></tr>`).join('');
 
   // ---------- RENDER: Momentos ----------
   document.getElementById('tblMomentos').innerHTML = MOMENTOS.map(m => `
