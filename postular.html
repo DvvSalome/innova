@@ -150,9 +150,21 @@
           <span class="err">Mínimo 6 caracteres.</span>
         </div>
         <div class="field">
-          <label for="cedula">Cédula *</label>
-          <input type="text" id="cedula" inputmode="numeric" required>
-          <span class="err">Ingresa tu número de cédula.</span>
+          <label for="tipo_documento">Tipo de documento *</label>
+          <select id="tipo_documento" required>
+            <option value="">Selecciona...</option>
+            <option value="CC">Cédula de ciudadanía</option>
+            <option value="CE">Cédula de extranjería</option>
+            <option value="PA">Pasaporte</option>
+            <option value="PPT">Permiso por Protección Temporal (PPT)</option>
+            <option value="otro">Otro</option>
+          </select>
+          <span class="err">Selecciona el tipo de documento.</span>
+        </div>
+        <div class="field">
+          <label for="cedula">Número de documento *</label>
+          <input type="text" id="cedula" required autocomplete="off" disabled placeholder="Elige primero el tipo de documento">
+          <span class="err">Ingresa el número de tu documento.</span>
         </div>
         <div class="field">
           <label for="whatsapp">N° de WhatsApp *</label>
@@ -278,7 +290,7 @@
     <fieldset class="fset">
       <div class="lg"><span class="no">04</span> Impacto y ODS</div>
       <div class="field">
-        <label>Tu emprendimiento está aliado a un ODS <span class="hint">(elige 1 o más) *</span></label>
+        <label>Tu emprendimiento está aliado a un ODS <span class="hint">(elige máximo 3) *</span></label>
         <div class="chips" id="odsChips">
           <label class="chip"><input type="checkbox" name="ods" value="1"><span>1 · Fin de la pobreza</span></label>
           <label class="chip"><input type="checkbox" name="ods" value="2"><span>2 · Hambre cero</span></label>
@@ -298,7 +310,7 @@
           <label class="chip"><input type="checkbox" name="ods" value="16"><span>16 · Paz, justicia e instituciones sólidas</span></label>
           <label class="chip"><input type="checkbox" name="ods" value="17"><span>17 · Alianzas para lograr los objetivos</span></label>
         </div>
-        <span class="err" id="odsErr">Selecciona al menos un ODS.</span>
+        <span class="err" id="odsErr">Selecciona entre 1 y 3 ODS.</span>
       </div>
 
       <div class="field">
@@ -328,10 +340,15 @@
           <span class="err">Ingresa un valor aproximado.</span>
         </div>
         <div class="field">
-          <label for="redes">Link de tus redes sociales *</label>
-          <input type="url" id="redes" placeholder="https://instagram.com/tu-negocio" required>
-          <span class="err">Ingresa la red con mayor interacción.</span>
+          <label for="rango_ganancias">Rango de ganancias *</label>
+          <input type="text" id="rango_ganancias" placeholder="Ej: $500.000 - $1.000.000" required>
+          <span class="err">Ingresa el rango de ganancias.</span>
         </div>
+      </div>
+      <div class="field">
+        <label for="redes">Link de tus redes sociales *</label>
+        <input type="url" id="redes" placeholder="https://instagram.com/tu-negocio" required>
+        <span class="err">Ingresa la red con mayor interacción.</span>
       </div>
       <div class="field">
         <label for="inversion">¿Por qué necesita y en qué invertiría el recurso otorgado? *</label>
@@ -345,12 +362,37 @@
       <div class="grid2">
         <div class="field">
           <label for="priorizada">¿Pertenece a alguna población priorizada? *</label>
-          <select id="priorizada" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
+          <select id="priorizada" required>
+            <option value="">Selecciona...</option>
+            <option>Comunidades indígenas</option>
+            <option>Comunidades negras</option>
+            <option>Migrantes y refugiados</option>
+            <option>Raizales</option>
+            <option>Reincorporados</option>
+            <option>Víctimas del conflicto armado interno</option>
+            <option>Zonas apartadas y de difícil acceso</option>
+            <option>No</option>
+            <option>Otro</option>
+          </select>
           <span class="err">Selecciona una opción.</span>
         </div>
         <div class="field">
           <label for="discapacidad">¿Tiene alguna discapacidad? *</label>
-          <select id="discapacidad" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
+          <select id="discapacidad" required><option value="">Selecciona...</option><option>No</option><option value="tiene_discapacidad">Sí</option></select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field" id="tipoDiscapacidadField" style="display: none;">
+          <label for="tipo_discapacidad">Indique cuál *</label>
+          <select id="tipo_discapacidad">
+            <option value="">Selecciona...</option>
+            <option>Discapacidad física</option>
+            <option>Discapacidad visual</option>
+            <option>Discapacidad auditiva</option>
+            <option>Discapacidad intelectual</option>
+            <option>Discapacidad psicosocial (mental)</option>
+            <option>Discapacidad múltiple</option>
+            <option>Sordoceguera</option>
+          </select>
           <span class="err">Selecciona una opción.</span>
         </div>
         <div class="field">
@@ -400,7 +442,7 @@
           <label>Copia de documento de identidad *</label>
           <label class="file" data-file-for="fCedula">
             <span class="ic">📄</span>
-            <span class="tx"><b>Subir cédula</b><span>PDF o imagen, máx. 10MB</span></span>
+            <span class="tx"><b id="fCedulaLabel">Subir documento</b><span>PDF o imagen, máx. 10MB</span></span>
             <input type="file" id="fCedula" accept=".pdf,.jpg,.jpeg,.png" required>
           </label>
           <span class="err">Adjunta tu documento de identidad.</span>
@@ -423,15 +465,12 @@
           </label>
           <span class="err">Adjunta tu recibo de Triple A.</span>
         </div>
-        <div class="field">
-          <label>Video del emprendimiento *</label>
-          <label class="file" data-file-for="fVideo">
-            <span class="ic">🎬</span>
-            <span class="tx"><b>Subir video</b><span>Máximo 90 segundos</span></span>
-            <input type="file" id="fVideo" accept="video/*" required>
-          </label>
-          <span class="err">Adjunta tu video (máx. 90s).</span>
-        </div>
+      </div>
+      <div class="field">
+        <label for="videoEnlace">Enlace del video del emprendimiento *</label>
+        <input type="url" id="videoEnlace" placeholder="https://youtube.com/watch?v=..." required>
+        <span class="hint">Máximo 90 segundos</span>
+        <span class="err">Ingresa un enlace de video válido.</span>
       </div>
     </fieldset>
 
@@ -479,6 +518,21 @@
     subcategoria.innerHTML = '<option value="">Selecciona...</option>' + opts.map(o => `<option>${o}</option>`).join('');
   });
 
+  const discapacidadSelect = document.getElementById('discapacidad');
+  const tipoDiscapacidadField = document.getElementById('tipoDiscapacidadField');
+  const tipoDiscapacidadInput = document.getElementById('tipo_discapacidad');
+
+  discapacidadSelect.addEventListener('change', () => {
+    if (discapacidadSelect.value === 'tiene_discapacidad') {
+      tipoDiscapacidadField.style.display = 'block';
+      tipoDiscapacidadInput.required = true;
+    } else {
+      tipoDiscapacidadField.style.display = 'none';
+      tipoDiscapacidadInput.required = false;
+      tipoDiscapacidadInput.value = '';
+    }
+  });
+
   document.querySelectorAll('[data-toggle-pwd]').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = btn.previousElementSibling;
@@ -486,6 +540,34 @@
       input.type = showing ? 'password' : 'text';
       btn.textContent = showing ? 'Mostrar' : 'Ocultar';
     });
+  });
+
+  const tipoDocumento = document.getElementById('tipo_documento');
+  const numeroDocumento = document.getElementById('cedula');
+  const fCedulaLabel = document.getElementById('fCedulaLabel');
+  const DOC_LABELS = {
+    CC: 'Cédula de ciudadanía',
+    CE: 'Cédula de extranjería',
+    PA: 'Pasaporte',
+    PPT: 'PPT',
+    otro: 'Documento',
+  };
+  tipoDocumento.addEventListener('change', () => {
+    const tipo = tipoDocumento.value;
+    const label = DOC_LABELS[tipo];
+    if (!tipo) {
+      numeroDocumento.disabled = true;
+      numeroDocumento.value = '';
+      numeroDocumento.placeholder = 'Elige primero el tipo de documento';
+      numeroDocumento.inputMode = 'text';
+      if (fCedulaLabel) fCedulaLabel.textContent = 'Subir documento';
+      return;
+    }
+    numeroDocumento.disabled = false;
+    numeroDocumento.placeholder = 'Número de ' + label.toLowerCase();
+    numeroDocumento.inputMode = (tipo === 'PA' || tipo === 'otro') ? 'text' : 'numeric';
+    if (fCedulaLabel) fCedulaLabel.textContent = 'Subir ' + label.toLowerCase();
+    numeroDocumento.focus();
   });
 
   const necesitaBoxes = [...document.querySelectorAll('input[name="necesita"]')];
@@ -507,6 +589,16 @@
         nameEl.textContent = input.files[0].name;
       } else {
         label.classList.remove('has-file');
+        if (input.id === 'fCedula') {
+          const tipo = tipoDocumento.value;
+          nameEl.textContent = tipo && DOC_LABELS[tipo]
+            ? 'Subir ' + DOC_LABELS[tipo].toLowerCase()
+            : 'Subir documento';
+        } else if (input.id === 'fRut') {
+          nameEl.textContent = 'Subir RUT';
+        } else {
+          nameEl.textContent = 'Subir recibo';
+        }
       }
     });
   });
@@ -530,7 +622,7 @@
     });
 
     const odsChecked = document.querySelectorAll('input[name="ods"]:checked').length;
-    if (odsChecked === 0) {
+    if (odsChecked === 0 || odsChecked > 3) {
       document.getElementById('odsErr').style.display = 'block';
       if (!firstInvalid) firstInvalid = document.getElementById('odsChips');
     }
