@@ -334,9 +334,9 @@
       <!-- ============ PARTICIPANTES ============ -->
       <section class="view" id="view-participantes">
         <div class="view-head">
-          <div><h2>Participantes</h2><p>Personas registradas en la convocatoria — datos de ejemplo, sin conexión a base de datos aún.</p></div>
+          <div><h2>Participantes</h2><p>Personas registradas en la convocatoria desde el formulario público.</p></div>
           <div style="display:flex; gap:10px;">
-            <button class="btn ghost" onclick="toast('Exportación simulada — sin backend todavía')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3v11"/><path d="m8 10 4 4 4-4"/><path d="M5 19h14"/></svg> Exportar</button>
+            <button class="btn ghost" onclick="window.exportParticipantes()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3v11"/><path d="m8 10 4 4 4-4"/><path d="M5 19h14"/></svg> Exportar</button>
           </div>
         </div>
         <div class="card">
@@ -373,7 +373,7 @@
       <section class="view" id="view-resultados">
         <div class="view-head">
           <div><h2>Resultados de la Home</h2><p><span class="pill blue" style="margin-right:6px;">Nuevo</span>Edita los contadores que se muestran en la sección "Resultados" del sitio público — antes quedaban fijos en el código.</p></div>
-          <button class="btn solid" onclick="toast('Cambios guardados (simulado)')">Guardar cambios</button>
+          <button class="btn solid" onclick="window.saveResultados()">Guardar cambios</button>
         </div>
         <div class="card" style="padding:22px; margin-bottom:16px;">
           <h4 style="margin:0 0 14px; font-size:14px; font-weight:700;">Edición actual — en curso</h4>
@@ -395,7 +395,7 @@
           <div id="etapasList"></div>
         </div>
         <div style="margin-top:16px; text-align:right;">
-          <button class="btn solid" onclick="toast('Etapas guardadas (simulado)')">Guardar etapas</button>
+          <button class="btn solid" onclick="window.saveEtapas()">Guardar etapas</button>
         </div>
       </section>
 
@@ -419,7 +419,7 @@
       <section class="view" id="view-sliders">
         <div class="view-head">
           <div><h2>Sliders del hero</h2><p>Fotos del carrusel principal de la Home.</p></div>
-          <button class="btn solid" onclick="toast('Selector de archivo (simulado)')">+ Nueva imagen</button>
+          <button class="btn solid" onclick="window.sliderNueva()">+ Nueva imagen</button>
         </div>
         <div class="card">
           <div class="table-wrap">
@@ -831,6 +831,10 @@
     }
     loadCursos();
     loadMomentos();
+    loadParticipantes();
+    loadResultados();
+    loadEtapas();
+    loadSliders();
   }
 
   function showLogin(msg){
@@ -1449,6 +1453,170 @@
     toast('Momento eliminado'); loadMomentos();
   };
   document.querySelector('.navlink[data-view="momentos"]').addEventListener('click', () => { if (currentProfile) loadMomentos(); });
+
+  // ---------- helpers ----------
+  function ini(n){ n=(n||'').toString().trim(); if(!n) return '?'; return n.split(/\s+/).slice(0,2).map(function(w){return w[0];}).join('').toUpperCase(); }
+
+  // ---------- PARTICIPANTES (postulaciones) ----------
+  async function loadParticipantes(){
+    var tb=document.getElementById('tblParticipantes'); if(!tb) return;
+    var res=await sb.from('postulaciones').select('*').order('created_at',{ascending:false});
+    if(res.error){ tb.innerHTML='<tr><td colspan="6">Error: '+esc(res.error.message)+'</td></tr>'; return; }
+    window.__participantes=res.data||[];
+    document.getElementById('navParticipantesCount').textContent=window.__participantes.length;
+    renderParticipantesRows(document.getElementById('searchParticipantes').value||'');
+  }
+  function renderParticipantesRows(q){
+    q=(q||'').toLowerCase();
+    var all=window.__participantes||[];
+    var list=all.filter(function(p){ if(!q) return true; return ((p.nombre_completo||'')+' '+(p.correo||'')+' '+(p.whatsapp||'')+' '+(p.cedula||'')+' '+(p.nombre_emprendimiento||'')).toLowerCase().indexOf(q)>=0; });
+    var tb=document.getElementById('tblParticipantes');
+    if(!list.length){ tb.innerHTML='<tr><td colspan="6" style="color:var(--muted)">'+(all.length?'Sin resultados para la búsqueda.':'Aún no hay postulaciones registradas.')+'</td></tr>'; }
+    else {
+      tb.innerHTML=list.map(function(p){
+        var est=p.estado||'postulado';
+        var green=(est==='participante'||est==='aceptado');
+        return '<tr><td><div class="cell-user"><span class="av">'+esc(ini(p.nombre_completo))+'</span><div><b>'+esc(p.nombre_completo||'')+'</b><span>'+esc(p.correo||'')+'</span></div></div></td>'
+          +'<td class="mono">'+esc(p.whatsapp||'')+'</td><td class="mono">'+esc(p.cedula||'')+'</td><td>'+esc(p.nombre_emprendimiento||'—')+'</td>'
+          +'<td><span class="pill '+(green?'green':'grey')+'">'+esc(est)+'</span></td>'
+          +'<td><button class="btn ghost" style="padding:5px 12px;font-size:12px" onclick="window.verParticipante(\''+p.id+'\')">Ver</button></td></tr>';
+      }).join('');
+    }
+    document.getElementById('participantesShown').textContent=list.length;
+    document.getElementById('participantesCount').textContent=list.length+' participantes';
+    var foot=document.querySelector('#view-participantes .table-foot > span'); if(foot) foot.textContent='Mostrando '+list.length+' de '+all.length;
+  }
+  window.filterParticipantes=function(){ renderParticipantesRows(document.getElementById('searchParticipantes').value); };
+  window.exportParticipantes=function(){
+    var rows=window.__participantes||[]; if(!rows.length){ toast('No hay postulaciones para exportar'); return; }
+    var cols=Object.keys(rows[0]);
+    var csv=[cols.join(',')].concat(rows.map(function(r){ return cols.map(function(c){ var v=r[c]; if(v==null)v=''; if(Array.isArray(v))v=v.join('|'); v=String(v).replace(/"/g,'""'); return '"'+v+'"'; }).join(','); })).join('\n');
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download='postulaciones.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    toast('CSV exportado ('+rows.length+' filas)');
+  };
+  window.verParticipante=function(id){
+    var p=(window.__participantes||[]).find(function(x){return x.id===id;}); if(!p) return;
+    var F=[['Nombre completo',p.nombre_completo],['Correo',p.correo],['WhatsApp',p.whatsapp],['Documento',((p.tipo_documento||'')+' '+(p.cedula||'')).trim()],['Género',p.genero],['Nacimiento',p.fecha_nacimiento],['Domicilio',p.domicilio],['Municipio',p.municipio],['Estrato',p.estrato],['Educación',p.nivel_educacion],['Emprendimiento',p.nombre_emprendimiento],['Tipo',p.tipo_emprendimiento],['Formalización',p.tipo_formalizacion],['Categoría verde',p.categoria_negocio_verde],['Subcategoría',p.subcategoria],['Dedicación',p.dedicacion_tiempo],['Colaboradores',p.num_colaboradores],['Etapa',p.etapa_emprendimiento],['Ventas 6m',p.promedio_ventas_6_meses],['Producto',p.descripcion_producto],['Problema',p.descripcion_problema],['Impacto',p.descripcion_impacto],['Clientes',p.descripcion_clientes],['Redes',p.redes_sociales],['ODS',(p.ods||[]).join(', ')],['Necesidades',(p.necesidades||[]).join(', ')]];
+    var body=F.map(function(f){ var v=(f[1]==null||f[1]==='')?'—':f[1]; return '<div class="field" style="margin:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)">'+esc(f[0])+'</label><div style="font-size:14px;font-weight:600">'+esc(String(v))+'</div></div>'; }).join('');
+    var est=p.estado||'postulado';
+    var opts=['postulado','preseleccionado','participante','aceptado','rechazado'].map(function(o){return '<option value="'+o+'"'+(o===est?' selected':'')+'>'+o+'</option>';}).join('');
+    var old=document.getElementById('modalParticipante'); if(old) old.remove();
+    var bg=document.createElement('div'); bg.className='modal-bg open'; bg.id='modalParticipante';
+    bg.innerHTML='<div class="modal"><div class="modal-head"><div><h3>'+esc(p.nombre_completo||'Postulación')+'</h3><p>'+esc(p.nombre_emprendimiento||'')+' · '+esc(p.municipio||'')+'</p></div><button class="modal-close" onclick="document.getElementById(\'modalParticipante\').remove()">✕</button></div>'
+      +'<div class="modal-body"><div class="grid2" style="gap:14px 22px">'+body+'</div>'
+      +'<div class="field" style="margin-top:18px"><label>Estado de la postulación</label><select id="partEstado">'+opts+'</select></div>'
+      +'<div class="save-status" id="partStatus"></div></div>'
+      +'<div class="modal-foot"><button class="btn ghost" onclick="document.getElementById(\'modalParticipante\').remove()">Cerrar</button><button class="btn solid" onclick="window.savePartEstado(\''+p.id+'\')">Guardar estado</button></div></div>';
+    bg.addEventListener('click',function(e){ if(e.target===bg) bg.remove(); });
+    document.body.appendChild(bg);
+  };
+  window.savePartEstado=async function(id){
+    var st=document.getElementById('partStatus'); var val=document.getElementById('partEstado').value;
+    st.textContent='Guardando…';
+    var res=await sb.from('postulaciones').update({estado:val}).eq('id',id);
+    if(res.error){ st.textContent='Error: '+res.error.message; return; }
+    toast('Estado actualizado'); var m=document.getElementById('modalParticipante'); if(m) m.remove(); loadParticipantes();
+  };
+
+  // ---------- RESULTADOS (resultados_programa) ----------
+  async function loadResultados(){
+    var res=await sb.from('resultados_programa').select('*').order('grupo').order('orden');
+    if(res.error){ return; }
+    window.__resultados=res.data||[];
+    renderResGrid('gridResultadosActual','actual');
+    renderResGrid('gridResultadosHistorico','historico');
+  }
+  function renderResGrid(cid,grupo){
+    var el=document.getElementById(cid); if(!el) return;
+    el.innerHTML=(window.__resultados||[]).filter(function(r){return r.grupo===grupo;}).map(function(r){
+      return '<div class="field"><label>'+esc(r.etiqueta)+'</label><input type="number" data-res-id="'+r.id+'" value="'+r.valor+'"></div>';
+    }).join('');
+  }
+  window.saveResultados=async function(){
+    var inputs=document.querySelectorAll('[data-res-id]');
+    if(!inputs.length){ toast('Nada para guardar'); return; }
+    toast('Guardando…');
+    for(var i=0;i<inputs.length;i++){
+      var id=inputs[i].getAttribute('data-res-id'); var valor=Number(inputs[i].value)||0;
+      var res=await sb.from('resultados_programa').update({valor:valor}).eq('id',id);
+      if(res.error){ toast('Error: '+res.error.message); return; }
+    }
+    toast('Resultados guardados'); loadResultados();
+  };
+
+  // ---------- ETAPAS (etapas_convocatoria) ----------
+  async function loadEtapas(){
+    var res=await sb.from('etapas_convocatoria').select('*').order('orden');
+    if(res.error){ return; }
+    window.__etapas=(res.data||[]).map(function(e){ return {id:e.id,nombre:e.nombre,fechas_texto:e.fechas_texto}; });
+    renderEtapasReal();
+  }
+  function renderEtapasReal(){
+    var el=document.getElementById('etapasList'); if(!el) return;
+    el.innerHTML=(window.__etapas||[]).map(function(e,i){
+      return '<div class="etapa-row"><div class="num">'+String(i+1).padStart(2,'0')+'</div>'
+        +'<input type="text" value="'+esc(e.nombre)+'" oninput="window.__etapas['+i+'].nombre=this.value">'
+        +'<input type="text" value="'+esc(e.fechas_texto)+'" oninput="window.__etapas['+i+'].fechas_texto=this.value">'
+        +'<button class="btn ghost" style="padding:5px 12px;font-size:12px" onclick="window.removeEtapa('+i+')">Quitar</button></div>';
+    }).join('');
+  }
+  window.addEtapa=function(){ window.__etapas=window.__etapas||[]; window.__etapas.push({id:null,nombre:'Nueva etapa',fechas_texto:'Fechas'}); renderEtapasReal(); };
+  window.removeEtapa=function(i){ if(!window.__etapas) return; window.__etapas.splice(i,1); renderEtapasReal(); };
+  window.saveEtapas=async function(){
+    var list=window.__etapas||[]; toast('Guardando…');
+    var ex=await sb.from('etapas_convocatoria').select('id'); if(ex.error){ toast('Error: '+ex.error.message); return; }
+    var keep=list.filter(function(e){return e.id;}).map(function(e){return e.id;});
+    var del=(ex.data||[]).filter(function(e){return keep.indexOf(e.id)<0;}).map(function(e){return e.id;});
+    if(del.length){ var d=await sb.from('etapas_convocatoria').delete().in('id',del); if(d.error){ toast('Error: '+d.error.message); return; } }
+    for(var i=0;i<list.length;i++){
+      var e=list[i]; var row={nombre:e.nombre,fechas_texto:e.fechas_texto,orden:i+1};
+      var r = e.id ? await sb.from('etapas_convocatoria').update(row).eq('id',e.id) : await sb.from('etapas_convocatoria').insert(row);
+      if(r.error){ toast('Error: '+r.error.message); return; }
+    }
+    toast('Etapas guardadas'); loadEtapas();
+  };
+
+  // ---------- SLIDERS (hero_sliders) ----------
+  async function loadSliders(){
+    var res=await sb.from('hero_sliders').select('*').order('orden');
+    if(res.error){ return; }
+    window.__sliders=res.data||[];
+    var tb=document.getElementById('tblSliders'); if(!tb) return;
+    if(!window.__sliders.length){ tb.innerHTML='<tr><td colspan="3" style="color:var(--muted)">Aún no hay imágenes en el slider.</td></tr>'; return; }
+    tb.innerHTML=window.__sliders.map(function(s){
+      var name=(s.imagen_url||'').split('/').pop();
+      return '<tr><td><div style="display:flex;align-items:center;gap:10px"><img src="'+esc(s.imagen_url)+'" style="width:66px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--line)"><span class="mono" style="font-size:11px;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(name)+'</span>'+(s.activo?'':' <span class="pill grey">Oculto</span>')+'</div></td>'
+        +'<td>'+s.orden+'</td>'
+        +'<td style="display:flex;gap:6px"><button class="btn ghost" style="padding:5px 12px;font-size:12px" onclick="window.sliderToggle(\''+s.id+'\','+(s.activo?'true':'false')+')">'+(s.activo?'Ocultar':'Mostrar')+'</button>'
+        +'<button class="btn ghost" style="padding:5px 12px;font-size:12px" onclick="window.sliderDelete(\''+s.id+'\')">Eliminar</button></td></tr>';
+    }).join('');
+  }
+  window.sliderToggle=async function(id,cur){ var res=await sb.from('hero_sliders').update({activo:!cur}).eq('id',id); if(res.error){ toast('Error: '+res.error.message); return; } loadSliders(); };
+  window.sliderDelete=async function(id){ if(!confirm('¿Eliminar esta imagen del slider?')) return; var res=await sb.from('hero_sliders').delete().eq('id',id); if(res.error){ toast('Error: '+res.error.message); return; } toast('Imagen eliminada'); loadSliders(); };
+  window.sliderNueva=function(){
+    var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+    inp.onchange=async function(){
+      var f=inp.files&&inp.files[0]; if(!f) return; toast('Subiendo imagen…');
+      try{
+        var path='sliders/'+Date.now()+'-'+f.name.replace(/[^\w.\-]+/g,'_');
+        var up=await sb.storage.from('cursos').upload(path,f,{upsert:false,contentType:f.type});
+        if(up.error) throw up.error;
+        var url=sb.storage.from('cursos').getPublicUrl(path).data.publicUrl;
+        var orden=((window.__sliders||[]).reduce(function(m,s){return Math.max(m,s.orden);},0))+1;
+        var ins=await sb.from('hero_sliders').insert({imagen_url:url,alt_text:f.name,orden:orden,activo:true});
+        if(ins.error) throw ins.error;
+        toast('Imagen agregada'); loadSliders();
+      }catch(e){ toast('Error: '+(e.message||e)); }
+    };
+    inp.click();
+  };
+
+  // recarga al cambiar de vista
+  document.querySelector('.navlink[data-view="participantes"]').addEventListener('click', function(){ if(currentProfile) loadParticipantes(); });
+  document.querySelector('.navlink[data-view="resultados"]').addEventListener('click', function(){ if(currentProfile) loadResultados(); });
+  document.querySelector('.navlink[data-view="convocatoria"]').addEventListener('click', function(){ if(currentProfile) loadEtapas(); });
+  document.querySelector('.navlink[data-view="sliders"]').addEventListener('click', function(){ if(currentProfile) loadSliders(); });
 
   requireStaff();
 })();
