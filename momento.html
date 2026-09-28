@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Categorías de negocio — Innova Social 4.0</title>
+<title>Momentos — Innova Social 4.0</title>
 <link rel="stylesheet" href="site-enhance.css">
-<meta name="description" content="Las tres categorías de negocios verdes que acepta la convocatoria Innova Social 4.0.">
+<meta name="description" content="Momentos de Innova Social 4.0: historias, eventos y logros del ecosistema de emprendimiento verde del Atlántico.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -437,13 +437,22 @@
     transform:translateX(-110%); animation:shine 5.5s 1.5s ease-in-out infinite;
   }
   @keyframes shine{ 0%{transform:translateX(-110%);} 22%,100%{transform:translateX(110%);} }
-  .cta-band h2{ position:relative; z-index:1; color:#fff; font-size:clamp(23px,2.9vw,32px); font-weight:800; max-width:24ch; }
+  .cta-band h2{ position:relative; z-index:1; color:#fff; font-size:clamp(23px,2.9vw,32px); font-weight:800; }
+  .cta-band > div{ flex:1 1 420px; min-width:0; }
   .cta-band p{ position:relative; z-index:1; margin:7px 0 0; font-size:14px; color:rgba(255,255,255,.85); }
   .cta-band .btn.solid{ position:relative; z-index:1; background:#fff; color:var(--blue-dark); }
   .cta-band .btn.solid::before{ background:var(--night); }
   .cta-band .btn.solid:hover{ color:#fff; }
 
   .more-links{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding-top:26px; border-top:1px solid var(--line); }
+  .anexos-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  @media (max-width:640px){ .anexos-grid{ grid-template-columns:1fr; } }
+  .anexo-card{ display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--paper); border:1px solid var(--line); border-radius:14px; transition:border-color .25s, box-shadow .25s, transform .25s; }
+  .anexo-card:hover{ border-color:var(--blue); box-shadow:var(--shadow-sm); transform:translateY(-2px); }
+  .anexo-icon{ flex-shrink:0; width:40px; height:40px; border-radius:10px; background:color-mix(in srgb, var(--blue) 12%, transparent); display:grid; place-items:center; color:var(--blue-deep); }
+  .anexo-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .anexo-info b{ font-size:13.5px; font-weight:700; color:var(--ink); }
+  .anexo-info small{ font-size:11.5px; color:var(--muted); font-weight:600; }
   .more-label{ font-size:12.5px; font-weight:600; color:var(--muted); margin-right:6px; }
   .more-link{ display:inline-flex; align-items:center; gap:7px; padding:10px 16px; border:1px solid var(--line); border-radius:11px; font-size:13.5px; font-weight:600; color:var(--ink); transition:border-color .25s, color .25s; }
   .more-link:hover{ border-color:var(--blue); color:var(--blue-deep); }
@@ -527,6 +536,9 @@
 
   /* ===== NOSOTROS ===== */
   .nos-grid{ display:grid; grid-template-columns:1.3fr .7fr; gap:48px; align-items:center; }
+  .programa-de{ text-align:center; padding:40px 0 10px; }
+  .programa-de-logos{ display:flex; align-items:center; justify-content:center; gap:40px; flex-wrap:wrap; margin-top:18px; }
+  .programa-de-logos img{ max-width:170px; max-height:60px; width:auto; height:auto; display:block; }
   .nos-copy p{ font-size:14.5px; line-height:1.7; color:var(--muted); margin:0 0 14px; }
   .nos-copy p:last-child{ margin-bottom:0; }
   .nos-copy strong{ color:var(--ink); }
@@ -615,13 +627,144 @@
   .proof-hint{ font-size:12px; color:var(--muted); margin-top:6px; }
 </style>
 <style>
-  .sub-page-head{ padding:64px 0 40px; background:var(--paper2); border-bottom:1px solid var(--line); }
-  .sub-page-head h1{ font-size:clamp(28px,4vw,44px); font-weight:800; margin:12px 0 0; color:var(--ink); letter-spacing:-.02em; }
-  .sub-page-head p{ font-size:15px; color:var(--muted); max-width:60ch; margin:12px 0 0; line-height:1.6; }
+  .nos-page-head{ padding:64px 0 40px; background:var(--paper2); border-bottom:1px solid var(--line); }
+  .nos-page-head h1{ font-size:clamp(28px,4vw,44px); font-weight:800; margin:12px 0 0; color:var(--ink); letter-spacing:-.01em; max-width:20ch; }
   .back-link{ display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--muted); }
   .back-link:hover{ color:var(--blue-deep); }
-  .sub-page-body{ padding:56px 0 70px; }
+  .nos-page-body{ padding:56px 0 70px; }
+  .nos-intro{ font-size:16px; line-height:1.7; color:var(--muted); max-width:62ch; margin:0 0 40px; }
+  .cat-overview{ position:relative; }
+  .cat-hotspot{
+    position:absolute; top:40%; bottom:2%; background:transparent; border:none; padding:0; margin:0;
+    cursor:pointer; -webkit-tap-highlight-color:transparent; border-radius:16px; transition:background-color .2s;
+  }
+  .cat-hotspot:hover, .cat-hotspot:focus-visible{ background:rgba(56,150,131,.08); }
+  .cat-hotspot:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+  .cat-detail{ display:none; }
+  .cat-detail.active{ display:block; animation:catFadeIn .35s ease; }
+  @keyframes catFadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+  .etype-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px 20px; margin:0 0 26px; }
+  .etype-head{ display:flex; align-items:center; justify-content:center; gap:10px; padding:16px 20px; border-radius:100px; color:#fff; font-weight:800; font-size:14.5px; text-align:center; }
+  .etype-head svg{ width:20px; height:20px; flex-shrink:0; }
+  .etype-head.teal{ background:linear-gradient(135deg,#1B8F82,#2BB5A6); }
+  .etype-head.green{ background:linear-gradient(135deg,#8DBF2E,#A9CF38); }
+  .etype-body{ margin-top:14px; border:1.5px solid; border-radius:18px; padding:22px 20px; font-size:13.5px; line-height:1.65; color:var(--ink); text-align:center; background:var(--paper); }
+  .etype-body.teal{ border-color:#2BB5A6; }
+  .etype-body.green{ border-color:#A9CF38; }
+  @media (max-width:640px){ .etype-grid{ grid-template-columns:1fr; } }
 </style>
+
+<style id="momento-css">
+  .mom-hero{
+    position:relative; isolation:isolate; overflow:hidden;
+    color:#fff; padding:132px 0 58px;
+    background:
+      linear-gradient(140deg, rgba(7,34,46,.86), rgba(21,75,115,.78)),
+      var(--hero-img, linear-gradient(140deg,#154B73,#07222E));
+    background-size:cover; background-position:center;
+  }
+  .mom-hero::after{
+    content:""; position:absolute; inset:0; z-index:-1;
+    background:radial-gradient(1100px 420px at 80% -10%, rgba(130,202,118,.32), transparent 60%);
+  }
+  .mom-hero .back-link{
+    display:inline-flex; align-items:center; gap:8px; color:#dff0ff;
+    font-weight:700; font-size:15px; opacity:.92; transition:opacity .2s;
+  }
+  .mom-hero .back-link:hover{ opacity:1; }
+  .mom-hero .eyebrow{
+    display:inline-block; margin:22px 0 12px; padding:6px 14px;
+    background:rgba(130,202,118,.22); border:1px solid rgba(130,202,118,.5);
+    border-radius:999px; color:#c9f0c0; font-weight:800; font-size:13px;
+    letter-spacing:.08em; text-transform:uppercase;
+  }
+  .mom-hero h1{
+    font-size:clamp(30px,4.6vw,54px); line-height:1.08; max-width:18ch; color:#fff;
+  }
+  .mom-meta{
+    display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:20px;
+    font-size:15px; color:#cfe6f5; font-weight:600;
+  }
+  .mom-meta span{ display:inline-flex; align-items:center; gap:8px; }
+  .mom-meta span+span::before{
+    content:"•"; margin-right:14px; opacity:.5;
+  }
+
+  .mom-body{ padding:52px 26px 20px; }
+  .mom-article{
+    max-width:760px; margin:0 auto; font-size:19px; line-height:1.78; color:var(--ink);
+  }
+  .mom-article .mom-lead{
+    font-size:22px; line-height:1.7; color:var(--blue-dark); font-weight:600;
+  }
+  .mom-article h2{
+    font-size:clamp(23px,2.8vw,32px); margin:44px 0 14px; color:var(--blue-deep);
+    letter-spacing:-.02em; position:relative; padding-top:10px;
+  }
+  .mom-article h2::before{
+    content:""; display:block; width:56px; height:4px; border-radius:4px;
+    background:linear-gradient(90deg,var(--blue),var(--mint)); margin-bottom:16px;
+  }
+  .mom-article p{ margin:0 0 20px; }
+  .mom-article strong{ color:var(--blue-dark); }
+  .mom-article blockquote{
+    margin:26px 0; padding:20px 26px; border-left:5px solid var(--mint);
+    background:var(--paper2); border-radius:0 14px 14px 0;
+    font-size:20px; font-style:italic; color:var(--blue-dark); font-weight:600;
+  }
+  .mom-figs{
+    display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:30px 0 6px;
+  }
+  .mom-figs img, .mom-article img{
+    width:100%; height:100%; object-fit:cover; border-radius:16px;
+    box-shadow:var(--shadow); display:block;
+  }
+  .mom-figs img{ aspect-ratio:4/3; }
+
+  .mom-video{ max-width:760px; margin:8px auto 0; }
+  .mom-video .yt-short{
+    max-width:340px; margin:0 auto; aspect-ratio:9/16;
+    border-radius:18px; overflow:hidden; box-shadow:var(--shadow-lg); background:#000;
+  }
+  .mom-video .yt-wide{
+    aspect-ratio:16/9; border-radius:16px; overflow:hidden;
+    box-shadow:var(--shadow-lg); background:#000; margin-bottom:18px;
+  }
+  .mom-video iframe{ width:100%; height:100%; border:0; display:block; }
+
+  .mom-more{ background:var(--paper2); border-top:1px solid var(--line); margin-top:56px; padding:56px 0 70px; }
+  .mom-more h2{ font-size:clamp(24px,3vw,34px); color:var(--ink); margin-bottom:26px; }
+  .mom-more-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .mom-card{
+    display:block; background:#fff; border:1px solid var(--line); border-radius:18px;
+    overflow:hidden; box-shadow:var(--shadow-sm); transition:transform .25s, box-shadow .25s;
+  }
+  .mom-card:hover{ transform:translateY(-6px); box-shadow:var(--shadow); }
+  .mom-card .thumb{ aspect-ratio:16/10; overflow:hidden; background:var(--paper2); }
+  .mom-card .thumb img{ width:100%; height:100%; object-fit:cover; transition:transform .4s; }
+  .mom-card:hover .thumb img{ transform:scale(1.05); }
+  .mom-card .body{ padding:18px 18px 22px; }
+  .mom-card .tag{
+    display:inline-block; font-size:12px; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--blue-deep); margin-bottom:10px;
+  }
+  .mom-card h3{ font-size:18px; line-height:1.3; color:var(--ink); }
+  .mom-card .date{ margin-top:12px; font-size:13px; color:var(--muted); font-weight:600; }
+
+  @media (max-width:820px){
+    .mom-more-grid{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:620px){
+    .mom-hero{ padding:112px 0 44px; }
+    .mom-body{ padding:38px 4px 10px; }
+    .mom-article{ font-size:18px; }
+    .mom-figs{ grid-template-columns:1fr; }
+    .mom-more-grid{ grid-template-columns:1fr; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+
 </head>
 <body>
 <nav class="top" id="nav">
@@ -639,52 +782,31 @@
     <a href="postular.html" class="btn solid"><span>Postúlate ahora <span class="arrow">→</span></span></a>
   </div>
 </nav>
-
-<header class="sub-page-head">
-  <div class="wrap">
-    <a class="back-link" href="index.html">← Volver a la convocatoria</a>
-    <div style="margin-top:18px;">
-      <span class="eyebrow">Qué buscamos</span>
-      <h1>Categorías de negocios verdes</h1>
-      <p>Tu emprendimiento debe encajar en una de estas tres categorías y apuntar a un ODS.</p>
+<article class="mom-wrap">
+  <header class="mom-hero" id="momHero">
+    <div class="wrap">
+      <a class="back-link" href="comunidad.html"><span aria-hidden="true">←</span> Volver a Momentos</a>
+      <span class="eyebrow" id="momTag">Momentos</span>
+      <h1 id="momTitle">Cargando momento…</h1>
+      <div class="mom-meta">
+        <span id="momAutor">Innova Social</span>
+        <span id="momFecha"></span>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<section class="sub-page-body">
-  <div class="wrap">
-    <div class="cats">
-      <article class="cat" data-reveal style="--tint:var(--c1);">
-        <span class="bar"></span>
-        <div class="kicker">Categoría 01</div>
-        <h3>Bioproductos y servicios sostenibles</h3>
-        <ul>
-          <li>Agrosistemas sostenibles</li><li>Agroindustria</li><li>Biocomercio</li><li>Biotecnología</li><li>Turismo sostenible</li>
-        </ul>
-        <div class="count"><b>14</b> actividades productivas</div>
-      </article>
-      <article class="cat" data-reveal style="--tint:var(--c5);">
-        <span class="bar"></span>
-        <div class="kicker">Categoría 02</div>
-        <h3>Ecoproductos industriales</h3>
-        <ul>
-          <li>Valoración de residuos</li><li>Moda sostenible</li><li>Construcción sostenible</li><li>Empaques ecológicos</li>
-        </ul>
-        <div class="count"><b>8</b> actividades productivas</div>
-      </article>
-      <article class="cat" data-reveal style="--tint:var(--c2);">
-        <span class="bar"></span>
-        <div class="kicker">Categoría 03</div>
-        <h3>Productos para la calidad ambiental</h3>
-        <ul>
-          <li>Tecnologías verdes</li><li>Restauración de ecosistemas</li><li>Transporte sostenible</li>
-        </ul>
-        <div class="count"><b>7</b> actividades productivas</div>
-      </article>
+  <div class="wrap mom-body">
+    <div class="mom-article" id="momBody"></div>
+    <div class="mom-video" id="momVideos"></div>
+  </div>
+
+  <section class="mom-more">
+    <div class="wrap">
+      <h2>Encuentra más momentos aquí</h2>
+      <div class="mom-more-grid" id="momMore"></div>
     </div>
-  </div>
-</section>
-
+  </section>
+</article>
 <footer>
   <div class="watermark">INNOVA SOCIAL 4.0</div>
   <div class="wrap">
@@ -713,6 +835,33 @@
     if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
   }), { threshold:.15 });
   document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+  /* Timeline */
+  const tlIO = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    [...document.querySelectorAll('.tl-step')].forEach((s,i) => setTimeout(() => s.classList.add('in'), reduce ? 0 : i*130));
+    const fill = document.getElementById('tlFill');
+    if (fill) setTimeout(() => fill.style.width = '100%', reduce ? 0 : 200);
+    tlIO.disconnect();
+  }), { threshold:.3 });
+  const tlWrap = document.getElementById('tlWrap');
+  if (tlWrap) tlIO.observe(tlWrap);
+
+  /* Categorías de negocios verdes: click a circle, show its detail image */
+  document.querySelectorAll('.cat-hotspot').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const alreadyActive = btn.classList.contains('is-active');
+      document.querySelectorAll('.cat-hotspot').forEach(b => b.classList.remove('is-active'));
+      document.querySelectorAll('.cat-detail').forEach(d => d.classList.remove('active'));
+      if (alreadyActive) return;
+      btn.classList.add('is-active');
+      const detail = document.getElementById('catDetail-' + btn.dataset.cat);
+      if (detail) {
+        detail.classList.add('active');
+        detail.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
+      }
+    });
+  });
 })();
 </script>
 
@@ -737,5 +886,89 @@
   });
 })();
 </script>
+
+<script>
+(function(){
+  var cfg = window.INNOVA_SUPABASE || {};
+  var sb = (window.supabase && cfg.url) ? window.supabase.createClient(cfg.url, cfg.anonKey) : null;
+
+  var params = new URLSearchParams(location.search);
+  var slug = params.get('slug') || 'de-camino-al-pitch-day';
+
+  function ytId(url){
+    if(!url) return null;
+    var m = String(url).match(/(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([\w-]{6,})/);
+    if(m) return m[1];
+    var t = String(url).trim();
+    return /^[\w-]{6,}$/.test(t) ? t : null;
+  }
+  function isShort(url){ return /shorts\//.test(String(url)); }
+
+  function fmtDate(iso){
+    if(!iso) return '';
+    try{
+      return new Date(iso).toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});
+    }catch(e){ return ''; }
+  }
+
+  function renderMomento(m){
+    document.title = m.titulo + ' — Innova Social 4.0';
+    document.getElementById('momTitle').textContent = m.titulo;
+    document.getElementById('momAutor').textContent = m.autor || 'Innova Social';
+    document.getElementById('momFecha').textContent = fmtDate(m.fecha_publicacion);
+    if(m.imagen_destacada_url){
+      document.getElementById('momHero').style.setProperty('--hero-img', "url('" + m.imagen_destacada_url + "')");
+    }
+    document.getElementById('momBody').innerHTML = m.cuerpo || ('<p>' + (m.resumen_tarjeta || '') + '</p>');
+
+    var vids = m.videos || [];
+    if(typeof vids === 'string'){ try{ vids = JSON.parse(vids); }catch(e){ vids = []; } }
+    var vhtml = '';
+    vids.forEach(function(u){
+      var id = ytId(u);
+      if(!id) return;
+      var cls = isShort(u) ? 'yt-short' : 'yt-wide';
+      vhtml += '<div class="'+cls+'"><iframe src="https://www.youtube.com/embed/'+id+'" title="Video del momento" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+    });
+    document.getElementById('momVideos').innerHTML = vhtml;
+  }
+
+  function renderMore(list){
+    var grid = document.getElementById('momMore');
+    if(!list || !list.length){ grid.parentElement.parentElement.style.display='none'; return; }
+    grid.innerHTML = list.map(function(m){
+      var img = m.imagen_destacada_url
+        ? '<div class="thumb"><img src="'+m.imagen_destacada_url+'" alt="'+ (m.titulo||'') +'" loading="lazy"></div>'
+        : '';
+      return '<a class="mom-card" href="momento.html?slug='+encodeURIComponent(m.slug)+'">'
+           + img
+           + '<div class="body"><span class="tag">Momentos</span>'
+           + '<h3>'+ (m.titulo||'') +'</h3>'
+           + '<div class="date">'+ fmtDate(m.fecha_publicacion) +'</div></div></a>';
+    }).join('');
+  }
+
+  if(!sb){
+    document.getElementById('momTitle').textContent = 'No se pudo cargar el momento';
+    return;
+  }
+
+  sb.from('momentos').select('*').eq('slug', slug).eq('estado','publicado').maybeSingle()
+    .then(function(res){
+      if(res.error || !res.data){
+        document.getElementById('momTitle').textContent = 'Momento no encontrado';
+        document.getElementById('momBody').innerHTML = '<p>Este momento no está disponible. <a href="comunidad.html">Ver todos los momentos →</a></p>';
+        return;
+      }
+      renderMomento(res.data);
+    });
+
+  sb.from('momentos').select('slug,titulo,imagen_destacada_url,fecha_publicacion')
+    .eq('estado','publicado').neq('slug', slug)
+    .order('fecha_publicacion',{ascending:false}).limit(3)
+    .then(function(res){ if(!res.error) renderMore(res.data || []); });
+})();
+</script>
+
 </body>
 </html>

@@ -4,9 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Panel — Innova Social 5.0</title>
+<link rel="stylesheet" href="site-enhance.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <style>
   :root{
     --blue:#62ABE2; --blue-deep:#2279BA; --blue-dark:#154B73; --blue-soft:#EBF4FB;
@@ -168,11 +171,75 @@
   .etapa-row{ display:grid; grid-template-columns:50px 1.4fr 1fr 40px; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
   .etapa-row:last-child{ border-bottom:none; }
   .etapa-row .num{ width:32px; height:32px; border-radius:var(--r-sm); background:var(--paper2); color:var(--blue-deep); font-weight:800; font-size:12.5px; display:flex; align-items:center; justify-content:center; }
+
+  /* ===== AUTH GATE ===== */
+  #authGate{ position:fixed; inset:0; z-index:300; background:linear-gradient(160deg,#154B73 0%,#132330 55%,#0d1a22 100%); display:flex; align-items:center; justify-content:center; padding:24px; }
+  #authGate.hidden{ display:none; }
+  .auth-card{ background:#fff; border-radius:16px; padding:32px 28px; width:100%; max-width:400px; box-shadow:0 24px 60px rgba(0,0,0,.35); }
+  .auth-card h2{ margin:0 0 6px; font-size:22px; font-weight:800; }
+  .auth-card .sub{ margin:0 0 22px; color:var(--muted); font-size:14px; line-height:1.5; }
+  .auth-card .err{ color:var(--danger); font-size:13px; margin:8px 0 0; display:none; }
+  .auth-card .err.show{ display:block; }
+  .shell.locked{ display:none; }
+
+  /* ===== CURSOS ===== */
+  .curso-list{ display:flex; flex-direction:column; gap:0; }
+  .curso-row{ display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; padding:16px 20px; border-bottom:1px solid var(--line); }
+  .curso-row:last-child{ border-bottom:none; }
+  .curso-row:hover{ background:var(--paper2); }
+  .curso-row .meta{ font-size:12.5px; color:var(--muted); margin-top:4px; }
+  .curso-row .acts{ display:flex; gap:6px; }
+  .tipo-tabs{ display:flex; flex-wrap:wrap; gap:8px; }
+  .tipo-tabs .chip{ border:none; font-family:inherit; }
+  .file-drop{ border:1.5px dashed var(--line); border-radius:var(--r-sm); padding:18px; text-align:center; background:var(--paper2); cursor:pointer; transition:border-color .15s, background .15s; display:block; }
+  .file-drop:hover, .file-drop.drag{ border-color:var(--blue); background:var(--blue-soft); }
+  .file-drop input{ display:none; }
+  .file-drop b{ display:block; font-size:14px; margin-bottom:4px; }
+  .file-drop span{ font-size:12.5px; color:var(--muted); }
+  .recurso-item{ display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); }
+  .recurso-item:last-child{ border-bottom:none; }
+  .recurso-item .tag{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:4px 8px; border-radius:6px; background:var(--blue-soft); color:var(--blue-deep); }
+  .recurso-item .tag.yt{ background:#FEE2E2; color:#B91C1C; }
+  .recurso-item .tag.vid{ background:#DBEAFE; color:#1D4ED8; }
+  .recurso-item .tag.doc{ background:#DCFCE7; color:#15803D; }
+  .recurso-item .tag.link{ background:#FEF3C7; color:#B45309; }
+  .recurso-item .tag.draft{ outline:1px dashed #94A3B8; }
+  .modal.wide{ max-width:820px; }
+  .modal-body{ max-height:72vh; }
+  .progress{ height:6px; background:var(--line); border-radius:99px; overflow:hidden; margin-top:8px; display:none; }
+  .progress.show{ display:block; }
+  .progress > i{ display:block; height:100%; width:0; background:var(--blue); transition:width .2s; }
+  .check-row{ display:flex; align-items:center; gap:8px; font-size:13.5px; }
+  .check-row input{ width:auto; }
+  .form-sec{ border:1px solid var(--line); border-radius:var(--r-md); padding:16px 16px 14px; background:#fff; }
+  .form-sec + .form-sec{ margin-top:14px; }
+  .form-sec > h4{ margin:0 0 4px; font-size:14px; font-weight:800; }
+  .form-sec > .hint{ margin:0 0 14px; font-size:12.5px; color:var(--muted); line-height:1.45; }
+  .composer{ padding:14px; background:var(--paper2); border-radius:var(--r-sm); border:1px solid var(--line); }
+  .recursos-count{ font-size:12px; font-weight:700; color:var(--blue-deep); background:var(--blue-soft); padding:4px 10px; border-radius:99px; }
+  .portada-preview{ width:100%; max-height:140px; object-fit:cover; border-radius:var(--r-sm); margin-top:8px; display:none; }
+  .portada-preview.show{ display:block; }
+  .save-status{ font-size:12.5px; color:var(--muted); margin-right:auto; align-self:center; }
 </style>
 </head>
 <body>
 
-<div class="shell">
+<div id="authGate">
+  <form class="auth-card" id="loginForm">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+      <div class="mark" style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#62ABE2,#82CA76);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;">IS</div>
+      <div><b style="display:block;font-size:14px;">Innova Social</b><span style="font-size:11px;color:#4F697A;font-weight:600;">PANEL ADMIN</span></div>
+    </div>
+    <h2>Iniciar sesión</h2>
+    <p class="sub">Entrá con tu cuenta de staff (admin o editor) para gestionar cursos, recursos y el resto del panel.</p>
+    <div class="field"><label>Correo</label><input type="email" id="loginEmail" required placeholder="tu@inngenios.co" autocomplete="username"></div>
+    <div class="field" style="margin-top:12px;"><label>Contraseña</label><input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password"></div>
+    <p class="err" id="loginErr"></p>
+    <button class="btn solid" type="submit" style="width:100%; justify-content:center; margin-top:18px;" id="loginBtn">Entrar</button>
+  </form>
+</div>
+
+<div class="shell locked" id="appShell">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <span class="mark">IS</span>
@@ -218,7 +285,7 @@
       </div>
       <div class="topbar-right">
         <div class="search-mini"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg> <input placeholder="Buscar en el panel..."></div>
-        <div class="avatar">CT</div>
+        <div class="avatar" id="userAvatar" title="Cerrar sesión">CT</div>
       </div>
     </div>
 
@@ -290,20 +357,15 @@
       <!-- ============ CURSOS ============ -->
       <section class="view" id="view-cursos">
         <div class="view-head">
-          <div><h2>Gestión de cursos</h2><p>Rutas de formación y bootcamps del programa.</p></div>
-          <button class="btn solid" onclick="openModal('modalCurso')">+ Nuevo curso</button>
+          <div><h2>Gestión de cursos</h2><p>Cursos con videos de YouTube, MP4, PDFs y enlaces para beneficiarios.</p></div>
+          <button class="btn solid" id="btnNuevoCurso">+ Nuevo curso</button>
         </div>
-        <div class="card">
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Categoría</th><th>Descripción</th><th>Acciones</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <div class="empty-state">
+        <div class="card" id="cursosCard">
+          <div class="empty-state" id="cursosEmpty">
             <div class="em"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="m2 9 10-5 10 5-10 5Z"/><path d="M6 11v5c0 1.1 2.7 2 6 2s6-.9 6-2v-5"/><path d="M22 9v6"/></svg></div>
-            <p>Aún no hay cursos creados.<br>Crea el primero con <b>+ Nuevo curso</b>.</p>
+            <p>Aún no hay cursos.<br>Crea el primero con <b>+ Nuevo curso</b>.</p>
           </div>
+          <div class="curso-list" id="cursosList" style="display:none;"></div>
         </div>
       </section>
 
@@ -400,15 +462,90 @@
   </div>
 </div>
 
-<!-- ===== MODAL: Nueva UP ===== -->
+<!-- ===== MODAL: Curso + recursos ===== -->
+<!-- ===== MODAL: Curso completo ===== -->
 <div class="modal-bg" id="modalCurso">
-  <div class="modal">
-    <div class="modal-head"><div><h3>Nuevo curso</h3><p>Se mostrará dentro de la ruta de formación.</p></div><button class="modal-close" onclick="closeModal('modalCurso')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
-    <div class="modal-body">
-      <div class="field"><label>Categoría</label><input type="text" placeholder="Ej: Modelo de negocio"></div>
-      <div class="field"><label>Descripción</label><textarea placeholder="¿Qué aprende el emprendedor en este curso?"></textarea></div>
+  <div class="modal wide">
+    <div class="modal-head">
+      <div>
+        <h3 id="modalCursoTitle">Nuevo curso</h3>
+        <p>Armá el curso completo de una vez: datos, portada y todos los recursos.</p>
+      </div>
+      <button class="modal-close" type="button" onclick="closeModal('modalCurso')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <div class="modal-foot"><button class="btn ghost" onclick="closeModal('modalCurso')">Cancelar</button><button class="btn solid" onclick="closeModal('modalCurso'); toast('Curso creado (simulado)')">Crear curso</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="cursoId">
+
+      <div class="form-sec">
+        <h4>1. Datos del curso</h4>
+        <p class="hint">Lo que ve el beneficiario en el listado y la ficha.</p>
+        <div class="field"><label>Título *</label><input type="text" id="cursoTitulo" placeholder="Ej: Bootcamp · Modelo de negocio sostenible"></div>
+        <div class="grid2" style="margin-top:12px;">
+          <div class="field"><label>Categoría</label><input type="text" id="cursoCategoria" placeholder="Ej: Bootcamp · Finanzas · Legal"></div>
+          <div class="field"><label>Orden en el listado</label><input type="number" id="cursoOrden" value="0" min="0" step="1"></div>
+        </div>
+        <div class="field" style="margin-top:12px;"><label>Descripción</label><textarea id="cursoDescripcion" placeholder="Qué aprende, para quién es, cuántas sesiones, qué se lleva al final…" style="min-height:90px;"></textarea></div>
+        <div class="grid2" style="margin-top:12px;">
+          <label class="check-row"><input type="checkbox" id="cursoActivo" checked> Activo (visible)</label>
+          <label class="check-row"><input type="checkbox" id="cursoSoloBenef" checked> Solo beneficiarios</label>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label>Portada (opcional)</label>
+          <label class="file-drop" id="portadaDrop">
+            <input type="file" id="cursoPortada" accept="image/jpeg,image/png,image/webp">
+            <b>Subí una imagen de portada</b>
+            <span id="portadaHint">JPG / PNG / WebP</span>
+          </label>
+          <img class="portada-preview" id="portadaPreview" alt="">
+        </div>
+      </div>
+
+      <div class="form-sec" id="recursosBlock">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:4px;">
+          <h4 style="margin:0;">2. Recursos del curso</h4>
+          <span class="recursos-count" id="recursosCount">0 en la lista</span>
+        </div>
+        <p class="hint">Agregá YouTube, MP4, PDFs y enlaces ahora. Quedan en la lista y se suben todos al publicar.</p>
+
+        <div id="recursosList"></div>
+
+        <div class="composer" style="margin-top:12px;">
+          <div style="font-size:13px; font-weight:800; margin-bottom:10px;">Agregar a la lista</div>
+          <div class="tipo-tabs" id="recursoTipoTabs">
+            <button type="button" class="chip on" data-tipo="youtube">YouTube</button>
+            <button type="button" class="chip" data-tipo="video">Video MP4</button>
+            <button type="button" class="chip" data-tipo="documento">PDF / Docs</button>
+            <button type="button" class="chip" data-tipo="enlace">Enlace</button>
+            <button type="button" class="chip" data-tipo="plantilla">Plantilla</button>
+          </div>
+          <div class="field" style="margin-top:12px;"><label>Título del recurso *</label><input type="text" id="recursoTitulo" placeholder="Ej: Sesión 1 — Pitch Day"></div>
+          <div class="field" id="recursoUrlField"><label>URL *</label><input type="url" id="recursoUrl" placeholder="https://www.youtube.com/watch?v=..."></div>
+          <div class="field" id="recursoMultiUrlField" style="display:none;">
+            <label>Varias URLs de YouTube (una por línea)</label>
+            <textarea id="recursoMultiUrl" placeholder="https://youtube.com/watch?v=...&#10;https://youtu.be/..." style="min-height:80px;"></textarea>
+          </div>
+          <div class="field" id="recursoFileField" style="display:none;">
+            <label>Archivo(s)</label>
+            <label class="file-drop" id="fileDrop">
+              <input type="file" id="recursoFile" accept="video/mp4,video/webm,application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,image/*" multiple>
+              <b>Clic o arrastrá uno o varios archivos</b>
+              <span id="fileDropHint">MP4 ~200 MB · PDF, Word, Excel, PowerPoint, ZIP</span>
+            </label>
+            <div class="progress" id="uploadProgress"><i></i></div>
+          </div>
+          <div class="field"><label>Notas para el beneficiario (opcional)</label><textarea id="recursoDesc" placeholder="Duración, qué ver primero, tarea…" style="min-height:56px;"></textarea></div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
+            <button type="button" class="btn solid" id="btnAddRecurso">+ Sumar a la lista</button>
+            <button type="button" class="btn ghost" id="btnToggleYoutubeBatch">Pegar varios YouTube</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="save-status" id="cursoSaveStatus"></span>
+      <button class="btn ghost" type="button" onclick="closeModal('modalCurso')">Cancelar</button>
+      <button class="btn solid" type="button" id="btnSaveCurso">Publicar curso completo</button>
+    </div>
   </div>
 </div>
 
@@ -658,6 +795,555 @@
 
   const analiticasLink = document.querySelector('.navlink[data-view="analiticas"]');
   if (analiticasLink) analiticasLink.addEventListener('click', () => requestAnimationFrame(renderAnalyticsCharts));
+})();
+</script>
+
+<script>
+(function(){
+  const cfg = window.INNOVA_SUPABASE;
+  if (!cfg || !window.supabase) {
+    console.error('Supabase no cargó');
+    return;
+  }
+  const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+  let currentProfile = null;
+  let recursoTipo = 'youtube';
+  let editingCursoId = null;
+  let draftRecursos = []; // {localId, tipo, titulo, descripcion, url, file?, archivo_nombre?, savedId?, storage_path?}
+  let savedRecursos = []; // from DB when editing
+  let portadaFile = null;
+  let draftSeq = 0;
+  let batchYoutubeMode = false;
+
+  const authGate = document.getElementById('authGate');
+  const appShell = document.getElementById('appShell');
+
+  function showApp(profile){
+    currentProfile = profile;
+    authGate.classList.add('hidden');
+    appShell.classList.remove('locked');
+    const av = document.getElementById('userAvatar');
+    if (av && profile) {
+      const name = profile.full_name || profile.email || 'IS';
+      av.textContent = name.split(/[\s@]/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      av.title = profile.email + ' · Clic para cerrar sesión';
+    }
+    loadCursos();
+  }
+
+  function showLogin(msg){
+    currentProfile = null;
+    authGate.classList.remove('hidden');
+    appShell.classList.add('locked');
+    if (msg) {
+      const err = document.getElementById('loginErr');
+      err.textContent = msg;
+      err.classList.add('show');
+    }
+  }
+
+  async function requireStaff(){
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { showLogin(); return null; }
+    const { data: profile, error } = await sb.from('profiles').select('id,email,full_name,role').eq('id', session.user.id).maybeSingle();
+    if (error || !profile || !['admin','editor'].includes(profile.role)) {
+      await sb.auth.signOut();
+      showLogin('Esta cuenta no tiene acceso de staff al panel.');
+      return null;
+    }
+    showApp(profile);
+    return profile;
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = document.getElementById('loginErr');
+    err.classList.remove('show');
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.textContent = 'Entrando…';
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    btn.disabled = false; btn.textContent = 'Entrar';
+    if (error) {
+      err.textContent = error.message === 'Invalid login credentials'
+        ? 'Correo o contraseña incorrectos.'
+        : error.message;
+      err.classList.add('show');
+      return;
+    }
+    await requireStaff();
+  });
+
+  document.getElementById('userAvatar').addEventListener('click', async () => {
+    if (!confirm('¿Cerrar sesión?')) return;
+    await sb.auth.signOut();
+    showLogin();
+  });
+
+  sb.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') showLogin();
+  });
+
+  // ---------- CURSOS ----------
+  function youtubeId(url){
+    if (!url) return null;
+    const m = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/);
+    return m ? m[1] : null;
+  }
+  function normalizeYoutube(url){
+    const id = youtubeId(url);
+    return id ? ('https://www.youtube.com/watch?v=' + id) : url;
+  }
+  function tipoLabel(t){
+    return ({ youtube:'YouTube', video:'MP4', documento:'Doc', enlace:'Enlace', plantilla:'Plantilla', otro:'Otro' })[t] || t;
+  }
+  function tipoClass(t){
+    return ({ youtube:'yt', video:'vid', documento:'doc', enlace:'link', plantilla:'doc' })[t] || '';
+  }
+  function esc(s){
+    return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function fmtSize(n){
+    if (!n && n !== 0) return '';
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n/1024).toFixed(1) + ' KB';
+    return (n/1048576).toFixed(1) + ' MB';
+  }
+
+  async function loadCursos(){
+    const list = document.getElementById('cursosList');
+    const empty = document.getElementById('cursosEmpty');
+    const { data, error } = await sb.from('cursos').select('id,titulo,descripcion,categoria,activo,orden,created_at, recursos(count)').order('orden').order('created_at', { ascending:false });
+    if (error) {
+      toast('Error cargando cursos: ' + error.message);
+      return;
+    }
+    if (!data || !data.length) {
+      list.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    list.style.display = 'block';
+    list.innerHTML = data.map(c => {
+      const n = (c.recursos && c.recursos[0] && c.recursos[0].count) || 0;
+      return `<div class="curso-row" data-id="${c.id}">
+        <div>
+          <b>${esc(c.titulo)}</b>
+          <div class="meta">${esc(c.categoria||'Sin categoría')} · ${n} recurso${n===1?'':'s'} · ${c.activo?'Activo':'Oculto'}</div>
+        </div>
+        <div class="acts">
+          <button class="icon-btn" title="Editar" data-act="edit"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 19.5H21"/><path d="M17 4a1.9 1.9 0 0 1 2.7 2.7L8.5 18l-4 1 1-4Z"/></svg></button>
+          <button class="icon-btn" title="Eliminar" data-act="del"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15"/><path d="M9.5 11v6M14.5 11v6"/><path d="M6.5 7l1 12.5A2 2 0 0 0 9.5 21h5a2 2 0 0 0 2-1.5L17.5 7"/><path d="M9.5 7V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V7"/></svg></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function clearComposer(){
+    document.getElementById('recursoTitulo').value = '';
+    document.getElementById('recursoUrl').value = '';
+    document.getElementById('recursoMultiUrl').value = '';
+    document.getElementById('recursoDesc').value = '';
+    document.getElementById('recursoFile').value = '';
+    document.getElementById('fileDropHint').textContent = 'MP4 ~200 MB · PDF, Word, Excel, PowerPoint, ZIP';
+  }
+
+  function resetCursoForm(){
+    editingCursoId = null;
+    draftRecursos = [];
+    savedRecursos = [];
+    portadaFile = null;
+    batchYoutubeMode = false;
+    document.getElementById('cursoId').value = '';
+    document.getElementById('cursoTitulo').value = '';
+    document.getElementById('cursoCategoria').value = '';
+    document.getElementById('cursoDescripcion').value = '';
+    document.getElementById('cursoOrden').value = '0';
+    document.getElementById('cursoActivo').checked = true;
+    document.getElementById('cursoSoloBenef').checked = true;
+    document.getElementById('cursoPortada').value = '';
+    document.getElementById('portadaHint').textContent = 'JPG / PNG / WebP';
+    document.getElementById('portadaPreview').classList.remove('show');
+    document.getElementById('portadaPreview').removeAttribute('src');
+    document.getElementById('modalCursoTitle').textContent = 'Nuevo curso';
+    document.getElementById('btnSaveCurso').textContent = 'Publicar curso completo';
+    document.getElementById('cursoSaveStatus').textContent = '';
+    clearComposer();
+    setRecursoTipo('youtube');
+    renderRecursosList();
+  }
+
+  function allRecursosView(){
+    const saved = savedRecursos.map(r => ({
+      localId: 'saved-' + r.id,
+      savedId: r.id,
+      tipo: r.tipo,
+      titulo: r.titulo,
+      descripcion: r.descripcion,
+      url: r.url,
+      archivo_nombre: r.archivo_nombre,
+      storage_path: r.storage_path,
+      pending: false
+    }));
+    const draft = draftRecursos.map(r => ({ ...r, pending: true }));
+    return saved.concat(draft);
+  }
+
+  function renderRecursosList(){
+    const box = document.getElementById('recursosList');
+    const items = allRecursosView();
+    const n = items.length;
+    const pending = draftRecursos.length;
+    document.getElementById('recursosCount').textContent =
+      n === 0 ? '0 en la lista' :
+      (pending ? `${n} en la lista · ${pending} pendiente${pending===1?'':'s'}` : `${n} recurso${n===1?'':'s'}`);
+
+    if (!items.length) {
+      box.innerHTML = '<p style="color:var(--muted);font-size:13px;margin:0 0 4px;">Todavía vacío. Sumá YouTube, MP4, PDFs o enlaces abajo — todo viaja junto al publicar.</p>';
+      return;
+    }
+    box.innerHTML = items.map((r, i) => {
+      const sub = r.archivo_nombre
+        ? `${esc(r.archivo_nombre)}${r.file ? ' · ' + fmtSize(r.file.size) : ''}`
+        : esc(r.url || '');
+      const open = r.url && !r.pending ? `<a class="icon-btn" href="${esc(r.url)}" target="_blank" rel="noopener" title="Abrir"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17 17 7"/><path d="M9 7h8v8"/></svg></a>` : '';
+      return `<div class="recurso-item" data-local="${esc(r.localId)}" data-saved="${esc(r.savedId||'')}" data-path="${esc(r.storage_path||'')}">
+        <span class="tag ${tipoClass(r.tipo)}${r.pending?' draft':''}">${tipoLabel(r.tipo)}${r.pending?' · nuevo':''}</span>
+        <div>
+          <b style="font-size:13.5px;">${i+1}. ${esc(r.titulo)}</b>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;word-break:break-all;">${sub}</div>
+          ${r.descripcion ? `<div style="font-size:12px;color:var(--muted);margin-top:2px;">${esc(r.descripcion)}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:4px;">
+          ${open}
+          <button class="icon-btn" data-del-rec type="button" title="Quitar"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 7h15"/><path d="M9.5 11v6M14.5 11v6"/><path d="M6.5 7l1 12.5A2 2 0 0 0 9.5 21h5a2 2 0 0 0 2-1.5L17.5 7"/><path d="M9.5 7V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V7"/></svg></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function setRecursoTipo(t){
+    recursoTipo = t;
+    document.querySelectorAll('#recursoTipoTabs .chip').forEach(c => c.classList.toggle('on', c.dataset.tipo === t));
+    const needsFile = t === 'video' || t === 'documento' || t === 'plantilla';
+    document.getElementById('recursoFileField').style.display = needsFile ? 'block' : 'none';
+    document.getElementById('recursoUrlField').style.display = (!needsFile && !batchYoutubeMode) ? 'block' : 'none';
+    document.getElementById('recursoMultiUrlField').style.display = (t === 'youtube' && batchYoutubeMode) ? 'block' : 'none';
+    document.getElementById('btnToggleYoutubeBatch').style.display = t === 'youtube' ? 'inline-flex' : 'none';
+    const label = document.querySelector('#recursoUrlField label');
+    if (label) {
+      label.textContent = t === 'youtube' ? 'URL de YouTube *' : t === 'enlace' ? 'URL del enlace *' : 'URL *';
+    }
+    const inp = document.getElementById('recursoFile');
+    if (t === 'video') { inp.accept = 'video/mp4,video/webm,video/quicktime'; inp.multiple = true; }
+    else { inp.accept = 'application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,image/*,text/plain'; inp.multiple = true; }
+  }
+
+  document.getElementById('recursoTipoTabs').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (chip) setRecursoTipo(chip.dataset.tipo);
+  });
+
+  document.getElementById('btnToggleYoutubeBatch').addEventListener('click', () => {
+    batchYoutubeMode = !batchYoutubeMode;
+    document.getElementById('btnToggleYoutubeBatch').textContent = batchYoutubeMode ? 'Una sola URL' : 'Pegar varios YouTube';
+    setRecursoTipo('youtube');
+  });
+
+  const fileDrop = document.getElementById('fileDrop');
+  const fileInput = document.getElementById('recursoFile');
+  fileDrop.addEventListener('click', () => fileInput.click());
+  fileDrop.addEventListener('dragover', (e) => { e.preventDefault(); fileDrop.classList.add('drag'); });
+  fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag'));
+  fileDrop.addEventListener('drop', (e) => {
+    e.preventDefault(); fileDrop.classList.remove('drag');
+    if (e.dataTransfer.files.length) {
+      fileInput.files = e.dataTransfer.files;
+      document.getElementById('fileDropHint').textContent = [...e.dataTransfer.files].map(f => f.name).join(', ');
+    }
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) document.getElementById('fileDropHint').textContent = [...fileInput.files].map(f => f.name).join(', ');
+  });
+
+  const portadaDrop = document.getElementById('portadaDrop');
+  const portadaInput = document.getElementById('cursoPortada');
+  const portadaPreview = document.getElementById('portadaPreview');
+  portadaDrop.addEventListener('click', () => portadaInput.click());
+  portadaInput.addEventListener('change', () => {
+    const f = portadaInput.files[0];
+    portadaFile = f || null;
+    if (!f) return;
+    document.getElementById('portadaHint').textContent = f.name;
+    const url = URL.createObjectURL(f);
+    portadaPreview.src = url;
+    portadaPreview.classList.add('show');
+  });
+
+  document.getElementById('btnNuevoCurso').addEventListener('click', () => {
+    resetCursoForm();
+    openModal('modalCurso');
+  });
+
+  document.getElementById('cursosList').addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    const row = btn.closest('.curso-row');
+    const id = row.dataset.id;
+    if (btn.dataset.act === 'del') {
+      if (!confirm('¿Eliminar este curso y todos sus recursos?')) return;
+      const { error } = await sb.from('cursos').delete().eq('id', id);
+      if (error) toast(error.message);
+      else { toast('Curso eliminado'); loadCursos(); }
+      return;
+    }
+    const { data: curso, error } = await sb.from('cursos').select('*').eq('id', id).single();
+    if (error) { toast(error.message); return; }
+    resetCursoForm();
+    editingCursoId = curso.id;
+    document.getElementById('cursoId').value = curso.id;
+    document.getElementById('cursoTitulo').value = curso.titulo || '';
+    document.getElementById('cursoCategoria').value = curso.categoria || '';
+    document.getElementById('cursoDescripcion').value = curso.descripcion || '';
+    document.getElementById('cursoOrden').value = curso.orden ?? 0;
+    document.getElementById('cursoActivo').checked = !!curso.activo;
+    document.getElementById('cursoSoloBenef').checked = curso.solo_beneficiarios !== false;
+    document.getElementById('modalCursoTitle').textContent = 'Editar curso';
+    document.getElementById('btnSaveCurso').textContent = 'Guardar cambios';
+    if (curso.portada_url) {
+      portadaPreview.src = curso.portada_url;
+      portadaPreview.classList.add('show');
+      document.getElementById('portadaHint').textContent = 'Portada actual (elegí otra para reemplazar)';
+    }
+    openModal('modalCurso');
+    const { data: recs } = await sb.from('recursos').select('*').eq('curso_id', curso.id).order('orden').order('created_at');
+    savedRecursos = recs || [];
+    renderRecursosList();
+  });
+
+  document.getElementById('recursosList').addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-del-rec]');
+    if (!btn) return;
+    const item = btn.closest('.recurso-item');
+    const localId = item.dataset.local;
+    const savedId = item.dataset.saved;
+    if (!confirm('¿Quitar este recurso de la lista?')) return;
+    if (savedId) {
+      const path = item.dataset.path;
+      if (path) await sb.storage.from('cursos').remove([path]);
+      const { error } = await sb.from('recursos').delete().eq('id', savedId);
+      if (error) { toast(error.message); return; }
+      savedRecursos = savedRecursos.filter(r => r.id !== savedId);
+      toast('Recurso eliminado');
+      loadCursos();
+    } else {
+      draftRecursos = draftRecursos.filter(r => r.localId !== localId);
+    }
+    renderRecursosList();
+  });
+
+  function pushDraft(item){
+    draftSeq += 1;
+    draftRecursos.push({ localId: 'draft-' + draftSeq, ...item });
+  }
+
+  document.getElementById('btnAddRecurso').addEventListener('click', () => {
+    const tipo = recursoTipo;
+    const tituloBase = document.getElementById('recursoTitulo').value.trim();
+    const desc = document.getElementById('recursoDesc').value.trim() || null;
+
+    try {
+      if (tipo === 'youtube' && batchYoutubeMode) {
+        const lines = document.getElementById('recursoMultiUrl').value.split(/\n+/).map(s => s.trim()).filter(Boolean);
+        if (!lines.length) throw new Error('Pegá al menos una URL de YouTube');
+        let added = 0;
+        lines.forEach((raw, i) => {
+          if (!youtubeId(raw)) return;
+          const url = normalizeYoutube(raw);
+          pushDraft({
+            tipo: 'youtube',
+            titulo: tituloBase ? `${tituloBase} ${i+1}` : `Video YouTube ${draftRecursos.length + 1}`,
+            descripcion: desc,
+            url
+          });
+          added++;
+        });
+        if (!added) throw new Error('Ninguna URL de YouTube válida');
+        clearComposer();
+        renderRecursosList();
+        toast(added + ' videos sumados a la lista');
+        return;
+      }
+
+      if (tipo === 'youtube' || tipo === 'enlace') {
+        if (!tituloBase) throw new Error('Título del recurso obligatorio');
+        let url = document.getElementById('recursoUrl').value.trim();
+        if (!url) throw new Error('Pegá la URL');
+        if (tipo === 'youtube') {
+          if (!youtubeId(url)) throw new Error('URL de YouTube no válida');
+          url = normalizeYoutube(url);
+        }
+        pushDraft({ tipo, titulo: tituloBase, descripcion: desc, url });
+        clearComposer();
+        renderRecursosList();
+        toast('Sumado a la lista');
+        return;
+      }
+
+      // files: video / documento / plantilla — one draft per file
+      const files = [...fileInput.files];
+      if (!files.length) throw new Error('Seleccioná al menos un archivo');
+      files.forEach((file, i) => {
+        if (tipo === 'video' && !/^video\//.test(file.type) && !/\.(mp4|webm|mov)$/i.test(file.name)) {
+          throw new Error(`"${file.name}" no parece un video`);
+        }
+        const titulo = files.length === 1
+          ? (tituloBase || file.name.replace(/\.[^.]+$/, ''))
+          : (tituloBase ? `${tituloBase} ${i+1}` : file.name.replace(/\.[^.]+$/, ''));
+        pushDraft({
+          tipo: tipo === 'plantilla' ? 'plantilla' : (tipo === 'video' ? 'video' : 'documento'),
+          titulo,
+          descripcion: desc,
+          file,
+          archivo_nombre: file.name,
+          url: ''
+        });
+      });
+      clearComposer();
+      renderRecursosList();
+      toast(files.length + ' archivo' + (files.length===1?'':'s') + ' en la lista');
+    } catch (err) {
+      toast(err.message || String(err));
+    }
+  });
+
+  async function uploadFile(file, cursoId, onPct){
+    const safe = file.name.replace(/[^\w.\-]+/g, '_');
+    const path = `${cursoId}/${Date.now()}_${safe}`;
+    if (onPct) onPct(30);
+    const { error } = await sb.storage.from('cursos').upload(path, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type || undefined
+    });
+    if (onPct) onPct(100);
+    if (error) throw error;
+    const { data } = sb.storage.from('cursos').getPublicUrl(path);
+    return { path, url: data.publicUrl, name: file.name };
+  }
+
+  document.getElementById('btnSaveCurso').addEventListener('click', async () => {
+    const titulo = document.getElementById('cursoTitulo').value.trim();
+    if (!titulo) { toast('El título del curso es obligatorio'); return; }
+    if (!editingCursoId && !draftRecursos.length && !confirm('¿Publicar el curso sin recursos? Podés sumarlos después.')) return;
+
+    const btn = document.getElementById('btnSaveCurso');
+    const status = document.getElementById('cursoSaveStatus');
+    btn.disabled = true;
+    const totalSteps = 1 + (portadaFile ? 1 : 0) + draftRecursos.length;
+    let done = 0;
+    const tick = (msg) => {
+      done++;
+      status.textContent = msg || (`Guardando… ${done}/${totalSteps}`);
+      const progress = document.getElementById('uploadProgress');
+      const bar = progress.querySelector('i');
+      progress.classList.add('show');
+      bar.style.width = Math.min(100, Math.round((done / totalSteps) * 100)) + '%';
+    };
+
+    try {
+      status.textContent = 'Guardando curso…';
+      const payload = {
+        titulo,
+        categoria: document.getElementById('cursoCategoria').value.trim() || null,
+        descripcion: document.getElementById('cursoDescripcion').value.trim() || null,
+        orden: Number(document.getElementById('cursoOrden').value) || 0,
+        activo: document.getElementById('cursoActivo').checked,
+        solo_beneficiarios: document.getElementById('cursoSoloBenef').checked
+      };
+
+      let curso;
+      if (editingCursoId) {
+        const { data, error } = await sb.from('cursos').update(payload).eq('id', editingCursoId).select().single();
+        if (error) throw error;
+        curso = data;
+      } else {
+        const { data, error } = await sb.from('cursos').insert(payload).select().single();
+        if (error) throw error;
+        curso = data;
+        editingCursoId = curso.id;
+        document.getElementById('cursoId').value = curso.id;
+      }
+      tick('Curso guardado');
+
+      if (portadaFile) {
+        status.textContent = 'Subiendo portada…';
+        const up = await uploadFile(portadaFile, curso.id);
+        const { error } = await sb.from('cursos').update({ portada_url: up.url }).eq('id', curso.id);
+        if (error) throw error;
+        portadaFile = null;
+        tick('Portada lista');
+      }
+
+      let ordenBase = savedRecursos.length;
+      for (const draft of [...draftRecursos]) {
+        status.textContent = `Subiendo: ${draft.titulo}…`;
+        let url = draft.url || '';
+        let storage_path = null;
+        let archivo_nombre = draft.archivo_nombre || null;
+        if (draft.file) {
+          const up = await uploadFile(draft.file, curso.id);
+          url = up.url;
+          storage_path = up.path;
+          archivo_nombre = up.name;
+        }
+        ordenBase += 1;
+        const { data: rec, error } = await sb.from('recursos').insert({
+          curso_id: curso.id,
+          titulo: draft.titulo,
+          descripcion: draft.descripcion,
+          tipo: draft.tipo,
+          url,
+          storage_path,
+          archivo_nombre,
+          categoria: payload.categoria,
+          orden: ordenBase,
+          activo: true,
+          solo_beneficiarios: payload.solo_beneficiarios
+        }).select().single();
+        if (error) throw error;
+        savedRecursos.push(rec);
+        draftRecursos = draftRecursos.filter(d => d.localId !== draft.localId);
+        tick();
+      }
+
+      document.getElementById('modalCursoTitle').textContent = 'Editar curso';
+      document.getElementById('btnSaveCurso').textContent = 'Guardar cambios';
+      renderRecursosList();
+      loadCursos();
+      toast('Curso publicado con todos los recursos');
+      status.textContent = 'Listo';
+      setTimeout(() => {
+        document.getElementById('uploadProgress').classList.remove('show');
+        document.getElementById('uploadProgress').querySelector('i').style.width = '0';
+        status.textContent = '';
+      }, 1200);
+    } catch (err) {
+      toast(err.message || String(err));
+      status.textContent = 'Error — revisá e intentá de nuevo';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // Load cursos when navigating to the view
+  document.querySelector('.navlink[data-view="cursos"]').addEventListener('click', () => {
+    if (currentProfile) loadCursos();
+  });
+
+  requireStaff();
 })();
 </script>
 </body>

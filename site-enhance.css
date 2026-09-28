@@ -1,0 +1,148 @@
+/* Innova Social — typography + responsive boost */
+*, *::before, *::after{ box-sizing:border-box; }
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  scroll-behavior:smooth;
+}
+body{
+  font-size:19px;
+  line-height:1.7;
+  overflow-x:hidden;
+  max-width:100vw;
+}
+img, video, svg, iframe{ max-width:100%; height:auto; }
+table{ width:100%; display:block; overflow-x:auto; }
+
+/* Nav hamburger */
+.nav-toggle{
+  display:none; width:46px; height:46px; border:1.5px solid var(--line,#E2ECF1);
+  border-radius:12px; background:var(--paper,#fff); cursor:pointer; padding:0;
+  align-items:center; justify-content:center; flex-direction:column; gap:5px; flex-shrink:0;
+}
+.nav-toggle span{ display:block; width:18px; height:2.5px; background:var(--ink,#132330); border-radius:2px; transition:transform .25s, opacity .2s; }
+.nav-toggle[aria-expanded="true"] span:nth-child(1){ transform:translateY(7.5px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+.nav-toggle[aria-expanded="true"] span:nth-child(3){ transform:translateY(-7.5px) rotate(-45deg); }
+
+@media (max-width:1000px){
+  .nav-toggle{ display:inline-flex; order:2; margin-left:auto; }
+  nav.top .row{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 12px;
+  }
+  nav.top .row > a:first-child{ order:1; }
+  nav.top .row > .btn.solid{
+    order:3; width:100%; justify-content:center; padding:14px 18px; font-size:16px !important;
+  }
+  nav.top ul{
+    display:none !important; order:4; width:100%; flex-direction:column; gap:0;
+    padding:8px 0 12px; margin:0; border-top:1px solid var(--line,#E2ECF1);
+    font-size:18px !important;
+  }
+  nav.top.open ul{ display:flex !important; }
+  nav.top ul li a{ display:block; padding:15px 2px; font-size:18px !important; }
+  nav.top .back{ order:3; margin-left:auto; font-size:15px !important; }
+}
+
+/* Bigger readable type across shared components */
+.eyebrow{ font-size:13.5px !important; letter-spacing:.12em !important; }
+.sec-head h2, .nos-page-head h1, .sub-page-head h1{ font-size:clamp(32px,4.4vw,48px) !important; line-height:1.15 !important; }
+.sec-head p, .nos-intro, .sub-page-head p{ font-size:19px !important; line-height:1.75 !important; }
+.bcard h3, .pc-body h3, .cat h3, .tl-step h4, .win h4{ font-size:20px !important; }
+.bcard p, .pc-hito, .req-list li, .nos-copy p, .tl-step p, .case-resumen{ font-size:17.5px !important; line-height:1.75 !important; }
+.pc-cat, .req-col h4, .case-card-label, .case-label-row, .nos-tag{ font-size:13px !important; }
+.pc-founder, .pstat span, .gal-hint, .more-label, .foot-fine{ font-size:14.5px !important; }
+.pc-badge, .case-photo .pc-badge{ font-size:14px !important; padding:7px 13px !important; }
+.btn{ font-size:16.5px !important; padding:14px 26px !important; }
+.case-hito{ font-size:22px !important; line-height:1.45 !important; }
+.case-photo-cap b{ font-size:18px !important; }
+.case-photo-cap span{ font-size:15px !important; }
+.case-card h3{ font-size:19px !important; }
+.case-card p{ font-size:16px !important; line-height:1.75 !important; }
+.case-hitos li{ font-size:16.5px !important; line-height:1.65 !important; }
+.req-note, .proof-hint{ font-size:15px !important; }
+.cta-band h2{ font-size:clamp(28px,3.6vw,40px) !important; }
+.cta-band p{ font-size:17.5px !important; line-height:1.65 !important; }
+.more-link{ font-size:16px !important; padding:13px 20px !important; }
+nav.top ul{ font-size:16.5px !important; }
+.quote p, .qcard p, blockquote{ font-size:17px !important; line-height:1.7 !important; }
+.gcard h3, .win h3{ font-size:17px !important; }
+.gcard p{ font-size:14.5px !important; }
+.ticker-chip, .bm-item{ font-size:14px !important; }
+.foot-col p, footer p, footer a{ font-size:15px !important; }
+footer h4{ font-size:16px !important; }
+
+/* Hero */
+header.hero h1{ font-size:clamp(38px,5.2vw,64px) !important; }
+header.hero .lede{ font-size:20px !important; line-height:1.7 !important; max-width:48ch !important; }
+.hero-stat b{ font-size:clamp(24px,3vw,34px) !important; }
+.hero-stat span{ font-size:14.5px !important; line-height:1.4 !important; }
+.hero-chip{ font-size:14px !important; }
+.hero-chip b{ font-size:18px !important; }
+
+/* Forms (postular) */
+.field label{ font-size:16px !important; }
+.field .hint, .counter{ font-size:14.5px !important; }
+input[type=text], input[type=email], input[type=password], input[type=date],
+input[type=number], input[type=tel], input[type=url], select, textarea{
+  font-size:17px !important; padding:14px 15px !important;
+}
+.chip span{ font-size:15px !important; padding:10px 16px !important; }
+.fset .lg{ font-size:18px !important; }
+header.top-band h1{ font-size:clamp(30px,5vw,44px) !important; }
+header.top-band p{ font-size:17.5px !important; line-height:1.7 !important; }
+.brand{ font-size:17px !important; }
+.back{ font-size:16px !important; }
+#successCard h2{ font-size:24px !important; }
+#successCard p{ font-size:16px !important; }
+
+/* Convocatoria / content pages */
+.nos-sec h2{ font-size:clamp(26px,3.2vw,34px) !important; }
+.nos-sec > p, .etype-body, .nos-sec li{ font-size:17.5px !important; line-height:1.8 !important; }
+.anexo-card, .anexos-grid a{ font-size:16px !important; }
+.etype-card h3{ font-size:19px !important; }
+.pstat b{ font-size:clamp(22px,2.6vw,30px) !important; }
+
+/* Global mobile layout hardening */
+@media (max-width:900px){
+  .wrap{ padding-left:16px !important; padding-right:16px !important; }
+  .hero-copy{ width:100% !important; max-width:100% !important; padding:68px 16px 24px !important; }
+  .hero-stage, header.hero{ min-height:520px; height:auto !important; max-height:none !important; }
+  .bento, .req-grid, .cats, .quotes, .nos-grid, .etype-grid, .anexos-grid,
+  .cases-grid, .case-cards, .proof-grid{
+    grid-template-columns:1fr !important;
+  }
+  .case-top{ grid-template-columns:1fr !important; gap:20px !important; }
+  .case-photo{ min-height:260px !important; }
+  .proof-stats, .hero-stats{ grid-template-columns:1fr 1fr !important; gap:12px !important; }
+  .winners{ grid-template-columns:1fr 1fr !important; }
+  .tl{ grid-template-columns:1fr 1fr !important; }
+  .cta-band{ padding:28px 18px !important; }
+  .cta-band > div, .cta-inner{ flex-direction:column !important; align-items:flex-start !important; gap:16px !important; }
+  .gallery, .proof-rail{ margin-left:-16px !important; margin-right:-16px !important; padding-left:16px !important; padding-right:16px !important; }
+  .gcard{ flex:0 0 min(85vw,340px) !important; height:380px !important; }
+  .nos-logos{ flex-wrap:wrap !important; justify-content:center !important; }
+  .bnf-cifras{ grid-template-columns:1fr 1fr !important; }
+  .row, .actions, .cta-actions{ flex-wrap:wrap !important; }
+  .hero-stat{ min-width:0 !important; padding:12px 0 !important; }
+}
+
+@media (max-width:620px){
+  body{ font-size:18px; }
+  .proof-stats, .hero-stats, .winners, .tl, .bnf-cifras, .grid2{ grid-template-columns:1fr !important; }
+  .btn{ width:100%; justify-content:center; }
+  nav.top .btn.solid{ width:100%; }
+  .foot-fine{ flex-direction:column; gap:10px; align-items:flex-start !important; }
+  .pc-photo{ height:200px !important; }
+  header.hero h1{ font-size:clamp(34px,9.5vw,44px) !important; }
+  header.hero .lede{ font-size:18.5px !important; }
+  .eyebrow{ font-size:13px !important; }
+  .fset{ padding:20px 14px !important; }
+  .sec-head h2, .nos-page-head h1, .sub-page-head h1{ font-size:clamp(30px,8.5vw,38px) !important; }
+  .sec-head p, .nos-intro, .sub-page-head p{ font-size:18px !important; }
+  .case-hito{ font-size:21px !important; }
+  .bento-photo{ min-height:220px !important; }
+  .win-badge b{ font-size:26px !important; }
+  .req-list li{ font-size:17px !important; }
+  section{ padding-top:40px !important; padding-bottom:40px !important; }
+}

@@ -23,12 +23,14 @@ Supabase, en orden por nombre (el prefijo de fecha ya los ordena), y luego
 
 ## Tablas
 
-- `profiles` — cuentas del panel (`admin`/`editor`), una fila por usuario de Supabase Auth.
+- `profiles` — cuentas del panel (`admin`/`editor`/`beneficiario`), una fila por usuario de Supabase Auth.
 - `postulaciones` — cada envío del formulario de `postular.html`. Público solo puede insertar; nunca se guarda contraseña acá (eso lo maneja Supabase Auth).
 - `casos_exito` — los 10 ganadores mostrados en `casos.html` y en cada `caso-<slug>.html`.
 - `momentos` — el blog de `comunidad.html`.
 - `hero_sliders` — fotos rotativas del hero en `index.html`.
 - `etapas_convocatoria` / `resultados_programa` — contenido de las vistas Convocatoria y Resultados del panel.
+- `cursos` — rutas de formación del panel (admin → Cursos).
+- `recursos` — materiales por curso (YouTube, MP4, PDF, enlaces). Bucket Storage `cursos` para archivos.
 
 ## Después de aplicarlo
 
