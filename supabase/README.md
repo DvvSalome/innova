@@ -1,48 +1,59 @@
-# Base de datos — Innova Social 4.0
+# Base de datos — Innova Social 5.0
 
-Migraciones para el panel de administración (`admin.html`) y el formulario de
-postulación (`postular.html`). Sin conexión activa a Supabase todavía — este
-SQL queda listo para correr apenas se autorice.
+Backend del sitio público, del formulario de postulación (`postular.html`), del
+panel (`admin.html`) y del área de beneficiarios (`acceso.html`, `mis-cursos.html`,
+`curso.html`). Proyecto de Supabase: `yivyqorgcagwykedngjv`.
 
-## Cómo aplicarlo
+## Estado en producción (30 sept 2026)
 
-Con el proyecto ya conectado (`supabase link --project-ref <ref>`):
+- Aplicadas `20260930120000_postulacion_completa.sql`, `20260930130000_panel_completo.sql`,
+  `20260930140000_endurecer_postulaciones.sql` (un visitante ya no puede enviarse como ganador ni
+  asignarse cuenta) y `20260930150000_cerrar_funciones.sql`, y `20260930160000_cuentas_y_limites.sql` (las cuentas nuevas
+  nacen «pendiente», límites de tamaño y rutas de adjuntos) — todas registradas con
+  `supabase migration repair --status applied`.
+- Desplegada la función `correos` (`supabase functions deploy correos --use-api`).
+
+Ojo: las migraciones anteriores se aplicaron en producción con otros nombres de
+versión, así que **no uses `supabase db push`** (intentaría repetirlas). Para una
+migración nueva, pruébala primero dentro de una transacción que termine en
+`rollback;` y luego aplícala:
 
 ```bash
-supabase db push
+supabase db query --linked -f supabase/migrations/<archivo>.sql
+supabase migration repair --status applied <versión>
 ```
-
-Esto corre todo `migrations/` en orden y, si usas `--include-seed` (o
-`supabase db reset` en local), también carga `seed.sql` con la información
-real de los 10 casos, las etapas de la convocatoria, los resultados y los
-4 Momentos ya publicados.
-
-Sin CLI: pega cada archivo de `migrations/` en el SQL Editor del dashboard de
-Supabase, en orden por nombre (el prefijo de fecha ya los ordena), y luego
-`seed.sql`.
 
 ## Tablas
 
-- `profiles` — cuentas del panel (`admin`/`editor`/`beneficiario`), una fila por usuario de Supabase Auth.
-- `postulaciones` — cada envío del formulario de `postular.html`. Público solo puede insertar; nunca se guarda contraseña acá (eso lo maneja Supabase Auth).
-- `casos_exito` — los 10 ganadores mostrados en `casos.html` y en cada `caso-<slug>.html`.
-- `momentos` — el blog de `comunidad.html`.
-- `hero_sliders` — fotos rotativas del hero en `index.html`.
-- `etapas_convocatoria` / `resultados_programa` — contenido de las vistas Convocatoria y Resultados del panel.
-- `cursos` — rutas de formación del panel (admin → Cursos).
-- `recursos` — materiales por curso (YouTube, MP4, PDF, enlaces). Bucket Storage `cursos` para archivos.
+- `profiles` — cuentas: `admin`, `editor`, `evaluador` (con `entidad` = `inngenios` o `triple_a`) y `beneficiario` (con `cohorte`).
+- `postulaciones` — cada envío del formulario, con `redes`, `documentos` (rutas en el bucket privado `postulaciones`), `orden_desempate` y `nota_desempate`.
+- `evaluaciones` — rúbrica de 4 criterios (1–5) por postulación y entidad. Cada evaluador solo ve la de su entidad.
+- `ranking_postulaciones` (vista) — P, I, A, global, parcial/falta y «revisar en conjunto» (|I − A| > 25).
+- `configuracion` — `pesos` del puntaje global (40 / 30 / 30 por defecto).
+- `correos_enviados` — registro de cada correo con su estado y error.
+- `visitas` + `analitica_resumen(desde, hasta)` — analítica propia del sitio (sin cookies ni IP).
+- `momentos`, `hero_sliders`, `etapas_convocatoria`, `resultados_programa` — contenido que se edita en el panel y se ve en el sitio (`sitio-datos.js`).
+- `cursos` (con `visibilidad`: todos / cohorte / emprendimiento) y `recursos` (con `modulo`).
 
-## Después de aplicarlo
+Buckets: `postulaciones` (privado, 10 MB, PDF/JPG/PNG), `momentos` (público, imágenes del blog y del inicio) y `cursos` (público, materiales).
 
-1. Que la primera persona (ej. `cristian@inngenios.co`) se registre normal vía Supabase Auth — le crea su fila en `profiles` con rol `editor`.
-2. Subir su rol a admin a mano, una sola vez:
-   ```sql
-   update public.profiles set role = 'admin' where email = 'cristian@inngenios.co';
-   ```
-3. `hero_sliders.imagen_url` en el seed son nombres de archivo de ejemplo (`hero-emprendedores-01.jpg`) — reemplázalos por las URLs reales una vez subas las fotos a Supabase Storage.
+## Correos (función `correos`, Resend)
 
-## Lo que falta
+Secretos de la función:
 
-Este SQL crea el esquema y lo llena con los datos reales que ya existen en el
-sitio. Conectar `admin.html` y `postular.html` a estas tablas (en vez de a los
-arreglos de JavaScript de ejemplo) es un paso aparte, todavía no hecho.
+```bash
+supabase secrets set RESEND_API_KEY=...            # lo pone la persona dueña de la cuenta de Resend
+supabase secrets set CORREO_REMITENTE="Innova Social <convocatoria@dominio-verificado>"
+supabase secrets set CORREO_PROGRAMA=correo-del-programa@...
+supabase secrets set SITE_URL=https://innova-eta.vercel.app
+```
+
+En Supabase → Authentication → URL Configuration hay que permitir
+`https://innova-eta.vercel.app/acceso.html` (y `http://localhost:4173/acceso.html`
+para pruebas): es a donde llevan los enlaces para crear la contraseña.
+
+## Roles
+
+- La primera cuenta admin se crea desde el dashboard (Authentication → Add user). Si su correo está en `admin_whitelist`, entra como admin automáticamente.
+- Después, todo el equipo se invita desde el panel: Ajustes → Equipo y accesos.
+- Los beneficiarios se crean al autorizar un ganador en la ficha de su postulación.
