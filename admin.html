@@ -252,16 +252,22 @@
   .grid2.g4{ grid-template-columns:repeat(4,minmax(0,1fr)); } .grid2.g3{ grid-template-columns:repeat(3,minmax(0,1fr)); } .grid2.gds{ grid-template-columns:140px minmax(0,1fr); }
   @media (max-width:900px){ .grid2.g4{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media (max-width:640px){ .grid2.g4, .grid2.g3, .grid2.gds{ grid-template-columns:1fr; } }
-  .sec-title{ font-size:13px; font-weight:800; margin:18px 0 8px; text-transform:uppercase; letter-spacing:.06em; color:var(--blue-deep); }
+  .sec-title{ font-size:13px; font-weight:800; margin:22px 0 10px; text-transform:uppercase; letter-spacing:.06em; color:var(--blue-deep); }
   .sec-title:first-child{ margin-top:0; }
+  .ficha-block{ margin:0 0 18px; padding:16px 18px; border:1px solid var(--line); border-radius:var(--r-md); background:#fff; }
+  .ficha-block > .sec-title{ margin:0 0 12px; font-size:12px; }
+  .ficha-block .kv{ gap:14px 28px; }
+  .ficha-block .long{ margin:14px 0 0; padding-top:14px; border-top:1px dashed var(--line); }
+  .ficha-block .long:first-of-type{ margin-top:4px; }
   .kv{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 22px; }
   @media (max-width:640px){ .kv{ grid-template-columns:1fr; } }
-  .kv .k{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700; }
-  .kv .v{ font-size:14px; font-weight:600; word-break:break-word; }
+  .kv .k{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700; margin-bottom:2px; }
+  .kv .v{ font-size:14.5px; font-weight:600; word-break:break-word; line-height:1.4; }
   .long{ margin:12px 0 0; }
-  .long .k{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700; }
-  .long .v{ font-size:13.5px; line-height:1.55; white-space:pre-wrap; }
+  .long .k{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700; margin-bottom:4px; }
+  .long .v{ font-size:14.5px; line-height:1.65; white-space:pre-wrap; font-weight:500; color:var(--ink); }
   .score-box{ border:1px solid var(--line); border-radius:var(--r-md); padding:14px 16px; background:var(--paper2); }
+  .rubric-sticky{ position:sticky; bottom:0; z-index:1; margin-top:8px; padding:12px 14px; border:1px solid var(--line); border-radius:var(--r-md); background:#fff; box-shadow:0 -6px 18px rgba(19,35,48,.06); }
   .score-grid{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
   @media (max-width:640px){ .score-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
   .score-grid > div{ background:#fff; border:1px solid var(--line); border-radius:var(--r-sm); padding:10px 12px; }
@@ -278,15 +284,16 @@
   .alert.err{ background:#FDF1F1; color:#9E2B30; }
   .modal.xl{ max-width:980px; }
   .modal-body.tall{ max-height:76vh; }
-  .rubric{ border:1px solid var(--line); border-radius:var(--r-md); padding:14px 16px; }
-  .rubric + .rubric{ margin-top:12px; }
-  .rubric h5{ margin:0 0 2px; font-size:14.5px; }
-  .rubric p.d{ margin:0 0 10px; font-size:12.5px; color:var(--muted); }
-  .rubric label{ display:grid; grid-template-columns:auto 22px 1fr; gap:8px; align-items:start; padding:7px 9px; border-radius:var(--r-sm); cursor:pointer; font-size:13px; line-height:1.4; border:1px solid transparent; }
+  .rubric{ border:1px solid var(--line); border-radius:var(--r-md); padding:16px 18px; background:#fff; }
+  .rubric + .rubric{ margin-top:14px; }
+  .rubric h5{ margin:0 0 4px; font-size:15.5px; line-height:1.3; }
+  .rubric p.d{ margin:0 0 12px; font-size:13px; line-height:1.5; color:var(--muted); }
+  .rubric label{ display:grid; grid-template-columns:auto 28px 1fr; gap:10px; align-items:start; padding:10px 12px; border-radius:var(--r-sm); cursor:pointer; font-size:13.5px; line-height:1.5; border:1px solid transparent; margin-bottom:4px; }
+  .rubric label:last-child{ margin-bottom:0; }
   .rubric label:hover{ background:var(--paper2); }
   .rubric label.on{ background:var(--blue-soft); border-color:var(--blue); }
-  .rubric label input{ margin:3px 0 0; }
-  .rubric label b{ font-variant-numeric:tabular-nums; }
+  .rubric label input{ margin:4px 0 0; }
+  .rubric label b{ font-variant-numeric:tabular-nums; font-size:14px; color:var(--blue-deep); }
   /* Calificación de cada entidad, tal como se ve en la ficha */
   .eval-card{ border:1px solid var(--line); border-radius:var(--r-md); padding:14px 16px; background:var(--paper2); }
   .eval-card.done{ background:#fff; border-color:color-mix(in srgb, var(--ok) 40%, var(--line)); }
@@ -1186,26 +1193,45 @@
     window.open(res.data.signedUrl, '_blank', 'noopener');
   };
 
-  // Ficha de datos (compartida entre administrador y evaluadores).
+  // Ficha de datos (compartida entre administrador y evaluadores), por bloques legibles.
   function fichaHtml(p){
     const siNo = (b) => b === true ? 'Sí' : b === false ? 'No' : '—';
     const money = (n) => (n == null || n === '') ? '—' : '$' + Number(n).toLocaleString('es-CO');
-    const F = [['Enviada', fmtFecha(p.created_at, true)], ['Nombre completo', p.nombre_completo], ['Correo', p.correo], ['WhatsApp', p.whatsapp], ['Documento', ((p.tipo_documento || '') + ' ' + (p.cedula || '')).trim()], ['Género', p.genero], ['Nacimiento', p.fecha_nacimiento], ['Municipio', p.municipio], ['Estrato', p.estrato], ['Educación', p.nivel_educacion], ['Empleo formal adicional', siNo(p.empleo_formal_adicional)], ['Emprendimiento', p.nombre_emprendimiento], ['Tipo', p.tipo_emprendimiento], ['Formalización', p.tipo_formalizacion], ['Categoría verde', p.categoria_negocio_verde], ['Subcategoría', p.subcategoria], ['Dedicación', p.dedicacion_tiempo], ['Colaboradores', p.num_colaboradores], ['Etapa', p.etapa_emprendimiento], ['¿Está vendiendo?', siNo(p.esta_vendiendo)], ['Ventas (promedio mensual)', money(p.promedio_ventas_6_meses)], ['Ganancia mensual', p.rango_ganancias], ['Financiación recibida', siNo(p.ha_recibido_financiacion)], ['Población priorizada', p.poblacion_priorizada], ['Discapacidad', (p.discapacidad || '—') + (p.tipo_discapacidad ? ' — ' + p.tipo_discapacidad : '')], ['ODS', (p.ods || []).join(', ')], ['Necesidades', (p.necesidades || []).join(', ')]];
+    const val = (v) => esc((v == null || v === '') ? '—' : String(v));
     const kv = (k, vHtml) => '<div><div class="k">' + esc(k) + '</div><div class="v">' + vHtml + '</div></div>';
-    let h = '<div class="kv">' + F.map(f => kv(f[0], esc((f[1] == null || f[1] === '') ? '—' : String(f[1])))).join('');
+    const bloque = (titulo, filas, extras) => '<div class="ficha-block"><div class="sec-title">' + esc(titulo) + '</div><div class="kv">'
+      + filas.map(f => kv(f[0], typeof f[1] === 'string' && f[1].indexOf('<') === 0 ? f[1] : val(f[1]))).join('')
+      + (extras || '') + '</div></div>';
+    const persona = [
+      ['Enviada', fmtFecha(p.created_at, true)], ['Nombre completo', p.nombre_completo], ['Correo', p.correo], ['WhatsApp', p.whatsapp],
+      ['Documento', ((p.tipo_documento || '') + ' ' + (p.cedula || '')).trim()], ['Género', p.genero], ['Nacimiento', p.fecha_nacimiento],
+      ['Municipio', p.municipio], ['Estrato', p.estrato], ['Educación', p.nivel_educacion],
+      ['Empleo formal adicional', siNo(p.empleo_formal_adicional)],
+      ['Población priorizada', p.poblacion_priorizada],
+      ['Discapacidad', (p.discapacidad || '—') + (p.tipo_discapacidad ? ' — ' + p.tipo_discapacidad : '')]
+    ];
+    const negocio = [
+      ['Emprendimiento', p.nombre_emprendimiento], ['Tipo', p.tipo_emprendimiento], ['Formalización', p.tipo_formalizacion],
+      ['Categoría verde', p.categoria_negocio_verde], ['Subcategoría', p.subcategoria], ['Dedicación', p.dedicacion_tiempo],
+      ['Colaboradores', p.num_colaboradores], ['Etapa', p.etapa_emprendimiento], ['¿Está vendiendo?', siNo(p.esta_vendiendo)],
+      ['Ventas (promedio mensual)', money(p.promedio_ventas_6_meses)], ['Ganancia mensual', p.rango_ganancias],
+      ['Financiación recibida', siNo(p.ha_recibido_financiacion)],
+      ['ODS', (p.ods || []).join(', ')], ['Necesidades', (p.necesidades || []).join(', ')]
+    ];
     const redes = partRedes(p);
-    h += kv('Redes sociales', redes.length ? redes.map(r => esc(r.red) + ': ' + linkHtml(r.url)).join('<br>') : 'Sin redes');
-    h += kv('Página web', p.pagina_web ? linkHtml(p.pagina_web) : '—');
-    h += kv('Video', p.video_url ? linkHtml(p.video_url) : '—');
+    const linksExtras = kv('Redes sociales', redes.length ? redes.map(r => esc(r.red) + ': ' + linkHtml(r.url)).join('<br>') : 'Sin redes')
+      + kv('Página web', p.pagina_web ? linkHtml(p.pagina_web) : '—')
+      + kv('Video', p.video_url ? linkHtml(p.video_url) : '—');
     let docs = p.documentos || {}; if (typeof docs === 'string') { try { docs = JSON.parse(docs); } catch(e){ docs = {}; } }
     const DOCN = { cedula: 'Documento de identidad', rut: 'RUT', recibo_triple_a: 'Recibo Triple A' };
-    h += kv('Documentos', Object.keys(DOCN).map(k => docs[k]
+    const docsExtras = kv('Documentos adjuntos', Object.keys(DOCN).map(k => docs[k]
       ? '<button type="button" class="btn ghost sm" style="margin:2px 4px 2px 0" data-doc="' + esc(docs[k]) + '">' + DOCN[k] + ' ↗</button>'
-      : '<span class="muted" style="font-size:12px;margin-right:8px">' + DOCN[k] + ': sin adjunto</span>').join(''));
-    h += '</div>';
+      : '<span class="muted" style="font-size:12.5px;margin-right:8px">' + DOCN[k] + ': sin adjunto</span>').join(''));
     const L = [['Producto o servicio', p.descripcion_producto], ['Problema que resuelve', p.descripcion_problema], ['Impacto', p.descripcion_impacto], ['Clientes', p.descripcion_clientes], ['Por qué necesita el recurso y en qué lo invertiría', p.uso_recurso]];
-    h += L.map(f => '<div class="long"><div class="k">' + esc(f[0]) + '</div><div class="v">' + esc(f[1] || '—') + '</div></div>').join('');
-    return h;
+    const narrativa = '<div class="ficha-block"><div class="sec-title">Narrativa del emprendimiento</div>'
+      + L.map(f => '<div class="long"><div class="k">' + esc(f[0]) + '</div><div class="v">' + esc(f[1] || '—') + '</div></div>').join('')
+      + '</div>';
+    return bloque('Persona postulante', persona) + bloque('Emprendimiento y operación', negocio, linksExtras + docsExtras) + narrativa;
   }
   $('genBody').addEventListener('click', (e) => { const d = e.target.closest('[data-doc]'); if (d) window.abrirDocumento(d.dataset.doc); });
 
@@ -1268,20 +1294,22 @@
     const s = score(p), ev = S.evals[id] || {};
     const tie = empates(S.participantes), enEmpate = !s.parcial && tie[s.G] > 1;
     const est = p.estado || 'postulado';
-    let body = '<div class="score-box" style="margin-bottom:16px"><div class="score-grid">'
+    const falta = ['inngenios', 'triple_a'].filter(k => !ev[k]);
+    // Primero se lee la postulación; puntajes y calificación van al final.
+    let body = fichaHtml(p);
+    body += '<div class="sec-title">Puntaje</div><div class="score-box"><div class="score-grid">'
       + '<div><span>Plataforma (P)</span><b>' + num(s.P) + '</b><div class="muted" style="font-size:11.5px">' + (s.pts != null ? s.pts + ' de ' + s.max + ' puntos' : '') + '</div></div>'
       + '<div><span>Inngenios (I)</span><b>' + (s.I == null ? '—' : num(s.I)) + '</b></div>'
       + '<div><span>Triple A (A)</span><b>' + (s.A == null ? '—' : num(s.A)) + '</b></div>'
       + '<div><span>Global</span><b>' + num(s.G) + '</b><div class="muted" style="font-size:11.5px">' + (s.parcial ? 'Parcial · ' + esc(s.falta || '') : 'Completo') + '</div></div>'
       + '</div>'
       + (s.revisar ? '<div class="alert err" style="margin-top:10px">I y A difieren en más de 25 puntos: revisen esta postulación en conjunto.</div>' : '')
-      + '<p class="muted" style="font-size:11.5px;margin:10px 0 0">Global = ' + Math.round(S.pesos.plataforma * 100) + ' % P + ' + Math.round(S.pesos.inngenios * 100) + ' % I + ' + Math.round(S.pesos.triple_a * 100) + ' % A.</p></div>';
-    const falta = ['inngenios', 'triple_a'].filter(k => !ev[k]);
+      + '<p class="muted" style="font-size:12px;margin:10px 0 0">Global = ' + Math.round(S.pesos.plataforma * 100) + ' % P + ' + Math.round(S.pesos.inngenios * 100) + ' % I + ' + Math.round(S.pesos.triple_a * 100) + ' % A.</p></div>';
+    body += '<details style="margin:12px 0 0"><summary class="muted" style="cursor:pointer;font-size:12.5px;font-weight:700">Detalle del puntaje de la plataforma</summary>'
+      + '<table class="mini-table" style="margin-top:8px">' + (s.detalle || []).map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + ' / ' + r[2] + '</td></tr>').join('') + '</table></details>';
     body += '<div class="sec-title">Calificación con la rúbrica</div>'
-      + (falta.length ? '<p class="muted" style="font-size:12.5px;margin:0 0 10px">' + (falta.length === 2 ? 'Ninguna de las dos entidades ha calificado esta postulación.' : 'Falta la calificación de ' + esc(ENTIDADES[falta[0]]) + '.') + ' El puntaje global queda parcial hasta que estén las dos.</p>' : '')
+      + (falta.length ? '<p class="muted" style="font-size:13px;margin:0 0 12px;line-height:1.5">' + (falta.length === 2 ? 'Ninguna de las dos entidades ha calificado esta postulación.' : 'Falta la calificación de ' + esc(ENTIDADES[falta[0]]) + '.') + ' El puntaje global queda parcial hasta que estén las dos.</p>' : '')
       + '<div class="grid2">' + evalTarjeta('inngenios', ev.inngenios, p.id) + evalTarjeta('triple_a', ev.triple_a, p.id) + '</div>';
-    body += '<div class="sec-title">Datos de la postulación</div>' + fichaHtml(p);
-    body += '<div class="sec-title">Detalle del puntaje de la plataforma</div><table class="mini-table">' + (s.detalle || []).map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + ' / ' + r[2] + '</td></tr>').join('') + '</table>';
     body += '<div class="sec-title">Desempate</div>'
       + (enEmpate ? '<div class="alert warn" style="margin-bottom:10px">Esta postulación tiene el mismo puntaje global (' + num(s.G) + ') que otra. Registren el orden acordado en la reunión de Inngenios y Triple A.</div>' : '<p class="muted" style="font-size:12.5px;margin:0 0 10px">Solo se usa si hay empate en el puntaje global.</p>')
       + '<div class="grid2 gds"><div class="field"><label for="dsOrden">Orden acordado</label><input type="number" id="dsOrden" min="1" step="1" value="' + (p.orden_desempate == null ? '' : p.orden_desempate) + '"></div>'
@@ -1386,17 +1414,21 @@
 
   function abrirRubrica(id){
     const p = S.participantes.find(x => x.id === id); if (!p) { toast('No encontramos esa postulación'); return; }
-    const ev = S.misEvals[id] || {};
-    let body = '<div class="alert info" style="margin-bottom:14px">Calificas como <b>' + esc(ENTIDADES[S.perfil.entidad]) + '</b>. Lee la postulación y elige, en cada criterio, la descripción que mejor la representa.</div>';
-    body += '<details style="margin-bottom:16px" open><summary style="cursor:pointer;font-weight:800;font-size:13.5px;margin-bottom:10px">Postulación completa</summary>' + fichaHtml(p) + '</details>';
-    body += '<div class="sec-title">Rúbrica</div>' + CRITERIOS.map(c => '<div class="rubric" data-crit="' + c.k + '"><h5>' + esc(c.t) + '</h5><p class="d">' + esc(c.d) + '</p>'
+    const ev = S.misEvals[id] || (S.evals[id] && S.evals[id][S.perfil.entidad]) || {};
+    // Leer primero; calificar al final.
+    let body = '<div class="alert info" style="margin-bottom:16px">Calificas como <b>' + esc(ENTIDADES[S.perfil.entidad]) + '</b>. Lee la postulación completa y, al final, elige en cada criterio la descripción que mejor la representa.</div>';
+    body += fichaHtml(p);
+    body += '<div class="sec-title" id="rubInicio">Calificación · rúbrica</div>'
+      + '<p class="muted" style="font-size:13px;margin:0 0 14px;line-height:1.5">Marca un nivel (1 a 5) por criterio. El total se calcula solo cuando están los cuatro.</p>'
+      + CRITERIOS.map(c => '<div class="rubric" data-crit="' + c.k + '"><h5>' + esc(c.t) + '</h5><p class="d">' + esc(c.d) + '</p>'
       + c.n.map((txt, i) => '<label class="' + (ev[c.k] === i + 1 ? 'on' : '') + '"><input type="radio" name="r_' + c.k + '" value="' + (i + 1) + '"' + (ev[c.k] === i + 1 ? ' checked' : '') + '><b>' + (i + 1) + '</b><span>' + esc(txt) + '</span></label>').join('') + '</div>').join('');
-    body += '<div class="field" style="margin-top:14px"><label for="rubComentario">Comentario (opcional, lo ve el administrador)</label><textarea id="rubComentario" maxlength="1500" placeholder="Fortalezas, dudas o lo que conviene revisar en la entrevista.">' + esc(ev.comentario || '') + '</textarea></div>';
-    body += '<div class="score-box" style="margin-top:14px" id="rubTotal"></div><div class="save-status" id="rubStatus" style="margin-top:8px"></div>';
-    const foot = '<button class="btn ghost" type="button" data-gen-close>Cerrar</button><button class="btn solid" type="button" id="btnGuardarRub">Guardar calificación</button>';
+    body += '<div class="field" style="margin-top:16px"><label for="rubComentario">Comentario (opcional, lo ve el administrador)</label><textarea id="rubComentario" maxlength="1500" rows="3" placeholder="Fortalezas, dudas o lo que conviene revisar en la entrevista.">' + esc(ev.comentario || '') + '</textarea></div>';
+    body += '<div class="rubric-sticky" id="rubTotal"></div><div class="save-status" id="rubStatus" style="margin-top:8px"></div>';
+    const foot = '<button class="btn ghost" type="button" data-gen-close>Cerrar</button><button class="btn ghost" type="button" id="btnIrRub">Ir a calificar</button><button class="btn solid" type="button" id="btnGuardarRub">Guardar calificación</button>';
     genAbrir(p.nombre_emprendimiento || 'Postulación', (p.nombre_completo || '') + ' · ' + (p.municipio || ''), body, foot);
     S.genSucio = false;
     $('genFoot').querySelector('[data-gen-close]').onclick = genCerrar;
+    $('btnIrRub').onclick = () => { const el = $('rubInicio'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     const total = () => {
       const vals = CRITERIOS.map(c => { const r = document.querySelector('input[name="r_' + c.k + '"]:checked'); return r ? Number(r.value) : null; });
       const faltan = vals.filter(v => v == null).length, suma = vals.reduce((a, v) => a + (v || 0), 0);
@@ -1411,7 +1443,7 @@
     total();
     $('btnGuardarRub').onclick = async () => {
       const t = total(), st = $('rubStatus');
-      if (t.faltan) { st.textContent = 'Califica los cuatro criterios antes de guardar.'; return; }
+      if (t.faltan) { st.textContent = 'Califica los cuatro criterios antes de guardar.'; $('rubInicio').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
       const { data: { user } } = await sb.auth.getUser();
       const row = { postulacion_id: p.id, entidad: S.perfil.entidad, evaluador_id: user.id, comentario: $('rubComentario').value.trim() || null };
       CRITERIOS.forEach((c, i) => { row[c.k] = t.vals[i]; });
