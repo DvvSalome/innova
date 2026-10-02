@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acceso — Innova Social 5.0</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --blue:#62ABE2; --blue-deep:#2279BA; --blue-dark:#154B73; --ink:#132330; --muted:#4F697A; --paper:#fff; --paper2:#F2F8FB; --line:#E2ECF1; --mint:#82CA76; --red:#DD494E; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; min-height:100vh; background:var(--paper2); color:var(--ink); font-family:"Nunito",-apple-system,"Segoe UI",sans-serif; display:flex; flex-direction:column; }
+  header{ background:var(--paper); border-bottom:1px solid var(--line); }
+  header .row{ max-width:960px; margin:0 auto; padding:16px 22px; display:flex; align-items:center; justify-content:space-between; }
+  .brand{ font-weight:800; font-size:15.5px; text-decoration:none; color:var(--ink); display:flex; align-items:center; gap:10px; }
+  .brand .mark{ width:28px; height:28px; border-radius:9px; background:linear-gradient(135deg,var(--blue),var(--mint)); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  header a.back{ font-size:13.5px; font-weight:600; color:var(--muted); }
+  main{ flex:1; display:flex; align-items:flex-start; justify-content:center; padding:48px 18px; }
+  .card{ width:100%; max-width:420px; background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:30px 26px; box-shadow:0 16px 34px -18px rgba(19,35,48,.3); }
+  h1{ font-size:22px; margin:0 0 6px; letter-spacing:-.01em; }
+  p.sub{ color:var(--muted); font-size:14px; margin:0 0 22px; line-height:1.5; }
+  label{ display:block; font-size:13px; font-weight:700; margin:0 0 6px; }
+  input{ width:100%; font:inherit; font-size:14px; padding:12px 13px; border-radius:10px; border:1.5px solid var(--line); margin:0 0 14px; }
+  input:focus{ outline:none; border-color:var(--blue); }
+  .btn{ width:100%; font:inherit; font-weight:700; font-size:15px; padding:14px; border-radius:12px; border:none; background:var(--blue-deep); color:#fff; cursor:pointer; }
+  .btn:disabled{ opacity:.6; cursor:wait; }
+  .link{ background:none; border:none; padding:0; font:inherit; font-size:13px; font-weight:700; color:var(--blue-deep); cursor:pointer; text-decoration:underline; }
+  .msg{ display:none; font-size:13.5px; line-height:1.5; border-radius:12px; padding:11px 13px; margin:0 0 16px; }
+  .msg.on{ display:block; }
+  .msg.err{ background:#FDF1F1; color:#9E2B30; border:1px solid #F5C6C8; }
+  .msg.ok{ background:#EEF8EC; color:#2F6E26; border:1px solid #CFE8C9; }
+  .hint{ font-size:12px; color:var(--muted); margin:-8px 0 14px; }
+  .row-end{ display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:13px; color:var(--muted); }
+  section[hidden]{ display:none !important; }
+</style>
+</head>
+<body>
+<header><div class="row"><a class="brand" href="index.html"><span class="mark">IS</span> Innova Social 5.0</a><a class="back" href="index.html">← Volver al sitio</a></div></header>
+<main>
+  <div class="card">
+    <div class="msg" id="msg" role="alert"></div>
+
+    <section id="vCargando"><p class="sub">Cargando…</p></section>
+
+    <section id="vClave" hidden>
+      <h1>Crea tu contraseña</h1>
+      <p class="sub" id="claveSub">Elige una contraseña para entrar a la plataforma de Innova Social 5.0.</p>
+      <form id="fClave" novalidate>
+        <label for="clave1">Contraseña nueva</label>
+        <input type="password" id="clave1" autocomplete="new-password" minlength="8" required>
+        <p class="hint">Mínimo 8 caracteres.</p>
+        <label for="clave2">Repite la contraseña</label>
+        <input type="password" id="clave2" autocomplete="new-password" minlength="8" required>
+        <button class="btn" type="submit" id="bClave">Guardar y entrar</button>
+      </form>
+    </section>
+
+    <section id="vEntrar" hidden>
+      <h1>Entra a la plataforma</h1>
+      <p class="sub">Para emprendimientos beneficiarios y el equipo del programa.</p>
+      <form id="fEntrar" novalidate>
+        <label for="email">Correo</label>
+        <input type="email" id="email" autocomplete="email" required>
+        <label for="clave">Contraseña</label>
+        <input type="password" id="clave" autocomplete="current-password" required>
+        <button class="btn" type="submit" id="bEntrar">Entrar</button>
+      </form>
+      <div class="row-end"><button class="link" type="button" id="aOlvide">¿Olvidaste tu contraseña?</button></div>
+    </section>
+
+    <section id="vOlvide" hidden>
+      <h1>Recupera tu contraseña</h1>
+      <p class="sub">Te enviamos un enlace para crear una contraseña nueva.</p>
+      <form id="fOlvide" novalidate>
+        <label for="emailR">Correo</label>
+        <input type="email" id="emailR" autocomplete="email" required>
+        <button class="btn" type="submit" id="bOlvide">Enviar enlace</button>
+      </form>
+      <div class="row-end"><button class="link" type="button" id="aVolver">← Volver a entrar</button></div>
+    </section>
+  </div>
+</main>
+<script>
+(function(){
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const cfg = window.INNOVA_SUPABASE || {};
+  const vistas = ['vCargando', 'vClave', 'vEntrar', 'vOlvide'];
+  function ver(id){ vistas.forEach(v => { $(v).hidden = v !== id; }); }
+  function aviso(texto, tipo){ const m = $('msg'); m.textContent = texto; m.className = 'msg on ' + (tipo || 'err'); }
+  function limpiar(){ $('msg').className = 'msg'; }
+
+  if (!window.supabase || !cfg.url) { ver('vEntrar'); aviso('No pudimos conectar con la plataforma. Intenta más tarde.'); return; }
+  const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+
+  const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const query = new URLSearchParams(location.search);
+  const tipoEnlace = hash.get('type') || query.get('type');
+  const errorEnlace = hash.get('error_code') || query.get('error_code') || hash.get('error');
+
+  async function destino(){
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return 'acceso.html';
+    const { data: perfil } = await sb.from('profiles').select('role').eq('id', user.id).maybeSingle();
+    const rol = perfil && perfil.role;
+    return ['admin', 'editor', 'evaluador'].includes(rol) ? 'admin.html' : 'mis-cursos.html';
+  }
+  async function irA(){ location.replace(await destino()); }
+
+  let modoClave = tipoEnlace === 'invite' || tipoEnlace === 'recovery';
+  sb.auth.onAuthStateChange((evento) => {
+    if (evento === 'PASSWORD_RECOVERY') { modoClave = true; ver('vClave'); }
+  });
+
+  (async function iniciar(){
+    if (errorEnlace) {
+      ver('vEntrar');
+      aviso(/expired/i.test(errorEnlace) || /otp_expired/.test(errorEnlace)
+        ? 'El enlace venció o ya se usó. Pide al equipo que te lo reenvíe, o usa «¿Olvidaste tu contraseña?».'
+        : 'El enlace no es válido. Pide al equipo que te lo reenvíe.');
+      return;
+    }
+    const { data: { session } } = await sb.auth.getSession();
+    if (session && modoClave) {
+      if (tipoEnlace === 'invite') $('claveSub').textContent = 'Te damos la bienvenida. Elige una contraseña para entrar a la plataforma de Innova Social 5.0.';
+      ver('vClave');
+      history.replaceState(null, '', location.pathname);
+      return;
+    }
+    if (session) { irA(); return; }
+    ver('vEntrar');
+  })();
+
+  $('fClave').addEventListener('submit', async (e) => {
+    e.preventDefault(); limpiar();
+    const a = $('clave1').value, b = $('clave2').value;
+    if (a.length < 8) { aviso('La contraseña debe tener mínimo 8 caracteres.'); return; }
+    if (a !== b) { aviso('Las contraseñas no coinciden.'); return; }
+    $('bClave').disabled = true; $('bClave').textContent = 'Guardando…';
+    const { error } = await sb.auth.updateUser({ password: a });
+    $('bClave').disabled = false; $('bClave').textContent = 'Guardar y entrar';
+    if (error) { aviso(/session|jwt/i.test(error.message) ? 'El enlace venció. Pide que te lo reenvíen.' : 'No se pudo guardar la contraseña: ' + error.message); return; }
+    aviso('Contraseña guardada. Entrando…', 'ok');
+    setTimeout(irA, 700);
+  });
+
+  $('fEntrar').addEventListener('submit', async (e) => {
+    e.preventDefault(); limpiar();
+    const email = $('email').value.trim(), password = $('clave').value;
+    if (!email || !password) { aviso('Escribe tu correo y tu contraseña.'); return; }
+    $('bEntrar').disabled = true; $('bEntrar').textContent = 'Entrando…';
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    $('bEntrar').disabled = false; $('bEntrar').textContent = 'Entrar';
+    if (error) { aviso(error.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos.' : error.message); return; }
+    irA();
+  });
+
+  $('aOlvide').addEventListener('click', () => { limpiar(); $('emailR').value = $('email').value; ver('vOlvide'); });
+  $('aVolver').addEventListener('click', () => { limpiar(); ver('vEntrar'); });
+  $('fOlvide').addEventListener('submit', async (e) => {
+    e.preventDefault(); limpiar();
+    const email = $('emailR').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { aviso('Escribe un correo válido.'); return; }
+    $('bOlvide').disabled = true;
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/acceso.html' });
+    $('bOlvide').disabled = false;
+    if (error) { aviso('No se pudo enviar el enlace: ' + error.message); return; }
+    aviso('Si el correo está registrado, te llegará un enlace para crear una contraseña nueva.', 'ok');
+  });
+})();
+</script>
+</body>
+</html>

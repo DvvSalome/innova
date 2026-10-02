@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mis cursos — Innova Social 5.0</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --blue:#62ABE2; --blue-deep:#2279BA; --blue-dark:#154B73; --ink:#132330; --muted:#4F697A; --paper:#fff; --paper2:#F2F8FB; --line:#E2ECF1; --mint:#82CA76; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper2); color:var(--ink); font-family:"Nunito",-apple-system,"Segoe UI",sans-serif; }
+  header{ background:var(--paper); border-bottom:1px solid var(--line); }
+  header .row{ max-width:1040px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .brand{ font-weight:800; font-size:15.5px; text-decoration:none; color:var(--ink); display:flex; align-items:center; gap:10px; }
+  .brand .mark{ width:28px; height:28px; border-radius:9px; background:linear-gradient(135deg,var(--blue),var(--mint)); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .who{ display:flex; align-items:center; gap:12px; font-size:13px; color:var(--muted); }
+  .who button{ font:inherit; font-weight:700; font-size:13px; background:none; border:1.5px solid var(--line); border-radius:10px; padding:7px 12px; cursor:pointer; color:var(--ink); }
+  main{ max-width:1040px; margin:0 auto; padding:34px 22px 60px; }
+  h1{ font-size:clamp(24px,3.4vw,32px); margin:0 0 6px; letter-spacing:-.02em; }
+  .sub{ color:var(--muted); margin:0 0 26px; font-size:14.5px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+  .curso{ display:flex; flex-direction:column; background:var(--paper); border:1px solid var(--line); border-radius:18px; overflow:hidden; text-decoration:none; color:inherit; transition:transform .2s, box-shadow .2s; }
+  .curso:hover{ transform:translateY(-3px); box-shadow:0 16px 30px -18px rgba(19,35,48,.35); }
+  .curso .portada{ aspect-ratio:16/9; background:linear-gradient(135deg,#DCEBF6,#E4F4E1); background-size:cover; background-position:center; }
+  .curso .tx{ padding:16px 18px 18px; }
+  .curso .cat{ font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--blue-deep); }
+  .curso h2{ font-size:17px; margin:6px 0 6px; }
+  .curso p{ font-size:13.5px; color:var(--muted); margin:0 0 10px; line-height:1.5; }
+  .curso .meta{ font-size:12px; font-weight:700; color:var(--muted); }
+  .vacio{ background:var(--paper); border:1px dashed var(--line); border-radius:18px; padding:30px; text-align:center; color:var(--muted); }
+</style>
+</head>
+<body>
+<header><div class="row"><a class="brand" href="index.html"><span class="mark">IS</span> Innova Social 5.0</a><div class="who"><span id="quien"></span><button type="button" id="salir">Salir</button></div></div></header>
+<main>
+  <h1 id="saludo">Mis cursos</h1>
+  <p class="sub">Los cursos y materiales del programa asignados a tu emprendimiento.</p>
+  <div class="grid" id="grid"><div class="vacio">Cargando cursos…</div></div>
+</main>
+<script>
+(function(){
+  'use strict';
+  const cfg = window.INNOVA_SUPABASE || {};
+  const grid = document.getElementById('grid');
+  if (!window.supabase || !cfg.url) { grid.innerHTML = '<div class="vacio">No pudimos conectar con la plataforma.</div>'; return; }
+  const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+
+  document.getElementById('salir').addEventListener('click', async () => { await sb.auth.signOut(); location.replace('acceso.html'); });
+
+  (async function(){
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { location.replace('acceso.html'); return; }
+    const { data: perfil } = await sb.from('profiles').select('full_name,email,role').eq('id', session.user.id).maybeSingle();
+    const nombre = (perfil && (perfil.full_name || perfil.email)) || session.user.email;
+    document.getElementById('quien').textContent = nombre;
+    document.getElementById('saludo').textContent = 'Hola, ' + String(nombre).split(/[\s@]/)[0];
+
+    const { data, error } = await sb.from('cursos').select('id,titulo,descripcion,categoria,portada_url,orden,recursos(count)').eq('activo', true).order('orden').order('created_at');
+    if (error) { grid.innerHTML = '<div class="vacio">No pudimos cargar tus cursos: ' + esc(error.message) + '</div>'; return; }
+    if (!data || !data.length) { grid.innerHTML = '<div class="vacio">Todavía no tienes cursos asignados. Cuando el equipo publique uno, aparecerá aquí.</div>'; return; }
+    grid.innerHTML = data.map(c => {
+      const n = (c.recursos && c.recursos[0] && c.recursos[0].count) || 0;
+      const portada = c.portada_url && /^https:\/\//.test(c.portada_url) ? ' style="background-image:url(\'' + esc(c.portada_url) + '\')"' : '';
+      return '<a class="curso" href="curso.html?id=' + encodeURIComponent(c.id) + '"><div class="portada"' + portada + '></div><div class="tx">'
+        + (c.categoria ? '<span class="cat">' + esc(c.categoria) + '</span>' : '')
+        + '<h2>' + esc(c.titulo) + '</h2>' + (c.descripcion ? '<p>' + esc(c.descripcion) + '</p>' : '')
+        + '<span class="meta">' + n + (n === 1 ? ' recurso' : ' recursos') + '</span></div></a>';
+    }).join('');
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curso — Innova Social 5.0</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --blue:#62ABE2; --blue-deep:#2279BA; --blue-dark:#154B73; --ink:#132330; --muted:#4F697A; --paper:#fff; --paper2:#F2F8FB; --line:#E2ECF1; --mint:#82CA76; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper2); color:var(--ink); font-family:"Nunito",-apple-system,"Segoe UI",sans-serif; }
+  header{ background:var(--paper); border-bottom:1px solid var(--line); }
+  header .row{ max-width:960px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .brand{ font-weight:800; font-size:15.5px; text-decoration:none; color:var(--ink); display:flex; align-items:center; gap:10px; }
+  .brand .mark{ width:28px; height:28px; border-radius:9px; background:linear-gradient(135deg,var(--blue),var(--mint)); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  header a.back{ font-size:13.5px; font-weight:700; color:var(--muted); }
+  .preview{ display:none; background:#FFF6E0; border-bottom:1px solid #F2DDA6; color:#7A5A12; font-size:13px; font-weight:700; text-align:center; padding:9px 16px; }
+  .preview.on{ display:block; }
+  main{ max-width:960px; margin:0 auto; padding:30px 22px 70px; }
+  .hero{ display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:24px; align-items:center; margin-bottom:28px; }
+  @media (max-width:760px){ .hero{ grid-template-columns:1fr; } }
+  .hero .portada{ aspect-ratio:16/9; border-radius:16px; background:linear-gradient(135deg,#DCEBF6,#E4F4E1) center/cover; }
+  .cat{ font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--blue-deep); }
+  h1{ font-size:clamp(24px,3.6vw,34px); margin:6px 0 10px; letter-spacing:-.02em; }
+  .desc{ color:var(--muted); font-size:15px; line-height:1.6; margin:0; }
+  .modulo{ background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:20px 20px 8px; margin-bottom:16px; }
+  .modulo h2{ font-size:16px; margin:0 0 14px; }
+  .rec{ border-top:1px solid var(--line); padding:14px 0; }
+  .rec:first-of-type{ border-top:none; padding-top:0; }
+  .rec h3{ font-size:15px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .rec .tipo{ font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--blue-deep); background:var(--paper2); border-radius:100px; padding:3px 8px; }
+  .rec p{ font-size:13.5px; color:var(--muted); margin:0 0 10px; line-height:1.5; }
+  .rec .video{ position:relative; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:#000; margin:0 0 6px; }
+  .rec .video iframe, .rec .video video{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .rec a.abrir{ display:inline-block; font-weight:700; font-size:13.5px; color:#fff; background:var(--blue-deep); text-decoration:none; padding:9px 14px; border-radius:10px; }
+  .vacio{ background:var(--paper); border:1px dashed var(--line); border-radius:18px; padding:30px; text-align:center; color:var(--muted); }
+</style>
+</head>
+<body>
+<header><div class="row"><a class="brand" href="index.html"><span class="mark">IS</span> Innova Social 5.0</a><a class="back" id="volver" href="mis-cursos.html">← Mis cursos</a></div></header>
+<div class="preview" id="previewBar">Vista previa: así verá el curso un beneficiario. <span id="previewEstado"></span></div>
+<main id="main"><div class="vacio">Cargando curso…</div></main>
+<script>
+(function(){
+  'use strict';
+  const cfg = window.INNOVA_SUPABASE || {};
+  const main = document.getElementById('main');
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  const https = (u) => { try { const x = new URL(u); return x.protocol === 'https:' ? x.href : null; } catch (e) { return null; } };
+  function ytId(u){ const m = String(u || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/); return m ? m[1] : null; }
+  const TIPOS = { youtube:'Video', video:'Video', documento:'Documento', enlace:'Enlace', plantilla:'Plantilla', otro:'Recurso' };
+
+  if (!window.supabase || !cfg.url) { main.innerHTML = '<div class="vacio">No pudimos conectar con la plataforma.</div>'; return; }
+  const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  const preview = params.get('preview') === '1';
+
+  function recurso(r){
+    const url = https(r.url);
+    let medio = '';
+    const yid = r.tipo === 'youtube' ? ytId(r.url) : null;
+    if (yid) medio = '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' + yid + '" title="' + esc(r.titulo) + '" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+    else if (r.tipo === 'video' && url) medio = '<div class="video"><video controls preload="metadata" src="' + esc(url) + '"></video></div>';
+    else if (url) medio = '<a class="abrir" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + (r.tipo === 'enlace' ? 'Abrir enlace' : 'Abrir ' + esc((r.archivo_nombre || 'archivo'))) + ' ↗</a>';
+    return '<div class="rec"><h3>' + esc(r.titulo) + ' <span class="tipo">' + esc(TIPOS[r.tipo] || 'Recurso') + '</span></h3>'
+      + (r.descripcion ? '<p>' + esc(r.descripcion) + '</p>' : '') + medio + '</div>';
+  }
+
+  (async function(){
+    if (!id) { main.innerHTML = '<div class="vacio">Falta el curso. <a href="mis-cursos.html">Ver mis cursos</a></div>'; return; }
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { location.replace('acceso.html'); return; }
+    if (preview) {
+      document.getElementById('previewBar').classList.add('on');
+      document.getElementById('volver').href = 'admin.html';
+      document.getElementById('volver').textContent = '← Volver al panel';
+    }
+    const { data: c, error } = await sb.from('cursos').select('*').eq('id', id).maybeSingle();
+    if (error || !c) { main.innerHTML = '<div class="vacio">Este curso no existe o no está disponible para tu cuenta.</div>'; return; }
+    if (preview) document.getElementById('previewEstado').textContent = c.activo ? '(Publicado)' : '(Aún no publicado: los beneficiarios todavía no lo ven)';
+    document.title = c.titulo + ' — Innova Social 5.0';
+    const { data: recs } = await sb.from('recursos').select('*').eq('curso_id', id).eq('activo', true).order('orden').order('created_at');
+    const grupos = [];
+    (recs || []).forEach(r => {
+      const k = (r.modulo || '').trim() || 'Materiales del curso';
+      let g = grupos.find(x => x.k === k);
+      if (!g) { g = { k, items: [] }; grupos.push(g); }
+      g.items.push(r);
+    });
+    const portada = https(c.portada_url);
+    main.innerHTML = '<div class="hero"><div>' + (c.categoria ? '<span class="cat">' + esc(c.categoria) + '</span>' : '')
+      + '<h1>' + esc(c.titulo) + '</h1>' + (c.descripcion ? '<p class="desc">' + esc(c.descripcion) + '</p>' : '') + '</div>'
+      + '<div class="portada"' + (portada ? ' style="background-image:url(\'' + esc(portada) + '\')"' : '') + '></div></div>'
+      + (grupos.length ? grupos.map(g => '<section class="modulo"><h2>' + esc(g.k) + '</h2>' + g.items.map(recurso).join('') + '</section>').join('')
+        : '<div class="vacio">Este curso todavía no tiene materiales.</div>');
+  })();
+})();
+</script>
+</body>
+</html>
