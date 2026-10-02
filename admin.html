@@ -630,14 +630,14 @@
             <div class="field"><label for="invNombre">Nombre</label><input type="text" id="invNombre" placeholder="Nombre y apellido"></div>
             <div class="field"><label for="invEmail">Correo *</label><input type="email" id="invEmail" placeholder="persona@correo.com" required></div>
             <div class="field"><label for="invRol">Rol *</label><select id="invRol"><option value="evaluador">Evaluador (califica postulaciones)</option><option value="editor">Editor (contenido web y cursos)</option><option value="admin">Administrador (todo el panel)</option></select></div>
-            <div class="field" id="invEntidadF"><label for="invEntidad">Entidad del evaluador *</label><select id="invEntidad"><option value="inngenios">Inngenios</option><option value="triple_a">Triple A</option></select></div>
+            <div class="field" id="invEntidadF"><label for="invEntidad">Entidad (para calificar)</label><select id="invEntidad"><option value="inngenios">Inngenios</option><option value="triple_a">Triple A</option><option value="">Sin entidad (no califica)</option></select></div>
             <div style="grid-column:1/-1; display:flex; gap:10px; align-items:center; flex-wrap:wrap;"><button class="btn solid" type="submit" id="btnInvitar">Enviar invitación</button><span class="save-status" id="invStatus"></span></div>
           </form>
         </div>
         <div class="card">
           <div class="table-wrap"><table><thead><tr><th>Persona</th><th>Rol</th><th>Entidad</th><th>Desde</th><th></th></tr></thead><tbody id="tblEquipo"></tbody></table></div>
         </div>
-        <p class="muted" style="font-size:12.5px; margin:10px 2px 0;">Roles: <b>Administrador</b> ve todo, incluidas las postulaciones, los correos y los accesos. <b>Editor</b> gestiona el contenido web y los cursos. <b>Evaluador</b> solo califica postulaciones con la rúbrica de su entidad. Los beneficiarios se crean al autorizar ganadores en Participantes.</p>
+        <p class="muted" style="font-size:12.5px; margin:10px 2px 0;">Roles: <b>Administrador</b> ve todo; si tiene entidad (Inngenios o Triple A), también califica. <b>Editor</b> gestiona el contenido web y los cursos. <b>Evaluador</b> solo califica con la rúbrica de su entidad. Los beneficiarios se crean al autorizar ganadores en Participantes.</p>
       </section>
 
       <!-- ============ CONFIGURACIÓN ============ -->
@@ -2267,9 +2267,15 @@
     if (r.error) { tb.innerHTML = '<tr><td colspan="5">Error: ' + esc(r.error.message) + '</td></tr>'; return; }
     S.equipo = r.data || [];
     const yo = S.perfil.id;
+    const entSelect = (u) => {
+      if (u.role !== 'evaluador' && u.role !== 'admin') return '<span class="muted">—</span>';
+      return '<select data-ent style="width:auto;padding:6px 8px;font-size:12.5px"><option value="">— Sin entidad —</option>'
+        + Object.keys(ENTIDADES).map(k => '<option value="' + k + '"' + (u.entidad === k ? ' selected' : '') + '>' + ENTIDADES[k] + '</option>').join('')
+        + '</select>';
+    };
     tb.innerHTML = S.equipo.map(u => '<tr data-id="' + esc(u.id) + '"><td><b>' + esc(u.full_name || '—') + '</b><div class="muted" style="font-size:12px">' + esc(u.email) + '</div></td>'
       + '<td><select data-rol ' + (u.id === yo ? 'disabled title="No puedes cambiar tu propio rol"' : '') + ' style="width:auto;padding:6px 8px;font-size:12.5px">' + ['admin', 'editor', 'evaluador'].map(k => '<option value="' + k + '"' + (u.role === k ? ' selected' : '') + '>' + ROLES[k] + '</option>').join('') + '<option value="pendiente">Quitar acceso al panel</option></select></td>'
-      + '<td>' + (u.role === 'evaluador' ? '<select data-ent style="width:auto;padding:6px 8px;font-size:12.5px"><option value="">— Sin entidad —</option>' + Object.keys(ENTIDADES).map(k => '<option value="' + k + '"' + (u.entidad === k ? ' selected' : '') + '>' + ENTIDADES[k] + '</option>').join('') + '</select>' : '<span class="muted">—</span>') + '</td>'
+      + '<td>' + entSelect(u) + '</td>'
       + '<td class="mono" style="font-size:12px">' + esc(fmtFecha(u.created_at)) + '</td>'
       + '<td>' + (u.id === yo ? '<span class="pill blue">Tú</span>' : '') + '</td></tr>').join('') || '<tr><td colspan="5" class="muted">Sin personas.</td></tr>';
   }
@@ -2281,19 +2287,35 @@
       const v = e.target.value;
       if (v === 'pendiente' && !confirm('¿Quitar el acceso al panel a ' + u.email + '? Su cuenta queda sin acceso a nada.')) { e.target.value = u.role; return; }
       if (v === 'evaluador' && !u.entidad) { toast('Elige la entidad del evaluador en la siguiente columna'); }
-      row.role = v; if (v !== 'evaluador') row.entidad = null;
+      row.role = v;
+      // Solo editor / sin acceso pierden entidad; admin y evaluador la conservan (o la eligen).
+      if (v !== 'evaluador' && v !== 'admin') row.entidad = null;
     }
     if (e.target.hasAttribute('data-ent')) row.entidad = e.target.value || null;
     const r = await sb.from('profiles').update(row).eq('id', id).select().maybeSingle();
     if (r.error || !r.data) { toast('No se pudo actualizar: ' + (r.error ? r.error.message : 'sin permiso')); loadEquipo(); return; }
-    toast('Acceso actualizado'); loadEquipo();
+    toast('Acceso actualizado');
+    if (id === S.perfil.id) {
+      S.perfil = Object.assign({}, S.perfil, r.data);
+      S.rol = S.perfil.role;
+      $('rolTag').innerHTML = '<b>' + esc(S.perfil.full_name || S.perfil.email) + '</b>' + esc(ROLES[S.perfil.role] || S.perfil.role) + (S.perfil.entidad ? ' · ' + esc(ENTIDADES[S.perfil.entidad] || S.perfil.entidad) : '');
+      aplicarPermisos();
+    }
+    loadEquipo();
   });
-  $('invRol').addEventListener('change', () => { $('invEntidadF').style.visibility = $('invRol').value === 'evaluador' ? 'visible' : 'hidden'; });
+  function syncInvEntidad(){
+    const rol = $('invRol').value;
+    $('invEntidadF').style.visibility = (rol === 'evaluador' || rol === 'admin') ? 'visible' : 'hidden';
+    if (rol === 'evaluador' && !$('invEntidad').value) $('invEntidad').value = 'inngenios';
+  }
+  $('invRol').addEventListener('change', syncInvEntidad);
+  syncInvEntidad();
   $('fInvitar').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = $('invEmail').value.trim().toLowerCase(), rol = $('invRol').value, st = $('invStatus');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { st.textContent = 'Escribe un correo válido.'; $('invEmail').focus(); return; }
-    const entidad = rol === 'evaluador' ? $('invEntidad').value : null;
+    const entidad = (rol === 'evaluador' || rol === 'admin') ? ($('invEntidad').value || null) : null;
+    if (rol === 'evaluador' && !entidad) { st.textContent = 'El evaluador necesita una entidad.'; return; }
     const quien = ROLES[rol] + (entidad ? ' de ' + ENTIDADES[entidad] : '');
     if (!confirm('¿Invitar a ' + email + ' como ' + quien + '?')) return;
     $('btnInvitar').disabled = true; st.textContent = 'Creando la cuenta y enviando la invitación…';

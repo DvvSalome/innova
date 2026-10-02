@@ -159,7 +159,9 @@ const ROLES: Record<string, string> = {
 const ENTIDADES: Record<string, string> = { inngenios: 'Inngenios', triple_a: 'Triple A' };
 
 function correoEquipo(nombre: string, rol: string, entidad: string | null, enlace: string) {
-  const quien = rol === 'evaluador' && entidad ? `${ROLES[rol]} de ${ENTIDADES[entidad] ?? entidad}` : ROLES[rol] ?? rol;
+  const quien = entidad && (rol === 'evaluador' || rol === 'admin')
+    ? `${ROLES[rol]} de ${ENTIDADES[entidad] ?? entidad}`
+    : ROLES[rol] ?? rol;
   const html = layout('Te invitaron al panel de Innova Social 5.0', `
     <p style="font-size:14px;line-height:1.6;margin:0 0 12px">Hola ${esc(nombre || '')}, te dieron acceso al panel de Innova Social 5.0 como <b>${esc(quien)}</b>.</p>
     <p style="font-size:14px;line-height:1.6;margin:0 0 4px">Crea tu contraseña para entrar:</p>
@@ -210,10 +212,12 @@ async function invitarEquipo(email: string, nombre: string, rol: string, entidad
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ error: 'Correo no válido' }, 400);
   if (!['admin', 'editor', 'evaluador'].includes(rol)) return json({ error: 'Rol no válido' }, 400);
   if (rol === 'evaluador' && !['inngenios', 'triple_a'].includes(entidad ?? '')) return json({ error: 'El evaluador necesita entidad (inngenios o triple_a)' }, 400);
+  if (rol === 'admin' && entidad && !['inngenios', 'triple_a'].includes(entidad)) return json({ error: 'Entidad no válida' }, 400);
+  const ent = (rol === 'evaluador' || rol === 'admin') && ['inngenios', 'triple_a'].includes(entidad ?? '') ? entidad : null;
   const { enlace, userId } = await enlaceAcceso(email.toLowerCase(), nombre);
-  await admin.from('profiles').update({ role: rol, entidad: rol === 'evaluador' ? entidad : null, full_name: nombre || null }).eq('id', userId);
-  const c = correoEquipo(nombre, rol, rol === 'evaluador' ? entidad : null, enlace);
-  const r = await enviar({ tipo: 'invitacion_equipo', para: email.toLowerCase(), asunto: c.asunto, html: c.html, enviado_por: porId, datos: { nombre, rol, entidad } });
+  await admin.from('profiles').update({ role: rol, entidad: ent, full_name: nombre || null }).eq('id', userId);
+  const c = correoEquipo(nombre, rol, ent, enlace);
+  const r = await enviar({ tipo: 'invitacion_equipo', para: email.toLowerCase(), asunto: c.asunto, html: c.html, enviado_por: porId, datos: { nombre, rol, entidad: ent } });
   return json({ ok: true, correo: r });
 }
 
