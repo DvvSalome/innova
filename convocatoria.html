@@ -640,20 +640,53 @@
   .cat-overview{ position:relative; }
   .cat-hotspot{
     position:absolute; top:40%; bottom:2%; background:transparent; border:none; padding:0; margin:0;
-    cursor:pointer; -webkit-tap-highlight-color:transparent; border-radius:16px; transition:background-color .2s;
+    cursor:zoom-in; -webkit-tap-highlight-color:transparent;
   }
-  .cat-hotspot:hover, .cat-hotspot:focus-visible{ background:rgba(56,150,131,.08); }
-  .cat-hotspot:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+  .cat-hotspot.is-active{ cursor:zoom-out; }
+  .cat-hotspot:focus-visible{ outline:none; }
   .cat-detail{ display:none; }
   .cat-detail.active{ display:block; animation:catFadeIn .35s ease; }
-  .cat-hotspot{ cursor:zoom-in; }
-  .cat-hotspot.is-active{ cursor:zoom-out; background:rgba(56,150,131,.10); }
+  /* ::before es la tarjeta que se levanta debajo del círculo. Se mueve ella y no
+     el botón, que ocupa un tercio completo del ancho: si levantáramos el botón,
+     la franja tintada se vería como una banda suelta sobre la imagen. */
+  .cat-hotspot::before{
+    content:""; position:absolute; left:7%; right:7%; top:2%; bottom:0;
+    border-radius:20px; border:2px solid transparent; background:transparent;
+    transition:background-color .28s, border-color .28s, box-shadow .28s,
+               transform .28s cubic-bezier(.2,.8,.2,1);
+    pointer-events:none;
+  }
+  .cat-hotspot:hover::before, .cat-hotspot:focus-visible::before{
+    background:rgba(56,150,131,.10); border-color:rgba(56,150,131,.5);
+    transform:translateY(-8px); box-shadow:0 24px 40px -26px rgba(19,35,48,.65);
+  }
+  .cat-hotspot:focus-visible::before{ border-color:var(--blue); }
+  .cat-hotspot:active::before{ transform:translateY(-2px); }
+  .cat-hotspot.is-active::before{ background:rgba(56,150,131,.12); border-color:rgba(56,150,131,.5); }
   .cat-hotspot::after{
     content:"Ver detalle"; position:absolute; left:50%; bottom:10px; transform:translateX(-50%);
     font-size:11.5px; font-weight:700; color:#fff; background:rgba(21,75,115,.82); padding:5px 11px; border-radius:100px;
-    white-space:nowrap; pointer-events:none; transition:background .2s;
+    white-space:nowrap; pointer-events:none;
+    animation:catLatido 2.8s ease-out infinite;
+    transition:background .25s, box-shadow .25s, transform .28s cubic-bezier(.2,.8,.2,1);
   }
-  .cat-hotspot.is-active::after{ content:"Ocultar detalle"; background:rgba(56,150,131,.95); }
+  .cat-hotspot:hover::after, .cat-hotspot:focus-visible::after{
+    animation:none; background:var(--blue-deep);
+    transform:translateX(-50%) translateY(-10px) scale(1.07);
+    box-shadow:0 12px 22px -10px rgba(21,75,115,.85);
+  }
+  .cat-hotspot.is-active::after{ content:"Ocultar detalle"; background:rgba(56,150,131,.95); animation:none; }
+  /* Latido en reposo: sin esto la pastilla parece una etiqueta impresa en la imagen. */
+  @keyframes catLatido{
+    0%, 70%, 100%{ box-shadow:0 0 0 0 rgba(56,150,131,0); }
+    35%{ box-shadow:0 0 0 7px rgba(56,150,131,.18); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cat-hotspot::before, .cat-hotspot::after{ animation:none !important; transition:none !important; }
+    .cat-hotspot:hover::before, .cat-hotspot:focus-visible::before,
+    .cat-hotspot:hover::after, .cat-hotspot:focus-visible::after{ transform:translateX(0); }
+    .cat-hotspot:hover::after, .cat-hotspot:focus-visible::after{ transform:translateX(-50%); }
+  }
   .cat-hint{
     position:absolute; top:12px; right:12px; display:inline-flex; align-items:center; gap:7px; pointer-events:none;
     font-size:12px; font-weight:700; color:var(--ink); background:rgba(255,255,255,.94); border:1px solid var(--line);
