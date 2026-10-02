@@ -7,51 +7,210 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <style>
-  :root{ --blue:#62ABE2; --blue-deep:#2279BA; --blue-dark:#154B73; --ink:#132330; --muted:#4F697A; --paper:#fff; --paper2:#F2F8FB; --line:#E2ECF1; --mint:#82CA76; }
+  :root{
+    --blue:#62ABE2; --blue-deep:#2279BA; --blue-dark:#154B73; --night:#0B1F2C;
+    --ink:#132330; --muted:#4F697A; --paper:#fff; --paper2:#F2F8FB; --line:#E2ECF1; --mint:#82CA76;
+    --shadow:0 10px 28px -16px rgba(19,35,48,.35); --shadow-lg:0 22px 44px -22px rgba(19,35,48,.45);
+  }
   *{ box-sizing:border-box; }
-  body{ margin:0; background:var(--paper2); color:var(--ink); font-family:"Nunito",-apple-system,"Segoe UI",sans-serif; }
-  header{ background:var(--paper); border-bottom:1px solid var(--line); }
-  header .row{ max-width:1040px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .brand{ font-weight:800; font-size:15.5px; text-decoration:none; color:var(--ink); display:flex; align-items:center; gap:10px; }
-  .brand .mark{ width:28px; height:28px; border-radius:9px; background:linear-gradient(135deg,var(--blue),var(--mint)); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; }
-  .who{ display:flex; align-items:center; gap:12px; font-size:13px; color:var(--muted); }
-  .who button{ font:inherit; font-weight:700; font-size:13px; background:none; border:1.5px solid var(--line); border-radius:10px; padding:7px 12px; cursor:pointer; color:var(--ink); }
-  main{ max-width:1040px; margin:0 auto; padding:34px 22px 60px; }
-  h1{ font-size:clamp(24px,3.4vw,32px); margin:0 0 6px; letter-spacing:-.02em; }
-  .sub{ color:var(--muted); margin:0 0 26px; font-size:14.5px; }
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
-  .curso{ display:flex; flex-direction:column; background:var(--paper); border:1px solid var(--line); border-radius:18px; overflow:hidden; text-decoration:none; color:inherit; transition:transform .2s, box-shadow .2s; }
-  .curso:hover{ transform:translateY(-3px); box-shadow:0 16px 30px -18px rgba(19,35,48,.35); }
-  .curso .portada{ aspect-ratio:16/9; background:linear-gradient(135deg,#DCEBF6,#E4F4E1); background-size:cover; background-position:center; }
-  .curso .tx{ padding:16px 18px 18px; }
+  body{ margin:0; background:var(--paper2); color:var(--ink); font-family:"Nunito",-apple-system,"Segoe UI",sans-serif; min-height:100vh; }
+  a{ color:inherit; text-decoration:none; }
+
+  .topbar{ position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .topbar .row{ max-width:1180px; margin:0 auto; padding:12px 22px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .brand{ font-weight:800; font-size:15px; display:flex; align-items:center; gap:10px; }
+  .brand .mark{ width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--blue),var(--mint)); color:#fff; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; }
+  .who{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted); }
+  .who button{ font:inherit; font-weight:700; font-size:13px; background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:7px 12px; cursor:pointer; color:var(--ink); }
+  .who button:hover{ border-color:var(--blue); color:var(--blue-deep); }
+
+  .hero{
+    background:radial-gradient(120% 140% at 10% 0%, #17475C 0%, #0B2C3B 48%, #061B25 100%);
+    color:#fff; padding:42px 22px 48px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.35;
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size:42px 42px;
+    mask-image:radial-gradient(80% 70% at 30% 0%, #000 20%, transparent 100%);
+  }
+  .hero .inner{ max-width:1180px; margin:0 auto; position:relative; z-index:1; }
+  .hero .eyebrow{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--mint); margin:0 0 10px; }
+  .hero h1{ font-size:clamp(28px,4vw,40px); margin:0 0 8px; letter-spacing:-.03em; font-weight:900; }
+  .hero p{ margin:0 0 22px; color:rgba(255,255,255,.72); font-size:15.5px; max-width:52ch; line-height:1.55; }
+  .hero-stats{ display:flex; flex-wrap:wrap; gap:10px; }
+  .hero-stats span{
+    display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); font-size:13px; font-weight:700;
+  }
+  .hero-stats b{ color:var(--mint); font-variant-numeric:tabular-nums; }
+
+  .toolbar{ max-width:1180px; margin:-22px auto 0; padding:0 22px; position:relative; z-index:2; }
+  .toolbar-card{
+    background:#fff; border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow:var(--shadow);
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  }
+  .search{ flex:1 1 220px; position:relative; }
+  .search svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+  .search input{
+    width:100%; font:inherit; font-size:14px; font-weight:600; border:1.5px solid var(--line); border-radius:12px;
+    padding:11px 12px 11px 38px; background:var(--paper2); color:var(--ink); outline:none;
+  }
+  .search input:focus{ border-color:var(--blue); background:#fff; }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{
+    font:inherit; font-size:12.5px; font-weight:800; border:1.5px solid var(--line); background:#fff; color:var(--muted);
+    border-radius:999px; padding:8px 12px; cursor:pointer; transition:border-color .2s, color .2s, background .2s;
+  }
+  .chip:hover{ border-color:var(--blue); color:var(--blue-deep); }
+  .chip.on{ background:var(--blue-deep); border-color:var(--blue-deep); color:#fff; }
+
+  main{ max-width:1180px; margin:0 auto; padding:28px 22px 70px; }
+  .section-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin:0 0 16px; flex-wrap:wrap; }
+  .section-head h2{ font-size:18px; margin:0; letter-spacing:-.01em; }
+  .section-head span{ font-size:13px; color:var(--muted); font-weight:700; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+  .curso{
+    display:flex; flex-direction:column; background:#fff; border:1px solid var(--line); border-radius:18px; overflow:hidden;
+    transition:transform .22s, box-shadow .22s, border-color .22s; position:relative;
+  }
+  .curso:hover{ transform:translateY(-4px); box-shadow:var(--shadow-lg); border-color:color-mix(in srgb, var(--blue) 35%, var(--line)); }
+  .curso .portada{
+    aspect-ratio:16/9; background:linear-gradient(135deg,#1a4a63,#0d2a3a); background-size:cover; background-position:center;
+    position:relative;
+  }
+  .curso .portada::after{
+    content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(6,27,37,.55));
+    opacity:0; transition:opacity .25s;
+  }
+  .curso:hover .portada::after{ opacity:1; }
+  .curso .play{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.9); opacity:0;
+    width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,.95); color:var(--blue-deep);
+    display:flex; align-items:center; justify-content:center; z-index:2; transition:opacity .25s, transform .25s;
+    box-shadow:0 10px 24px rgba(0,0,0,.25);
+  }
+  .curso:hover .play{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .curso .tx{ padding:16px 16px 18px; display:flex; flex-direction:column; flex:1; }
   .curso .cat{ font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--blue-deep); }
-  .curso h2{ font-size:17px; margin:6px 0 6px; }
-  .curso p{ font-size:13.5px; color:var(--muted); margin:0 0 10px; line-height:1.5; }
-  .curso .meta{ font-size:12px; font-weight:700; color:var(--muted); }
-  .vacio{ background:var(--paper); border:1px dashed var(--line); border-radius:18px; padding:30px; text-align:center; color:var(--muted); }
+  .curso h3{ font-size:16.5px; margin:6px 0 8px; letter-spacing:-.015em; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .curso p{ font-size:13.5px; color:var(--muted); margin:0 0 14px; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; flex:1; }
+  .curso .meta{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:10px; }
+  .curso .meta .lessons{ display:inline-flex; align-items:center; gap:6px; }
+  .prog{ height:6px; background:var(--paper2); border-radius:99px; overflow:hidden; }
+  .prog i{ display:block; height:100%; width:0; background:linear-gradient(90deg,var(--blue),var(--mint)); border-radius:99px; transition:width .4s; }
+  .prog-lbl{ font-size:11.5px; font-weight:800; color:var(--muted); margin-top:6px; }
+
+  .vacio{
+    grid-column:1/-1; background:#fff; border:1px dashed var(--line); border-radius:18px; padding:48px 24px;
+    text-align:center; color:var(--muted); font-size:14.5px; line-height:1.55;
+  }
+  .vacio b{ display:block; color:var(--ink); font-size:17px; margin-bottom:6px; }
+  @media (max-width:560px){
+    .hero{ padding:32px 18px 40px; }
+    .toolbar, main, .topbar .row{ padding-left:16px; padding-right:16px; }
+  }
 </style>
 </head>
 <body>
-<header><div class="row"><a class="brand" href="index.html"><span class="mark">IS</span> Innova Social 5.0</a><div class="who"><span id="quien"></span><button type="button" id="salir">Salir</button></div></div></header>
+<header class="topbar">
+  <div class="row">
+    <a class="brand" href="index.html"><span class="mark">IS</span> Innova Social 5.0</a>
+    <div class="who"><span id="quien"></span><button type="button" id="salir">Salir</button></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="inner">
+    <p class="eyebrow">Aprendizaje del programa</p>
+    <h1 id="saludo">Mis cursos</h1>
+    <p>Formación práctica para tu emprendimiento: videos, plantillas y materiales del equipo de Innova Social.</p>
+    <div class="hero-stats">
+      <span><b id="statCursos">0</b> cursos</span>
+      <span><b id="statLecciones">0</b> lecciones</span>
+      <span><b id="statProg">0%</b> avance</span>
+    </div>
+  </div>
+</section>
+
+<div class="toolbar">
+  <div class="toolbar-card">
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Buscar un curso…" autocomplete="off">
+    </div>
+    <div class="chips" id="chips"><button type="button" class="chip on" data-cat="">Todos</button></div>
+  </div>
+</div>
+
 <main>
-  <h1 id="saludo">Mis cursos</h1>
-  <p class="sub">Los cursos y materiales del programa asignados a tu emprendimiento.</p>
+  <div class="section-head">
+    <h2>Tu catálogo</h2>
+    <span id="conteo">Cargando…</span>
+  </div>
   <div class="grid" id="grid"><div class="vacio">Cargando cursos…</div></div>
 </main>
+
 <script>
 (function(){
   'use strict';
   const cfg = window.INNOVA_SUPABASE || {};
   const grid = document.getElementById('grid');
-  if (!window.supabase || !cfg.url) { grid.innerHTML = '<div class="vacio">No pudimos conectar con la plataforma.</div>'; return; }
-  const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
-  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  const chips = document.getElementById('chips');
+  const qEl = document.getElementById('q');
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const progKey = (id) => 'innova_curso_prog_' + id;
+  function loadProg(id){
+    try { return JSON.parse(localStorage.getItem(progKey(id)) || '{}'); } catch (e) { return {}; }
+  }
+  function progPct(id, total){
+    if (!total) return 0;
+    const p = loadProg(id);
+    const done = Object.keys(p).filter(k => p[k]).length;
+    return Math.min(100, Math.round((done / total) * 100));
+  }
 
+  if (!window.supabase || !cfg.url) { grid.innerHTML = '<div class="vacio"><b>Sin conexión</b>No pudimos conectar con la plataforma.</div>'; return; }
+  const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
   document.getElementById('salir').addEventListener('click', async () => { await sb.auth.signOut(); location.replace('acceso.html'); });
+
+  let all = [];
+  let cat = '';
+
+  function render(){
+    const q = (qEl.value || '').trim().toLowerCase();
+    const filtered = all.filter(c => {
+      if (cat && (c.categoria || '') !== cat) return false;
+      if (!q) return true;
+      return [c.titulo, c.descripcion, c.categoria].join(' ').toLowerCase().includes(q);
+    });
+    document.getElementById('conteo').textContent = filtered.length + (filtered.length === 1 ? ' curso' : ' cursos');
+    if (!filtered.length) {
+      grid.innerHTML = '<div class="vacio"><b>Sin resultados</b>Prueba con otra búsqueda o categoría.</div>';
+      return;
+    }
+    grid.innerHTML = filtered.map(c => {
+      const n = c._n || 0;
+      const pct = progPct(c.id, n);
+      const portada = c.portada_url && /^https:\/\//.test(c.portada_url) ? ' style="background-image:url(\'' + esc(c.portada_url) + '\')"' : '';
+      return '<a class="curso" href="curso.html?id=' + encodeURIComponent(c.id) + '">'
+        + '<div class="portada"' + portada + '><span class="play"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>'
+        + '<div class="tx">'
+        + (c.categoria ? '<span class="cat">' + esc(c.categoria) + '</span>' : '<span class="cat">Programa</span>')
+        + '<h3>' + esc(c.titulo) + '</h3>'
+        + (c.descripcion ? '<p>' + esc(c.descripcion) + '</p>' : '<p>Materiales y lecciones del programa.</p>')
+        + '<div class="meta"><span class="lessons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>' + n + (n === 1 ? ' lección' : ' lecciones') + '</span>'
+        + (pct > 0 ? '<span>' + pct + '% completado</span>' : '<span>Empezar</span>') + '</div>'
+        + '<div class="prog"><i style="width:' + pct + '%"></i></div>'
+        + (pct > 0 ? '<div class="prog-lbl">' + (pct === 100 ? 'Completado' : 'Continuar aprendiendo') + '</div>' : '<div class="prog-lbl">Aún no iniciado</div>')
+        + '</div></a>';
+    }).join('');
+  }
 
   (async function(){
     const { data: { session } } = await sb.auth.getSession();
@@ -62,16 +221,39 @@
     document.getElementById('saludo').textContent = 'Hola, ' + String(nombre).split(/[\s@]/)[0];
 
     const { data, error } = await sb.from('cursos').select('id,titulo,descripcion,categoria,portada_url,orden,recursos(count)').eq('activo', true).order('orden').order('created_at');
-    if (error) { grid.innerHTML = '<div class="vacio">No pudimos cargar tus cursos: ' + esc(error.message) + '</div>'; return; }
-    if (!data || !data.length) { grid.innerHTML = '<div class="vacio">Todavía no tienes cursos asignados. Cuando el equipo publique uno, aparecerá aquí.</div>'; return; }
-    grid.innerHTML = data.map(c => {
+    if (error) { grid.innerHTML = '<div class="vacio"><b>Error</b>No pudimos cargar tus cursos: ' + esc(error.message) + '</div>'; return; }
+    if (!data || !data.length) {
+      grid.innerHTML = '<div class="vacio"><b>Todavía no hay cursos</b>Cuando el equipo publique uno, aparecerá aquí.</div>';
+      document.getElementById('conteo').textContent = '0 cursos';
+      return;
+    }
+    all = data.map(c => {
       const n = (c.recursos && c.recursos[0] && c.recursos[0].count) || 0;
-      const portada = c.portada_url && /^https:\/\//.test(c.portada_url) ? ' style="background-image:url(\'' + esc(c.portada_url) + '\')"' : '';
-      return '<a class="curso" href="curso.html?id=' + encodeURIComponent(c.id) + '"><div class="portada"' + portada + '></div><div class="tx">'
-        + (c.categoria ? '<span class="cat">' + esc(c.categoria) + '</span>' : '')
-        + '<h2>' + esc(c.titulo) + '</h2>' + (c.descripcion ? '<p>' + esc(c.descripcion) + '</p>' : '')
-        + '<span class="meta">' + n + (n === 1 ? ' recurso' : ' recursos') + '</span></div></a>';
-    }).join('');
+      return Object.assign({}, c, { _n: n });
+    });
+    const cats = [...new Set(all.map(c => c.categoria).filter(Boolean))];
+    chips.innerHTML = '<button type="button" class="chip on" data-cat="">Todos</button>'
+      + cats.map(c => '<button type="button" class="chip" data-cat="' + esc(c) + '">' + esc(c) + '</button>').join('');
+    chips.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      cat = btn.getAttribute('data-cat') || '';
+      [...chips.querySelectorAll('.chip')].forEach(b => b.classList.toggle('on', b === btn));
+      render();
+    });
+    qEl.addEventListener('input', render);
+
+    const totalL = all.reduce((a, c) => a + c._n, 0);
+    let doneAll = 0, totalAll = 0;
+    all.forEach(c => {
+      totalAll += c._n;
+      const p = loadProg(c.id);
+      doneAll += Object.keys(p).filter(k => p[k]).length;
+    });
+    document.getElementById('statCursos').textContent = String(all.length);
+    document.getElementById('statLecciones').textContent = String(totalL);
+    document.getElementById('statProg').textContent = (totalAll ? Math.round((doneAll / totalAll) * 100) : 0) + '%';
+    render();
   })();
 })();
 </script>
