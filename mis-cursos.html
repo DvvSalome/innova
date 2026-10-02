@@ -29,27 +29,22 @@
   .who button:hover{ border-color:var(--blue); color:var(--blue-deep); }
 
   .hero{
-    background:radial-gradient(120% 140% at 10% 0%, #17475C 0%, #0B2C3B 48%, #061B25 100%);
-    color:#fff; padding:42px 22px 48px; position:relative; overflow:hidden;
-  }
-  .hero::after{
-    content:""; position:absolute; inset:0; pointer-events:none; opacity:.35;
-    background-image:linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
-    background-size:42px 42px;
-    mask-image:radial-gradient(80% 70% at 30% 0%, #000 20%, transparent 100%);
+    background:linear-gradient(180deg,#fff 0%, var(--paper2) 100%);
+    color:var(--ink); padding:36px 22px 28px; position:relative; border-bottom:1px solid var(--line);
   }
   .hero .inner{ max-width:1180px; margin:0 auto; position:relative; z-index:1; }
-  .hero .eyebrow{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--mint); margin:0 0 10px; }
-  .hero h1{ font-size:clamp(28px,4vw,40px); margin:0 0 8px; letter-spacing:-.03em; font-weight:900; }
-  .hero p{ margin:0 0 22px; color:rgba(255,255,255,.72); font-size:15.5px; max-width:52ch; line-height:1.55; }
+  .hero .eyebrow{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--blue-deep); margin:0 0 10px; display:inline-flex; align-items:center; gap:8px; }
+  .hero .eyebrow::before{ content:""; width:18px; height:2px; background:var(--blue); border-radius:2px; }
+  .hero h1{ font-size:clamp(28px,4vw,40px); margin:0 0 8px; letter-spacing:-.03em; font-weight:900; color:var(--ink); }
+  .hero p{ margin:0 0 22px; color:var(--muted); font-size:15.5px; max-width:52ch; line-height:1.55; }
   .hero-stats{ display:flex; flex-wrap:wrap; gap:10px; }
   .hero-stats span{
     display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px;
-    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); font-size:13px; font-weight:700;
+    background:#fff; border:1px solid var(--line); font-size:13px; font-weight:700; color:var(--muted);
   }
-  .hero-stats b{ color:var(--mint); font-variant-numeric:tabular-nums; }
+  .hero-stats b{ color:var(--blue-deep); font-variant-numeric:tabular-nums; }
 
-  .toolbar{ max-width:1180px; margin:-22px auto 0; padding:0 22px; position:relative; z-index:2; }
+  .toolbar{ max-width:1180px; margin:18px auto 0; padding:0 22px; position:relative; z-index:2; }
   .toolbar-card{
     background:#fff; border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow:var(--shadow);
     display:flex; flex-wrap:wrap; gap:10px; align-items:center;
