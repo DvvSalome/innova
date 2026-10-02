@@ -287,6 +287,26 @@
   .rubric label.on{ background:var(--blue-soft); border-color:var(--blue); }
   .rubric label input{ margin:3px 0 0; }
   .rubric label b{ font-variant-numeric:tabular-nums; }
+  /* Calificación de cada entidad, tal como se ve en la ficha */
+  .eval-card{ border:1px solid var(--line); border-radius:var(--r-md); padding:14px 16px; background:var(--paper2); }
+  .eval-card.done{ background:#fff; border-color:color-mix(in srgb, var(--ok) 40%, var(--line)); }
+  .eval-card.mia{ box-shadow:0 0 0 2px var(--blue-soft); }
+  .eval-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .eval-head b{ font-size:14px; }
+  .eval-score{ display:flex; align-items:baseline; gap:8px; margin-bottom:8px; }
+  .eval-score b{ font-size:30px; line-height:1; font-variant-numeric:tabular-nums; color:var(--blue-deep); }
+  .eval-score span{ font-size:11.5px; color:var(--muted); }
+  .eval-crit{ display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:10px; align-items:center; padding:5px 0; border-bottom:1px dashed var(--line); font-size:12.5px; }
+  .eval-crit:last-of-type{ border-bottom:none; }
+  .eval-crit .v{ font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .dots{ display:inline-flex; gap:3px; }
+  .dots i{ width:9px; height:9px; border-radius:50%; background:#fff; border:1px solid var(--line); }
+  .dots i.on{ background:var(--blue); border-color:var(--blue); }
+  .eval-com{ font-size:12.5px; margin:10px 0 0; white-space:pre-wrap; background:var(--paper2); border:1px solid var(--line); border-radius:var(--r-sm); padding:8px 10px; }
+  .eval-com span{ display:block; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:3px; }
+  .eval-vacio{ font-size:12.5px; color:var(--muted); margin:0; }
+  .eval-fecha{ font-size:11.5px; color:var(--muted); margin:8px 0 0; }
+  .eval-card .btn{ margin-top:12px; width:100%; justify-content:center; }
   .pager{ display:flex; gap:8px; align-items:center; }
   .rows-edit .row{ display:grid; grid-template-columns:34px minmax(0,1.3fr) minmax(0,.9fr) 150px auto; gap:8px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
   .rows-edit .row:last-child{ border-bottom:none; }
@@ -333,18 +353,6 @@
   .rec-edit .acts{ display:flex; gap:2px; }
   .published-box{ display:none; }
   .published-box.show{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  /* Seguimiento (maqueta) */
-  .flow{ display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; }
-  @media (max-width:1000px){ .flow{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-  .flow div{ background:#fff; border:1px solid var(--line); border-radius:var(--r-md); padding:12px; font-size:12.5px; line-height:1.4; }
-  .flow b{ display:block; font-size:13px; margin-bottom:4px; }
-  .flow i{ font-style:normal; font-size:10.5px; font-weight:800; letter-spacing:.1em; color:var(--blue-deep); }
-  .mock{ position:relative; }
-  .mock::before{ content:"Ejemplo"; position:absolute; top:10px; right:12px; font-size:10.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--warn); }
-  .bars-h{ display:flex; flex-direction:column; gap:8px; }
-  .bars-h div{ display:grid; grid-template-columns:minmax(0,1fr) 60px; gap:10px; align-items:center; font-size:12.5px; }
-  .bars-h span{ position:relative; height:8px; background:var(--paper2); border-radius:9px; overflow:hidden; }
-  .bars-h span i{ position:absolute; inset:0 auto 0 0; background:var(--blue); border-radius:9px; }
   .help h4{ margin:18px 0 6px; font-size:14.5px; }
   .help h4:first-child{ margin-top:0; }
   .help p, .help li{ font-size:13.5px; line-height:1.6; color:var(--ink); }
@@ -387,7 +395,6 @@
       <div class="navlink" data-view="participantes"><span class="ic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Participantes <span class="badge" id="navParticipantesCount">0</span></div>
       <div class="navlink" data-view="calificar"><span class="ic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/></svg></span> Calificar <span class="badge" id="navCalificarCount">0</span></div>
       <div class="navlink" data-view="cursos"><span class="ic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 9 10-5 10 5-10 5Z"/><path d="M6 11v5c0 1.1 2.7 2 6 2s6-.9 6-2v-5"/><path d="M22 9v6"/></svg></span> Cursos</div>
-      <div class="navlink" data-view="seguimiento"><span class="ic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg></span> Seguimiento <span class="badge">Maqueta</span></div>
     </div>
 
     <div class="navgroup">
@@ -509,60 +516,6 @@
         <div class="card" id="cursosCard">
           <div class="empty-state" id="cursosEmpty"><p>Aún no hay cursos.<br>Crea el primero con <b>+ Nuevo curso</b>.</p></div>
           <div class="curso-list" id="cursosList" style="display:none;"></div>
-        </div>
-      </section>
-
-      <!-- ============ SEGUIMIENTO (maqueta) ============ -->
-      <section class="view" id="view-seguimiento">
-        <div class="view-head">
-          <div><h2>Seguimiento por emprendimiento</h2><p>Flujo y maqueta del módulo, para aprobación del equipo antes de construirlo.</p></div>
-        </div>
-        <div class="alert warn" style="margin-bottom:16px;"><b>Maqueta para aprobación.</b> Esta pantalla todavía no guarda datos: muestra cómo funcionaría el módulo para que Inngenios y Triple A lo revisen. Los datos que aparecen son de ejemplo.</div>
-        <div class="card" style="padding:20px; margin-bottom:16px;">
-          <h4 style="margin:0 0 14px; font-size:14px;">Flujo propuesto</h4>
-          <div class="flow">
-            <div><i>01</i><b>Ganador autorizado</b>El equipo lo autoriza en Participantes y recibe su acceso.</div>
-            <div><i>02</i><b>Ficha</b>Datos del emprendimiento, su equipo y el mentor asignado.</div>
-            <div><i>03</i><b>Fases y entregables</b>Cada fase con entregables, fecha límite y estado.</div>
-            <div><i>04</i><b>Repositorio</b>El emprendimiento sube archivos; el mentor deja retroalimentación.</div>
-            <div><i>05</i><b>Asistencia</b>Registro por sesión, bootcamp o mentoría.</div>
-            <div><i>06</i><b>Plan de inversión</b>Compras y desembolsos con sus soportes.</div>
-            <div><i>07</i><b>Reportes</b>Por emprendimiento y consolidado, en PDF y Excel para Triple A.</div>
-          </div>
-        </div>
-        <div class="chart-grid">
-          <div class="card mock" style="padding:20px;">
-            <h4 style="margin:0 0 4px; font-size:15px;">Ficha · Emprendimiento de ejemplo</h4>
-            <p class="muted" style="margin:0 0 14px; font-size:12.5px;">Soledad · Negocio verde · Mentor: (por asignar)</p>
-            <table class="mini-table">
-              <tr><td><b>Fase 1 · Diagnóstico</b> — Plan de trabajo</td><td><span class="pill green">Aprobado</span></td></tr>
-              <tr><td><b>Fase 2 · Incubación</b> — Modelo de negocio validado</td><td><span class="pill blue">Entregado</span></td></tr>
-              <tr><td><b>Fase 2 · Incubación</b> — Plan de inversión</td><td><span class="pill grey">Pendiente · 15 feb</span></td></tr>
-              <tr><td><b>Fase 3 · Escalamiento</b> — Informe de ventas</td><td><span class="pill grey">Pendiente · 30 abr</span></td></tr>
-            </table>
-            <div class="alert info" style="margin-top:14px;">Retroalimentación del mentor: «Ajustar la proyección de ventas del segundo trimestre.»</div>
-          </div>
-          <div class="card mock" style="padding:20px;">
-            <h4 style="margin:0 0 12px; font-size:15px;">Avance del programa</h4>
-            <div class="bars-h">
-              <div>Entregables aprobados<span><i style="width:42%"></i></span></div>
-              <div>Asistencia a sesiones<span><i style="width:78%"></i></span></div>
-              <div>Plan de inversión ejecutado<span><i style="width:35%"></i></span></div>
-            </div>
-            <div style="display:flex; gap:8px; margin-top:18px; flex-wrap:wrap;">
-              <button class="btn ghost sm" disabled>Descargar informe PDF</button>
-              <button class="btn ghost sm" disabled>Descargar consolidado Excel</button>
-            </div>
-          </div>
-        </div>
-        <div class="card" style="padding:20px;">
-          <h4 style="margin:0 0 8px; font-size:14px;">Para decidir con el equipo</h4>
-          <ul style="margin:0; padding-left:1.2em; font-size:13.5px; line-height:1.7;">
-            <li>Fases y entregables definitivos de la incubación 5.0, con sus fechas.</li>
-            <li>Quién es mentor de cada emprendimiento y qué puede aprobar.</li>
-            <li>Formato del informe para Triple A (campos y periodicidad).</li>
-            <li>Soportes exigidos para compras y desembolsos del plan de inversión.</li>
-          </ul>
         </div>
       </section>
 
@@ -902,15 +855,15 @@
   const ENTIDADES = { inngenios: 'Inngenios', triple_a: 'Triple A' };
   const ESTADOS = { postulado: 'Postulado', preseleccionado: 'Preseleccionado', ganador: 'Ganador', rechazado: 'Rechazado' };
   const VISTAS = {
-    inicio: ['admin', 'editor'], participantes: ['admin'], calificar: ['evaluador'], cursos: ['admin', 'editor'],
-    seguimiento: ['admin'], momentos: ['admin', 'editor'], sliders: ['admin', 'editor'], convocatoria: ['admin', 'editor'],
+    inicio: ['admin', 'editor'], participantes: ['admin'], calificar: ['admin', 'evaluador'], cursos: ['admin', 'editor'],
+    momentos: ['admin', 'editor'], sliders: ['admin', 'editor'], convocatoria: ['admin', 'editor'],
     resultados: ['admin', 'editor'], analiticas: ['admin', 'editor'], correos: ['admin'], equipo: ['admin'],
     configuracion: ['admin'], ayuda: ['admin', 'editor', 'evaluador']
   };
   const TITULOS = {
     inicio: ['Panel / Inicio', 'Inicio'], participantes: ['Panel / Programa', 'Participantes y ranking'],
     calificar: ['Panel / Programa', 'Calificar postulaciones'], cursos: ['Panel / Programa', 'Cursos'],
-    seguimiento: ['Panel / Programa', 'Seguimiento (maqueta)'], momentos: ['Panel / Contenido web', 'Momentos (blog)'],
+    momentos: ['Panel / Contenido web', 'Momentos (blog)'],
     sliders: ['Panel / Contenido web', 'Fotos del inicio'], convocatoria: ['Panel / Contenido web', 'Etapas de la convocatoria'],
     resultados: ['Panel / Contenido web', 'Resultados del programa'], analiticas: ['Panel / Reportes', 'Analíticas web'],
     correos: ['Panel / Reportes', 'Correos enviados'], equipo: ['Panel / Ajustes', 'Equipo y accesos'],
@@ -936,7 +889,14 @@
   const toast = window.toast;
   function openModal(id){ $(id).classList.add('open'); }
   function closeModal(id){ $(id).classList.remove('open'); }
-  function puede(v){ return S.rol && (VISTAS[v] || []).includes(S.rol); }
+  // «Calificar» aparece solo si la cuenta tiene entidad (Inngenios o Triple A):
+  // hay administradores que califican (los de Inngenios) y otros que no.
+  function puede(v){
+    if (!S.rol || !(VISTAS[v] || []).includes(S.rol)) return false;
+    if (v === 'calificar') return !!(S.perfil && S.perfil.entidad);
+    return true;
+  }
+  function miEntidad(){ return (S.perfil && S.perfil.entidad) || null; }
   function iconBtn(path, title, attrs){ return '<button type="button" class="icon-btn" title="' + esc(title) + '" aria-label="' + esc(title) + '" ' + (attrs || '') + '><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg></button>'; }
   const IC = {
     up: '<path d="m6 15 6-6 6 6"/>', down: '<path d="m6 9 6 6 6-6"/>',
@@ -1275,13 +1235,30 @@
       'Tiene plan o estrategia clara para escalar y consolidar operaciones.',
       'Muestra alto potencial de crecimiento, impacto regional y sostenibilidad comprobada.'] }
   ];
-  function evalResumen(ev){
-    if (!ev) return '<span class="muted">Sin calificar</span>';
-    const suma = CRITERIOS.reduce((a, c) => a + (ev[c.k] || 0), 0);
-    return '<b>' + num(suma / 20 * 100) + '</b> <span class="muted">(' + suma + ' de 20)</span>'
-      + '<table class="mini-table" style="margin-top:6px">' + CRITERIOS.map(c => '<tr><td>' + esc(c.t.replace(/^\d\.\s*/, '').replace(/\s*\(.*$/, '')) + '</td><td>' + (ev[c.k] || '—') + ' / 5</td></tr>').join('') + '</table>'
-      + (ev.comentario ? '<p style="font-size:12.5px;margin:8px 0 0;white-space:pre-wrap"><span class="muted">Comentario:</span> ' + esc(ev.comentario) + '</p>' : '')
-      + '<p class="muted" style="font-size:11.5px;margin:6px 0 0">Calificado el ' + esc(fmtFecha(ev.updated_at || ev.created_at, true)) + '</p>';
+  const critCorto = (c) => c.t.replace(/^\d\.\s*/, '').replace(/\s*\(.*$/, '');
+  // Tarjeta de la calificación de una entidad dentro de la ficha: puntaje grande,
+  // los cuatro criterios con sus puntos y el botón para calificar si es tu entidad.
+  function evalTarjeta(entidad, ev, pid){
+    const mia = miEntidad() === entidad, nombre = ENTIDADES[entidad];
+    let h = '<div class="eval-card' + (ev ? ' done' : '') + (mia ? ' mia' : '') + '">'
+      + '<div class="eval-head"><b>' + esc(nombre) + (mia ? ' <span class="muted" style="font-weight:600;font-size:11.5px">(tu entidad)</span>' : '') + '</b>'
+      + (ev ? '<span class="pill green">Calificada</span>' : '<span class="pill grey">Sin calificar</span>') + '</div>';
+    if (ev) {
+      const suma = CRITERIOS.reduce((a, c) => a + (ev[c.k] || 0), 0);
+      h += '<div class="eval-score"><b>' + num(suma / 20 * 100) + '</b><span>de 100 · ' + suma + ' de 20 puntos</span></div>'
+        + CRITERIOS.map(c => {
+            const v = ev[c.k] || 0;
+            return '<div class="eval-crit"><span>' + esc(critCorto(c)) + '</span>'
+              + '<span class="dots" role="img" aria-label="' + v + ' de 5">' + [1, 2, 3, 4, 5].map(n => '<i' + (n <= v ? ' class="on"' : '') + '></i>').join('') + '</span>'
+              + '<span class="v">' + (v || '—') + '/5</span></div>';
+          }).join('')
+        + (ev.comentario ? '<p class="eval-com"><span>Comentario del evaluador</span>' + esc(ev.comentario) + '</p>' : '')
+        + '<p class="eval-fecha">Calificada el ' + esc(fmtFecha(ev.updated_at || ev.created_at, true)) + '</p>';
+    } else {
+      h += '<p class="eval-vacio">' + (mia ? 'Todavía no la has calificado. Pulsa el botón para abrir la rúbrica.' : 'El evaluador de ' + esc(nombre) + ' todavía no la ha calificado.') + '</p>';
+    }
+    if (mia) h += '<button type="button" class="btn ' + (ev ? 'ghost' : 'solid') + ' sm" data-rubrica="' + esc(pid) + '">' + (ev ? 'Editar mi calificación' : 'Calificar como ' + esc(nombre)) + '</button>';
+    return h + '</div>';
   }
 
   async function verParticipante(id){
@@ -1299,9 +1276,12 @@
       + '</div>'
       + (s.revisar ? '<div class="alert err" style="margin-top:10px">I y A difieren en más de 25 puntos: revisen esta postulación en conjunto.</div>' : '')
       + '<p class="muted" style="font-size:11.5px;margin:10px 0 0">Global = ' + Math.round(S.pesos.plataforma * 100) + ' % P + ' + Math.round(S.pesos.inngenios * 100) + ' % I + ' + Math.round(S.pesos.triple_a * 100) + ' % A.</p></div>';
+    const falta = ['inngenios', 'triple_a'].filter(k => !ev[k]);
+    body += '<div class="sec-title">Calificación con la rúbrica</div>'
+      + (falta.length ? '<p class="muted" style="font-size:12.5px;margin:0 0 10px">' + (falta.length === 2 ? 'Ninguna de las dos entidades ha calificado esta postulación.' : 'Falta la calificación de ' + esc(ENTIDADES[falta[0]]) + '.') + ' El puntaje global queda parcial hasta que estén las dos.</p>' : '')
+      + '<div class="grid2">' + evalTarjeta('inngenios', ev.inngenios, p.id) + evalTarjeta('triple_a', ev.triple_a, p.id) + '</div>';
     body += '<div class="sec-title">Datos de la postulación</div>' + fichaHtml(p);
     body += '<div class="sec-title">Detalle del puntaje de la plataforma</div><table class="mini-table">' + (s.detalle || []).map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + ' / ' + r[2] + '</td></tr>').join('') + '</table>';
-    body += '<div class="sec-title">Calificaciones de los evaluadores</div><div class="grid2"><div class="score-box"><b style="font-size:13px">Inngenios</b><div style="margin-top:6px">' + evalResumen(ev.inngenios) + '</div></div><div class="score-box"><b style="font-size:13px">Triple A</b><div style="margin-top:6px">' + evalResumen(ev.triple_a) + '</div></div></div>';
     body += '<div class="sec-title">Desempate</div>'
       + (enEmpate ? '<div class="alert warn" style="margin-bottom:10px">Esta postulación tiene el mismo puntaje global (' + num(s.G) + ') que otra. Registren el orden acordado en la reunión de Inngenios y Triple A.</div>' : '<p class="muted" style="font-size:12.5px;margin:0 0 10px">Solo se usa si hay empate en el puntaje global.</p>')
       + '<div class="grid2 gds"><div class="field"><label for="dsOrden">Orden acordado</label><input type="number" id="dsOrden" min="1" step="1" value="' + (p.orden_desempate == null ? '' : p.orden_desempate) + '"></div>'
@@ -1317,6 +1297,7 @@
     $('genFoot').querySelector('[data-gen-close]').onclick = genCerrar;
     $('btnGuardarPart').onclick = () => guardarParticipante(p);
     $('btnAutorizar').onclick = () => autorizarGanador(p);
+    $('genBody').querySelectorAll('[data-rubrica]').forEach(b => b.onclick = () => abrirRubrica(b.dataset.rubrica, { volverAFicha: true }));
     cargarCorreosDe(p.id);
   }
   async function guardarParticipante(p){
