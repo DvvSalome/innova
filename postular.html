@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Postúlate — Innova Social 4.0</title>
+<title>Postúlate — Innova Social 5.0</title>
 <link rel="stylesheet" href="site-enhance.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -104,51 +106,121 @@
     border:1px solid var(--line); box-shadow:var(--shadow);
   }
   #successCard .check{
-    width:56px; height:56px; border-radius:50%; background:var(--mint); color:#07222E; font-size:26px; font-weight:800;
+    width:56px; height:56px; border-radius:50%; background:var(--mint); color:#07222E;
     display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
   }
+  #successCard .check svg{ display:block; }
   #successCard h2{ font-size:22px; font-weight:800; margin-bottom:8px; }
   #successCard p{ color:var(--muted); font-size:14px; max-width:44ch; margin:0 auto 22px; }
+
+  /* Progreso y borrador */
+  .progress-wrap{ position:sticky; top:61px; z-index:15; background:var(--paper2); padding:12px 0 10px; }
+  .progress-steps{ display:flex; gap:6px; }
+  .progress-steps a{
+    flex:1; text-decoration:none; font-size:11px; font-weight:700; color:var(--muted); text-align:center;
+    padding:7px 4px; border-radius:9px; background:var(--paper); border:1.5px solid var(--line); transition:all .2s;
+  }
+  .progress-steps a.done{ border-color:var(--mint); color:#2F6E26; background:color-mix(in srgb, var(--mint) 14%, #fff); }
+  .progress-steps a.bad{ border-color:#DD494E; color:#B7353A; background:#FDF1F1; }
+  .progress-meta{ display:flex; justify-content:space-between; gap:10px; font-size:11.5px; color:var(--muted); margin-top:7px; }
+  .progress-bar{ height:4px; border-radius:4px; background:var(--line); overflow:hidden; margin-top:8px; }
+  .progress-bar i{ display:block; height:100%; width:0; background:linear-gradient(90deg,var(--blue),var(--mint)); transition:width .3s; }
+  @media (max-width:620px){ .progress-steps a{ font-size:0; padding:7px 0; } .progress-steps a::before{ content:attr(data-no); font-size:11px; } }
+  .draft-banner{ display:none; margin:14px 0 0; padding:12px 14px; border-radius:12px; background:#fff; border:1px solid var(--line); font-size:13px; color:var(--muted); }
+  .draft-banner button{ background:none; border:none; color:var(--blue-deep); font-weight:700; cursor:pointer; font-size:13px; padding:0; margin-left:6px; text-decoration:underline; }
+  .fset{ scroll-margin-top:150px; }
+  .fset.fset-bad{ border-color:#DD494E; box-shadow:0 0 0 3px #FDE3E3; }
+  .fset .lg .badge-bad{ display:none; margin-left:auto; font-size:11px; font-weight:700; color:#B7353A; background:#FDF1F1; padding:3px 9px; border-radius:100px; }
+  .fset.fset-bad .lg .badge-bad{ display:inline-block; }
+
+  /* Ayudas y contadores */
+  .field .help{ font-size:12px; color:var(--muted); line-height:1.45; background:var(--paper2); border-radius:10px; padding:9px 11px; }
+  .field .help b{ color:var(--ink); }
+  .charline{ display:flex; justify-content:space-between; gap:10px; font-size:11.5px; color:var(--muted); }
+  .charline .cc{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .charline .cc.low{ color:#B7353A; font-weight:600; }
+  .charline .cc.ok{ color:#2F6E26; font-weight:600; }
+  .field.invalid textarea{ border-color:#DD494E; }
+
+  /* Redes sociales */
+  .redes-list{ display:flex; flex-direction:column; gap:8px; }
+  .red-row{ display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:start; }
+  @media (max-width:620px){ .red-row{ grid-template-columns:1fr auto; } .red-row select{ grid-column:1/-1; } }
+  .red-row .rm{ height:44px; width:44px; border-radius:10px; border:1.5px solid var(--line); background:#fff; color:var(--muted); cursor:pointer; font-size:18px; line-height:1; }
+  .red-row .rm:hover{ border-color:#DD494E; color:#DD494E; }
+  .red-row .rm-ph{ width:44px; }
+  .red-row.bad input{ border-color:#DD494E; }
+  .add-red{ align-self:flex-start; background:none; border:1.5px dashed var(--line); border-radius:10px; padding:9px 14px; font-weight:700; font-size:13px; color:var(--blue-deep); cursor:pointer; font-family:inherit; }
+  .add-red:hover{ border-color:var(--blue); }
+
+  /* Adjuntos */
+  .file-meta{ display:none; align-items:center; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:2px; }
+  .file-meta.on{ display:flex; }
+  .file-meta b{ color:var(--ink); font-weight:700; word-break:break-all; }
+  .file-meta button{ background:none; border:none; padding:0; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; text-decoration:underline; }
+  .file-meta .replace{ color:var(--blue-deep); }
+  .file-meta .remove{ color:#B7353A; }
+  .field.invalid .file{ border-color:#DD494E; }
+
+  /* Resumen de pendientes y errores de envío */
+  .pending-box, .send-error{ display:none; background:#fff; border:1.5px solid #DD494E; border-radius:14px; padding:14px 16px; margin-bottom:12px; font-size:13px; }
+  .pending-box.on, .send-error.on{ display:block; }
+  .pending-box b, .send-error b{ color:#B7353A; }
+  .pending-box ul{ margin:8px 0 0; padding-left:18px; max-height:128px; overflow:auto; }
+  @media (max-width:620px){ .pending-box ul{ max-height:96px; } }
+  .pending-box li{ margin:3px 0; }
+  .pending-box a{ color:var(--blue-deep); font-weight:600; }
 </style>
 </head>
 <body>
 
 <nav class="top">
   <div class="row">
-    <a class="brand" href="index.html"><span class="mark">IS</span> Innova Social 4.0</a>
+    <a class="brand" href="index.html"><span class="mark">IS</span> Innova Social 5.0</a>
     <a class="back" href="index.html">← Volver a la home</a>
   </div>
 </nav>
 
 <header class="top-band wrap">
-  <span class="eyebrow">Postulación · Edición 4.0</span>
-  <h1>Postúlate a Innova Social 4.0</h1>
-  <p>El registro de tu cuenta es a la vez tu postulación a la convocatoria. Completa los datos de tu perfil y de tu emprendimiento — toma unos 10 minutos.</p>
+  <span class="eyebrow">Postulación · Edición 5.0</span>
+  <h1>Postúlate a Innova Social 5.0</h1>
+  <p>Completa los datos de tu perfil y de tu emprendimiento; toma unos 15 minutos. Tu avance se guarda automáticamente en este navegador, así que puedes volver y seguir donde ibas.</p>
 </header>
 
+<div class="progress-wrap">
+  <div class="wrap">
+    <nav class="progress-steps" id="progressSteps" aria-label="Secciones del formulario">
+      <a href="#sec-1" data-sec="sec-1" data-no="01">01 Tus datos</a>
+      <a href="#sec-2" data-sec="sec-2" data-no="02">02 Perfil</a>
+      <a href="#sec-3" data-sec="sec-3" data-no="03">03 Emprendimiento</a>
+      <a href="#sec-4" data-sec="sec-4" data-no="04">04 Impacto</a>
+      <a href="#sec-5" data-sec="sec-5" data-no="05">05 Contexto</a>
+      <a href="#sec-6" data-sec="sec-6" data-no="06">06 Documentos</a>
+    </nav>
+    <div class="progress-bar"><i id="progressFill"></i></div>
+    <div class="progress-meta"><span id="progressText">0 % completado</span><span id="draftStatus" aria-live="polite"></span></div>
+  </div>
+</div>
+
 <div class="wrap">
+  <div class="draft-banner" id="draftBanner">
+    <span id="draftBannerText">Recuperamos el borrador que dejaste en este navegador.</span>
+    <button type="button" id="draftDiscard">Empezar de cero</button>
+  </div>
   <form id="postulacionForm" novalidate>
 
-    <fieldset class="fset">
-      <div class="lg"><span class="no">01</span> Tu cuenta</div>
+    <fieldset class="fset" id="sec-1" data-title="Tus datos">
+      <div class="lg"><span class="no">01</span> Tus datos <span class="badge-bad">Incompleta</span></div>
       <div class="grid2">
         <div class="field">
           <label for="nombre">Nombre completo *</label>
-          <input type="text" id="nombre" required>
+          <input type="text" id="nombre" required autocomplete="name">
           <span class="err">Escribe tu nombre completo.</span>
         </div>
         <div class="field">
           <label for="correo">Correo electrónico *</label>
-          <input type="email" id="correo" required>
+          <input type="email" id="correo" required autocomplete="email">
           <span class="err">Ingresa un correo válido.</span>
-        </div>
-        <div class="field">
-          <label for="password">Contraseña *</label>
-          <div class="pwd-wrap">
-            <input type="password" id="password" required minlength="6">
-            <button type="button" data-toggle-pwd>Mostrar</button>
-          </div>
-          <span class="err">Mínimo 6 caracteres.</span>
         </div>
         <div class="field">
           <label for="tipo_documento">Tipo de documento *</label>
@@ -165,15 +237,15 @@
         <div class="field">
           <label for="cedula">Número de documento *</label>
           <input type="text" id="cedula" required autocomplete="off" disabled placeholder="Elige primero el tipo de documento">
-          <span class="err">Ingresa el número de tu documento.</span>
+          <span class="err" id="cedulaErr">Ingresa el número de tu documento.</span>
         </div>
         <div class="field">
           <label for="whatsapp">N° de WhatsApp *</label>
           <div class="tel-wrap">
             <span class="prefix">+57</span>
-            <input type="tel" id="whatsapp" required>
+            <input type="tel" id="whatsapp" required inputmode="numeric" placeholder="300 123 4567" autocomplete="tel-national">
           </div>
-          <span class="err">Ingresa tu número de WhatsApp.</span>
+          <span class="err">Ingresa un celular de 10 dígitos.</span>
         </div>
         <div class="field">
           <label for="genero">Género *</label>
@@ -186,13 +258,13 @@
         <div class="field">
           <label for="nacimiento">Fecha de nacimiento *</label>
           <input type="date" id="nacimiento" required>
-          <span class="err">Ingresa tu fecha de nacimiento.</span>
+          <span class="err" id="nacimientoErr">Ingresa tu fecha de nacimiento.</span>
         </div>
       </div>
     </fieldset>
 
-    <fieldset class="fset">
-      <div class="lg"><span class="no">02</span> Tu perfil</div>
+    <fieldset class="fset" id="sec-2" data-title="Tu perfil">
+      <div class="lg"><span class="no">02</span> Tu perfil <span class="badge-bad">Incompleta</span></div>
       <div class="grid2">
         <div class="field">
           <label for="municipio">Domicilio donde opera el negocio *</label>
@@ -224,7 +296,7 @@
           <span class="err">Selecciona una opción.</span>
         </div>
         <div class="field">
-          <label for="empleo">¿Tiene un empleo formal adicional? *</label>
+          <label for="empleo">¿Tienes un empleo formal adicional? *</label>
           <select id="empleo" required>
             <option value="">Selecciona...</option><option>Sí</option><option>No</option>
           </select>
@@ -233,19 +305,20 @@
       </div>
     </fieldset>
 
-    <fieldset class="fset">
-      <div class="lg"><span class="no">03</span> Tu emprendimiento</div>
+    <fieldset class="fset" id="sec-3" data-title="Tu emprendimiento">
+      <div class="lg"><span class="no">03</span> Tu emprendimiento <span class="badge-bad">Incompleta</span></div>
       <div class="grid2">
         <div class="field" style="grid-column:1/-1;">
           <label for="empnombre">Nombre del emprendimiento *</label>
           <input type="text" id="empnombre" required>
           <span class="err">Escribe el nombre de tu emprendimiento.</span>
         </div>
-        <div class="field">
+        <div class="field" style="grid-column:1/-1;">
           <label for="tipoemp">Tipo de emprendimiento *</label>
           <select id="tipoemp" required>
             <option value="">Selecciona...</option><option>Emprendimiento verde</option><option>Negocio verde</option>
           </select>
+          <span class="help"><b>Emprendimiento verde:</b> una iniciativa en etapa temprana que ofrece un producto o servicio con impacto ambiental positivo, pero todavía no ha sido verificada. <b>Negocio verde:</b> un negocio en operación que ya cumple, o tiene verificados por la autoridad ambiental, los criterios del Plan Nacional de Negocios Verdes.</span>
           <span class="err">Selecciona una opción.</span>
         </div>
         <div class="field">
@@ -267,11 +340,11 @@
           <span class="err">Selecciona una categoría.</span>
         </div>
         <div class="field">
-          <label for="subcategoria">Sub categoría *</label>
+          <label for="subcategoria">Subcategoría *</label>
           <select id="subcategoria" required disabled>
             <option value="">Elige primero una categoría</option>
           </select>
-          <span class="err">Selecciona una sub categoría.</span>
+          <span class="err">Selecciona una subcategoría.</span>
         </div>
         <div class="field">
           <label for="dedicacion">Dedicación de tiempo al emprendimiento *</label>
@@ -282,16 +355,17 @@
         </div>
         <div class="field">
           <label for="colaboradores">N° de colaboradores/empleados *</label>
-          <input type="number" id="colaboradores" min="0" value="1" required>
-          <span class="err">Ingresa un número.</span>
+          <input type="number" id="colaboradores" min="0" step="1" inputmode="numeric" placeholder="Ej: 3" required>
+          <span class="hint">Cuenta a las personas que trabajan en el emprendimiento, además de ti. Si trabajas solo, escribe 0.</span>
+          <span class="err">Ingresa un número entero (0 o más).</span>
         </div>
       </div>
     </fieldset>
 
-    <fieldset class="fset">
-      <div class="lg"><span class="no">04</span> Impacto y ODS</div>
+    <fieldset class="fset" id="sec-4" data-title="Impacto y ODS">
+      <div class="lg"><span class="no">04</span> Impacto y ODS <span class="badge-bad">Incompleta</span></div>
       <div class="field">
-        <label>Tu emprendimiento está aliado a un ODS <span class="hint">(elige máximo 3) *</span></label>
+        <label>¿Con qué ODS está alineado tu emprendimiento? <span class="hint">(elige máximo 3) *</span></label>
         <div class="chips" id="odsChips">
           <label class="chip"><input type="checkbox" name="ods" value="1"><span>1 · Fin de la pobreza</span></label>
           <label class="chip"><input type="checkbox" name="ods" value="2"><span>2 · Hambre cero</span></label>
@@ -311,58 +385,80 @@
           <label class="chip"><input type="checkbox" name="ods" value="16"><span>16 · Paz, justicia e instituciones sólidas</span></label>
           <label class="chip"><input type="checkbox" name="ods" value="17"><span>17 · Alianzas para lograr los objetivos</span></label>
         </div>
+        <div class="counter" id="odsCounter">0 / 3 seleccionados</div>
         <span class="err" id="odsErr">Selecciona entre 1 y 3 ODS.</span>
       </div>
 
       <div class="field">
         <label for="producto">Describe el producto o servicio que ofrece tu emprendimiento *</label>
-        <textarea id="producto" required></textarea>
-        <span class="err">Cuéntanos qué ofreces.</span>
+        <textarea id="producto" required data-min="150" data-max="600" maxlength="600"></textarea>
+        <div class="charline"><span>Qué vendes, a quién y cómo lo haces.</span><span class="cc" data-cc-for="producto"></span></div>
+        <span class="err">Escribe entre 150 y 600 caracteres sobre lo que ofreces.</span>
       </div>
       <div class="field">
         <label for="problema">Describe el problema o necesidad que resuelve *</label>
-        <textarea id="problema" required></textarea>
-        <span class="err">Cuéntanos qué problema resuelves.</span>
+        <textarea id="problema" required data-min="150" data-max="600" maxlength="600"></textarea>
+        <div class="charline"><span>Qué problema ambiental o social atiendes y en qué municipio.</span><span class="cc" data-cc-for="problema"></span></div>
+        <span class="err">Escribe entre 150 y 600 caracteres sobre el problema que resuelves.</span>
       </div>
       <div class="field">
         <label for="impacto">Describe el impacto que genera *</label>
-        <textarea id="impacto" required></textarea>
-        <span class="err">Cuéntanos tu impacto.</span>
+        <textarea id="impacto" required data-min="200" data-max="800" maxlength="800"></textarea>
+        <div class="charline"><span>Cuántas personas, kilos de residuos o empleos, en qué municipio y desde cuándo.</span><span class="cc" data-cc-for="impacto"></span></div>
+        <span class="err">Escribe entre 200 y 800 caracteres sobre tu impacto.</span>
       </div>
       <div class="field">
         <label for="clientes">Describe tus clientes actuales / público objetivo *</label>
-        <textarea id="clientes" required></textarea>
-        <span class="err">Cuéntanos quiénes son tus clientes.</span>
+        <textarea id="clientes" required data-min="100" data-max="400" maxlength="400"></textarea>
+        <div class="charline"><span>Quiénes te compran hoy y a quién quieres llegar.</span><span class="cc" data-cc-for="clientes"></span></div>
+        <span class="err">Escribe entre 100 y 400 caracteres sobre tus clientes.</span>
       </div>
       <div class="grid2">
         <div class="field">
-          <label for="ventas">Promedio de ventas en los últimos 6 meses *</label>
-          <input type="text" id="ventas" placeholder="Ej: $1.500.000 / mes" required>
-          <span class="err">Ingresa un valor aproximado.</span>
+          <label for="ventas">Promedio mensual de ventas en los últimos 6 meses (COP) *</label>
+          <input type="text" id="ventas" inputmode="numeric" placeholder="Ej: 1.500.000" required autocomplete="off">
+          <span class="hint">Solo números. Si aún no vendes, escribe 0.</span>
+          <span class="err">Ingresa un valor en pesos (solo números).</span>
         </div>
         <div class="field">
-          <label for="rango_ganancias">Rango de ganancias *</label>
-          <input type="text" id="rango_ganancias" placeholder="Ej: $500.000 - $1.000.000" required>
-          <span class="err">Ingresa el rango de ganancias.</span>
+          <label for="rango_ganancias">Ganancia mensual promedio *</label>
+          <select id="rango_ganancias" required>
+            <option value="">Selecciona un rango...</option>
+            <option>Aún no tengo ganancias</option>
+            <option>Menos de $500.000</option>
+            <option>$500.000 – $1.000.000</option>
+            <option>$1.000.000 – $3.000.000</option>
+            <option>$3.000.000 – $5.000.000</option>
+            <option>Más de $5.000.000</option>
+          </select>
+          <span class="err">Selecciona un rango.</span>
         </div>
       </div>
       <div class="field">
-        <label for="redes">Link de tus redes sociales *</label>
-        <input type="url" id="redes" placeholder="https://instagram.com/tu-negocio" required>
-        <span class="err">Ingresa la red con mayor interacción.</span>
+        <label>Redes sociales del emprendimiento <span class="hint">(opcional, hasta 3)</span></label>
+        <div class="redes-list" id="redesList"></div>
+        <button type="button" class="add-red" id="addRed">+ Agregar otra red</button>
+        <span class="hint">Pega el enlace o escribe tu @usuario. Si todavía no tienes redes, puedes dejarlo vacío.</span>
+        <span class="err" id="redesErr">Revisa los enlaces marcados: deben ser una dirección web válida o un @usuario.</span>
       </div>
       <div class="field">
-        <label for="inversion">¿Por qué necesita y en qué invertiría el recurso otorgado? *</label>
-        <textarea id="inversion" required></textarea>
-        <span class="err">Cuéntanos en qué invertirías el capital.</span>
+        <label for="web">Página web <span class="hint">(opcional)</span></label>
+        <input type="text" id="web" inputmode="url" placeholder="https://tu-negocio.com" autocomplete="url">
+        <span class="err">Ingresa una dirección web válida o deja el campo vacío.</span>
+      </div>
+      <div class="field">
+        <label for="inversion">¿Por qué necesitas el recurso y en qué lo invertirías? *</label>
+        <textarea id="inversion" required data-min="150" data-max="600" maxlength="600"></textarea>
+        <div class="charline"><span>Qué comprarías o harías con el capital y qué resultado esperas.</span><span class="cc" data-cc-for="inversion"></span></div>
+        <span class="err">Escribe entre 150 y 600 caracteres sobre cómo invertirías el capital.</span>
       </div>
     </fieldset>
 
-    <fieldset class="fset">
-      <div class="lg"><span class="no">05</span> Contexto adicional</div>
+    <fieldset class="fset" id="sec-5" data-title="Contexto adicional">
+      <div class="lg"><span class="no">05</span> Contexto adicional <span class="badge-bad">Incompleta</span></div>
       <div class="grid2">
         <div class="field">
-          <label for="priorizada">¿Pertenece a alguna población priorizada? *</label>
+          <label for="priorizada">¿Perteneces a alguna población priorizada? *</label>
           <select id="priorizada" required>
             <option value="">Selecciona...</option>
             <option>Comunidades indígenas</option>
@@ -378,12 +474,12 @@
           <span class="err">Selecciona una opción.</span>
         </div>
         <div class="field">
-          <label for="discapacidad">¿Tiene alguna discapacidad? *</label>
+          <label for="discapacidad">¿Tienes alguna discapacidad? *</label>
           <select id="discapacidad" required><option value="">Selecciona...</option><option>No</option><option value="tiene_discapacidad">Sí</option></select>
           <span class="err">Selecciona una opción.</span>
         </div>
         <div class="field" id="tipoDiscapacidadField" style="display: none;">
-          <label for="tipo_discapacidad">Indique cuál *</label>
+          <label for="tipo_discapacidad">Indica cuál *</label>
           <select id="tipo_discapacidad">
             <option value="">Selecciona...</option>
             <option>Discapacidad física</option>
@@ -436,79 +532,107 @@
       </div>
     </fieldset>
 
-    <fieldset class="fset">
-      <div class="lg"><span class="no">06</span> Documentos habilitantes</div>
+    <fieldset class="fset" id="sec-6" data-title="Documentos habilitantes">
+      <div class="lg"><span class="no">06</span> Documentos habilitantes <span class="badge-bad">Incompleta</span></div>
       <div class="grid2">
         <div class="field">
           <label>Copia de documento de identidad *</label>
           <label class="file" data-file-for="fCedula">
             <span class="ic">📄</span>
-            <span class="tx"><b id="fCedulaLabel">Subir documento</b><span>PDF o imagen, máx. 10MB</span></span>
-            <input type="file" id="fCedula" accept=".pdf,.jpg,.jpeg,.png" required>
+            <span class="tx"><b id="fCedulaLabel">Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fCedula" accept=".pdf,.jpg,.jpeg,.png" required data-label="Documento de identidad">
           </label>
-          <span class="err">Adjunta tu documento de identidad.</span>
+          <div class="file-meta" data-meta-for="fCedula"></div>
+          <span class="err">Adjunta tu documento de identidad (PDF, JPG o PNG de máximo 10 MB).</span>
         </div>
         <div class="field">
           <label>RUT *</label>
           <label class="file" data-file-for="fRut">
             <span class="ic">📄</span>
-            <span class="tx"><b>Subir RUT</b><span>PDF o imagen, máx. 10MB</span></span>
-            <input type="file" id="fRut" accept=".pdf,.jpg,.jpeg,.png" required>
+            <span class="tx"><b>Subir RUT</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fRut" accept=".pdf,.jpg,.jpeg,.png" required data-label="RUT">
           </label>
-          <span class="err">Adjunta tu RUT.</span>
+          <div class="file-meta" data-meta-for="fRut"></div>
+          <span class="err">Adjunta tu RUT (PDF, JPG o PNG de máximo 10 MB).</span>
         </div>
         <div class="field">
           <label>Recibo de servicio Triple A *</label>
           <label class="file" data-file-for="fRecibo">
             <span class="ic">📄</span>
-            <span class="tx"><b>Subir recibo</b><span>Para validar domicilio</span></span>
-            <input type="file" id="fRecibo" accept=".pdf,.jpg,.jpeg,.png" required>
+            <span class="tx"><b>Subir recibo</b><span>Para validar domicilio · máx. 10 MB</span></span>
+            <input type="file" id="fRecibo" accept=".pdf,.jpg,.jpeg,.png" required data-label="Recibo de Triple A">
           </label>
-          <span class="err">Adjunta tu recibo de Triple A.</span>
+          <div class="file-meta" data-meta-for="fRecibo"></div>
+          <span class="err">Adjunta tu recibo de Triple A (PDF, JPG o PNG de máximo 10 MB).</span>
         </div>
       </div>
       <div class="field">
         <label for="videoEnlace">Enlace del video del emprendimiento *</label>
-        <input type="url" id="videoEnlace" placeholder="https://youtube.com/watch?v=..." required>
-        <span class="hint">Máximo 90 segundos</span>
-        <span class="err">Ingresa un enlace de video válido.</span>
+        <input type="text" id="videoEnlace" inputmode="url" placeholder="https://youtube.com/watch?v=..." required>
+        <span class="hint">Máximo 90 segundos. Súbelo a YouTube, Google Drive o Vimeo y verifica que sea público o que cualquier persona con el enlace pueda verlo.</span>
+        <span class="err">Pega un enlace de YouTube, Google Drive o Vimeo.</span>
       </div>
+      <p class="hint" style="margin:6px 0 0; font-size:11.5px; color:var(--muted);">Por seguridad, los documentos adjuntos no se guardan en el borrador: si recargas la página, tendrás que volver a subirlos.</p>
     </fieldset>
 
-    <fieldset class="fset">
+    <fieldset class="fset" id="sec-7" data-title="Aceptación">
       <div class="toggle-row">
         <input type="checkbox" id="terminos" required>
-        <p>Acepto los <a href="#" onclick="return false;">términos y condiciones</a> de la convocatoria Innova Social 4.0. *</p>
+        <p>Acepto los <a href="https://www.innovasocial.co/files_web/terminos-de-referencia-innova-social.pdf" target="_blank" rel="noopener noreferrer">términos y condiciones</a> de la convocatoria Innova Social 5.0. *</p>
       </div>
       <div class="toggle-row">
         <input type="checkbox" id="datos" required>
-        <p>Autorizo el tratamiento de mis datos personales conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013, según la <a href="#" onclick="return false;">Política de Tratamiento de Datos Personales</a>. *</p>
+        <p>Autorizo el tratamiento de mis datos personales conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013, según la <a href="https://www.innovasocial.co/files_web/politica-de-tratamiento-de-datos-innova-social.pdf" target="_blank" rel="noopener noreferrer">Política de Tratamiento de Datos Personales</a>. *</p>
       </div>
     </fieldset>
 
     <div class="submit-bar">
+      <div class="pending-box" id="pendingBox" role="alert">
+        <b>Faltan datos para enviar tu postulación.</b> Revisa estos campos:
+        <ul id="pendingList"></ul>
+      </div>
+      <div class="send-error" id="sendError" role="alert">
+        <b>No pudimos enviar tu postulación.</b> <span id="sendErrorText">Revisa tu conexión e intenta de nuevo en unos minutos.</span> Tus respuestas siguen guardadas en este navegador.
+      </div>
       <button type="submit" class="btn" id="submitBtn"><span>Postular →</span></button>
     </div>
   </form>
 
   <div id="successCard">
-    <div class="check">✓</div>
-    <h2>¡Postulación registrada!</h2>
-    <p>Esto es una demo — todavía no hay backend conectado. En la siguiente fase, esta pantalla confirma por correo y WhatsApp, y guarda tu postulación en el panel del equipo.</p>
+    <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h2>¡Recibimos tu postulación!</h2>
+    <p>Tu postulación a Innova Social 5.0 quedó registrada. El equipo del programa te contactará por correo y WhatsApp con los próximos pasos de la convocatoria.</p>
     <a class="btn" href="index.html" style="display:inline-flex; width:auto; padding-left:22px; padding-right:22px;">Volver a la home</a>
   </div>
 </div>
 
 <script>
 (function(){
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const form = $('postulacionForm');
+  const DRAFT_KEY = 'innova5_postulacion_borrador_v1';
+  const MAX_FILE = 10 * 1024 * 1024;
+  const FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+  const SECTIONS = ['sec-1', 'sec-2', 'sec-3', 'sec-4', 'sec-5', 'sec-6'];
+
+  function onlyDigits(v){ return String(v || '').replace(/\D/g, ''); }
+  function labelOf(el){
+    const field = el.closest('.field');
+    const lab = field && (field.querySelector('label[for="' + el.id + '"]') || field.querySelector('label'));
+    return lab ? lab.childNodes[0].textContent.replace('*', '').trim() : el.id;
+  }
+
+  // ---------- Categoría y subcategoría ----------
   const SUBCATS = {
     bio: ['Agrosistemas sostenibles','Agroindustria sostenible','Biocomercio','Biotecnología','Turismo sostenible'],
     eco: ['Aprovechamiento y valoración de residuos','Moda sostenible','Construcción e infraestructura sostenible','Empaques y envases ecológicos'],
     cal: ['Tecnologías verdes','Negocios asociados con preservación y restauración de ecosistemas','Transporte sostenible'],
   };
-  const categoria = document.getElementById('categoria');
-  const subcategoria = document.getElementById('subcategoria');
-  categoria.addEventListener('change', () => {
+  const CAT_LABELS = { bio:'Bioproductos y servicios sostenibles', eco:'Ecoproductos industriales', cal:'Productos para la calidad ambiental' };
+  const categoria = $('categoria');
+  const subcategoria = $('subcategoria');
+  function fillSubcats(){
     const opts = SUBCATS[categoria.value];
     if (!opts) {
       subcategoria.innerHTML = '<option value="">Elige primero una categoría</option>';
@@ -516,136 +640,478 @@
       return;
     }
     subcategoria.disabled = false;
-    subcategoria.innerHTML = '<option value="">Selecciona...</option>' + opts.map(o => `<option>${o}</option>`).join('');
-  });
+    subcategoria.innerHTML = '<option value="">Selecciona...</option>' + opts.map(o => '<option>' + o + '</option>').join('');
+  }
+  categoria.addEventListener('change', fillSubcats);
 
-  const discapacidadSelect = document.getElementById('discapacidad');
-  const tipoDiscapacidadField = document.getElementById('tipoDiscapacidadField');
-  const tipoDiscapacidadInput = document.getElementById('tipo_discapacidad');
+  // ---------- Discapacidad ----------
+  const discapacidadSelect = $('discapacidad');
+  const tipoDiscapacidadField = $('tipoDiscapacidadField');
+  const tipoDiscapacidadInput = $('tipo_discapacidad');
+  function syncDiscapacidad(){
+    const tiene = discapacidadSelect.value === 'tiene_discapacidad';
+    tipoDiscapacidadField.style.display = tiene ? 'block' : 'none';
+    tipoDiscapacidadInput.required = tiene;
+    if (!tiene) tipoDiscapacidadInput.value = '';
+  }
+  discapacidadSelect.addEventListener('change', syncDiscapacidad);
 
-  discapacidadSelect.addEventListener('change', () => {
-    if (discapacidadSelect.value === 'tiene_discapacidad') {
-      tipoDiscapacidadField.style.display = 'block';
-      tipoDiscapacidadInput.required = true;
-    } else {
-      tipoDiscapacidadField.style.display = 'none';
-      tipoDiscapacidadInput.required = false;
-      tipoDiscapacidadInput.value = '';
-    }
-  });
-
-  document.querySelectorAll('[data-toggle-pwd]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const input = btn.previousElementSibling;
-      const showing = input.type === 'text';
-      input.type = showing ? 'password' : 'text';
-      btn.textContent = showing ? 'Mostrar' : 'Ocultar';
-    });
-  });
-
-  const tipoDocumento = document.getElementById('tipo_documento');
-  const numeroDocumento = document.getElementById('cedula');
-  const fCedulaLabel = document.getElementById('fCedulaLabel');
-  const DOC_LABELS = {
-    CC: 'Cédula de ciudadanía',
-    CE: 'Cédula de extranjería',
-    PA: 'Pasaporte',
-    PPT: 'PPT',
-    otro: 'Documento',
+  // ---------- Documento de identidad ----------
+  const DOC_RULES = {
+    CC:   { label:'Cédula de ciudadanía', re:/^\d{6,10}$/, numeric:true,  msg:'La cédula debe tener entre 6 y 10 dígitos, solo números.' },
+    CE:   { label:'Cédula de extranjería', re:/^\d{3,10}$/, numeric:true, msg:'La cédula de extranjería debe tener entre 3 y 10 dígitos, solo números.' },
+    PPT:  { label:'PPT', re:/^\d{5,10}$/, numeric:true, msg:'El PPT debe tener entre 5 y 10 dígitos, solo números.' },
+    PA:   { label:'Pasaporte', re:/^[A-Za-z0-9]{5,12}$/, numeric:false, msg:'El pasaporte debe tener entre 5 y 12 letras o números, sin espacios.' },
+    otro: { label:'Documento', re:/^[A-Za-z0-9-]{3,20}$/, numeric:false, msg:'Escribe el número del documento (de 3 a 20 letras o números).' },
   };
-  tipoDocumento.addEventListener('change', () => {
-    const tipo = tipoDocumento.value;
-    const label = DOC_LABELS[tipo];
-    if (!tipo) {
+  const tipoDocumento = $('tipo_documento');
+  const numeroDocumento = $('cedula');
+  const fCedulaLabel = $('fCedulaLabel');
+  function syncTipoDocumento(focus){
+    const rule = DOC_RULES[tipoDocumento.value];
+    if (!rule) {
       numeroDocumento.disabled = true;
       numeroDocumento.value = '';
       numeroDocumento.placeholder = 'Elige primero el tipo de documento';
-      numeroDocumento.inputMode = 'text';
-      if (fCedulaLabel) fCedulaLabel.textContent = 'Subir documento';
+      fCedulaLabel.textContent = 'Subir documento';
       return;
     }
     numeroDocumento.disabled = false;
-    numeroDocumento.placeholder = 'Número de ' + label.toLowerCase();
-    numeroDocumento.inputMode = (tipo === 'PA' || tipo === 'otro') ? 'text' : 'numeric';
-    if (fCedulaLabel) fCedulaLabel.textContent = 'Subir ' + label.toLowerCase();
-    numeroDocumento.focus();
-  });
-
-  const necesitaBoxes = [...document.querySelectorAll('input[name="necesita"]')];
-  const necesitaCounter = document.getElementById('necesitaCounter');
-  function updateNecesita(){
-    const checked = necesitaBoxes.filter(b => b.checked);
-    necesitaCounter.textContent = `${checked.length} / 3 seleccionadas`;
-    necesitaCounter.classList.toggle('limit', checked.length >= 3);
-    necesitaBoxes.forEach(b => { if (!b.checked) b.disabled = checked.length >= 3; });
+    numeroDocumento.placeholder = 'Número de ' + rule.label.toLowerCase();
+    numeroDocumento.inputMode = rule.numeric ? 'numeric' : 'text';
+    numeroDocumento.maxLength = rule.numeric ? 10 : 20;
+    if (rule.numeric) numeroDocumento.value = onlyDigits(numeroDocumento.value);
+    $('cedulaErr').textContent = rule.msg;
+    fCedulaLabel.textContent = 'Subir ' + rule.label.toLowerCase();
+    if (focus) numeroDocumento.focus();
   }
-  necesitaBoxes.forEach(b => b.addEventListener('change', updateNecesita));
-
-  document.querySelectorAll('.file input[type=file]').forEach(input => {
-    input.addEventListener('change', () => {
-      const label = input.closest('.file');
-      const nameEl = label.querySelector('.tx span');
-      if (input.files[0]) {
-        label.classList.add('has-file');
-        nameEl.textContent = input.files[0].name;
-      } else {
-        label.classList.remove('has-file');
-        if (input.id === 'fCedula') {
-          const tipo = tipoDocumento.value;
-          nameEl.textContent = tipo && DOC_LABELS[tipo]
-            ? 'Subir ' + DOC_LABELS[tipo].toLowerCase()
-            : 'Subir documento';
-        } else if (input.id === 'fRut') {
-          nameEl.textContent = 'Subir RUT';
-        } else {
-          nameEl.textContent = 'Subir recibo';
-        }
-      }
-    });
+  tipoDocumento.addEventListener('change', () => syncTipoDocumento(true));
+  numeroDocumento.addEventListener('input', () => {
+    const rule = DOC_RULES[tipoDocumento.value];
+    if (rule && rule.numeric) numeroDocumento.value = onlyDigits(numeroDocumento.value);
+    else numeroDocumento.value = numeroDocumento.value.replace(/\s/g, '');
   });
 
-  const form = document.getElementById('postulacionForm');
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    let firstInvalid = null;
+  // ---------- WhatsApp ----------
+  const whatsapp = $('whatsapp');
+  whatsapp.addEventListener('input', () => { whatsapp.value = onlyDigits(whatsapp.value).slice(0, 10); });
 
-    document.querySelectorAll('.field').forEach(f => f.classList.remove('invalid'));
-    document.getElementById('odsErr').style.display = 'none';
-    document.getElementById('necesitaErr').style.display = 'none';
+  // ---------- Fecha de nacimiento: mayor de edad ----------
+  const nacimiento = $('nacimiento');
+  (function(){
+    const t = new Date();
+    const max = new Date(t.getFullYear() - 18, t.getMonth(), t.getDate());
+    nacimiento.max = max.toISOString().slice(0, 10);
+    nacimiento.min = (t.getFullYear() - 100) + '-01-01';
+  })();
+  function edad(iso){
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return NaN;
+    const [y, m, d] = iso.split('-').map(Number);
+    const t = new Date();
+    let a = t.getFullYear() - y;
+    if (t.getMonth() + 1 < m || (t.getMonth() + 1 === m && t.getDate() < d)) a--;
+    return a;
+  }
 
-    document.querySelectorAll('.field').forEach(field => {
-      const input = field.querySelector('input,select,textarea');
-      if (!input || !input.required) return;
-      if (!input.value || (input.type === 'checkbox' && !input.checked)) {
-        field.classList.add('invalid');
-        if (!firstInvalid) firstInvalid = field;
-      }
+  // ---------- Contadores de caracteres ----------
+  const textareas = [...form.querySelectorAll('textarea[data-min]')];
+  function updateCounter(ta){
+    const cc = form.querySelector('[data-cc-for="' + ta.id + '"]');
+    if (!cc) return;
+    const n = ta.value.trim().length, min = +ta.dataset.min, max = +ta.dataset.max;
+    cc.textContent = n + ' / ' + max + (n < min ? ' · mínimo ' + min : '');
+    cc.classList.toggle('low', n > 0 && n < min);
+    cc.classList.toggle('ok', n >= min);
+  }
+  textareas.forEach(ta => { ta.addEventListener('input', () => updateCounter(ta)); updateCounter(ta); });
+
+  // ---------- Chips con máximo 3 ----------
+  function setupMaxChips(name, counterId, noun){
+    const boxes = [...form.querySelectorAll('input[name="' + name + '"]')];
+    const counter = $(counterId);
+    function update(){
+      const n = boxes.filter(b => b.checked).length;
+      counter.textContent = n + ' / 3 ' + noun;
+      counter.classList.toggle('limit', n >= 3);
+      boxes.forEach(b => { if (!b.checked) b.disabled = n >= 3; });
+    }
+    boxes.forEach(b => b.addEventListener('change', update));
+    return { boxes, update };
+  }
+  const odsChips = setupMaxChips('ods', 'odsCounter', 'seleccionados');
+  const necesitaChips = setupMaxChips('necesita', 'necesitaCounter', 'seleccionadas');
+
+  // ---------- Ventas en pesos ----------
+  const ventas = $('ventas');
+  ventas.addEventListener('input', () => {
+    const d = onlyDigits(ventas.value).replace(/^0+(?=\d)/, '').slice(0, 13);
+    ventas.value = d ? Number(d).toLocaleString('es-CO') : '';
+  });
+  function ventasNumero(){ const d = onlyDigits(ventas.value); return d === '' ? null : Number(d); }
+
+  // ---------- Enlaces ----------
+  function normalizeUrl(raw){
+    const v = String(raw || '').trim();
+    if (!v) return null;
+    if (/\s/.test(v)) return false;
+    const withScheme = /^https?:\/\//i.test(v) ? v : 'https://' + v;
+    try {
+      const u = new URL(withScheme);
+      if (!/\./.test(u.hostname)) return false;
+      return u.href;
+    } catch (e) { return false; }
+  }
+  const REDES = [
+    { v:'Instagram', base:'https://www.instagram.com/' },
+    { v:'Facebook',  base:'https://www.facebook.com/' },
+    { v:'TikTok',    base:'https://www.tiktok.com/@' },
+    { v:'LinkedIn',  base:'https://www.linkedin.com/in/' },
+    { v:'YouTube',   base:'https://www.youtube.com/@' },
+    { v:'X',         base:'https://x.com/' },
+    { v:'Otra',      base:null },
+  ];
+  function normalizeRed(red, raw){
+    const v = String(raw || '').trim();
+    if (!v) return null;
+    const isHandle = v[0] === '@' || /^[A-Za-z0-9_-]{2,60}$/.test(v);
+    if (isHandle) {
+      const handle = v.replace(/^@/, '');
+      if (!/^[A-Za-z0-9._-]{2,60}$/.test(handle)) return false;
+      const net = REDES.find(r => r.v === red);
+      return net && net.base ? net.base + handle : false;
+    }
+    return normalizeUrl(v);
+  }
+  const redesList = $('redesList');
+  const addRedBtn = $('addRed');
+  function redRows(){ return [...redesList.querySelectorAll('.red-row')]; }
+  function addRedRow(red, url, removable){
+    const row = document.createElement('div');
+    row.className = 'red-row';
+    const opts = REDES.map(r => '<option' + (r.v === (red || 'Instagram') ? ' selected' : '') + '>' + r.v + '</option>').join('');
+    row.innerHTML = '<select aria-label="Red social">' + opts + '</select>'
+      + '<input type="text" inputmode="url" placeholder="https://instagram.com/tu-negocio o @tu-negocio" aria-label="Enlace o usuario">'
+      + (removable ? '<button type="button" class="rm" aria-label="Quitar esta red">×</button>' : '<span class="rm-ph"></span>');
+    row.querySelector('input').value = url || '';
+    if (removable) row.querySelector('.rm').addEventListener('click', () => { row.remove(); syncAddRed(); onChange(); });
+    redesList.appendChild(row);
+    syncAddRed();
+    return row;
+  }
+  function syncAddRed(){ addRedBtn.style.display = redRows().length >= 3 ? 'none' : ''; }
+  addRedBtn.addEventListener('click', () => { addRedRow('Facebook', '', true).querySelector('input').focus(); onChange(); });
+  addRedRow('Instagram', '', false);
+  function redesValues(){
+    return redRows().map(row => ({ row, red: row.querySelector('select').value, raw: row.querySelector('input').value }));
+  }
+
+  // ---------- Video ----------
+  const VIDEO_HOSTS = /(^|\.)(youtube\.com|youtu\.be|vimeo\.com|drive\.google\.com)$/i;
+  function videoUrl(){
+    const href = normalizeUrl($('videoEnlace').value);
+    if (!href) return href;
+    try { return VIDEO_HOSTS.test(new URL(href).hostname) ? href : false; } catch (e) { return false; }
+  }
+
+  // ---------- Adjuntos ----------
+  function fmtSize(b){ return b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function fileProblem(input){
+    const f = input.files && input.files[0];
+    if (!f) return 'falta';
+    if (FILE_TYPES.indexOf(f.type) < 0 && !/\.(pdf|jpe?g|png)$/i.test(f.name)) return 'tipo';
+    if (f.size > MAX_FILE) return 'peso';
+    return null;
+  }
+  function renderFileMeta(input){
+    const box = form.querySelector('.file[data-file-for="' + input.id + '"]');
+    const meta = form.querySelector('[data-meta-for="' + input.id + '"]');
+    const f = input.files && input.files[0];
+    const prob = f ? fileProblem(input) : null;
+    box.classList.toggle('has-file', !!f && !prob);
+    if (!f) { meta.classList.remove('on'); meta.innerHTML = ''; return; }
+    const warn = prob === 'peso' ? ' · <span style="color:#B7353A;font-weight:700">supera 10 MB</span>'
+      : prob === 'tipo' ? ' · <span style="color:#B7353A;font-weight:700">formato no permitido</span>' : '';
+    meta.innerHTML = '<span>📎 <b></b> · ' + fmtSize(f.size) + warn + '</span>'
+      + '<button type="button" class="replace">Reemplazar</button><button type="button" class="remove">Quitar</button>';
+    meta.querySelector('b').textContent = f.name;
+    meta.querySelector('.replace').addEventListener('click', () => input.click());
+    meta.querySelector('.remove').addEventListener('click', () => { input.value = ''; renderFileMeta(input); onChange(); });
+    meta.classList.add('on');
+  }
+  const fileInputs = [...form.querySelectorAll('.file input[type=file]')];
+  fileInputs.forEach(input => input.addEventListener('change', () => { renderFileMeta(input); onChange(); }));
+
+  // ---------- Reglas (validación, progreso y resumen salen de aquí) ----------
+  const req = (id, sec) => ({ sec, el: $(id), label: labelOf($(id)), test: () => String($(id).value || '').trim() !== '' });
+  const CHECKS = [
+    req('nombre', 'sec-1'),
+    { sec:'sec-1', el:$('correo'), label:'Correo electrónico', test: () => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('correo').value.trim()) },
+    req('tipo_documento', 'sec-1'),
+    { sec:'sec-1', el:numeroDocumento, label:'Número de documento', test: () => { const r = DOC_RULES[tipoDocumento.value]; return !!r && r.re.test(numeroDocumento.value.trim()); } },
+    { sec:'sec-1', el:whatsapp, label:'N° de WhatsApp', test: () => /^\d{10}$/.test(whatsapp.value) },
+    req('genero', 'sec-1'),
+    { sec:'sec-1', el:nacimiento, label:'Fecha de nacimiento', test: () => { const a = edad(nacimiento.value); return a >= 18 && a <= 100; },
+      msg: () => { const a = edad(nacimiento.value); return isNaN(a) ? 'Ingresa tu fecha de nacimiento.' : 'Debes ser mayor de edad para postularte.'; } },
+    req('municipio', 'sec-2'), req('estrato', 'sec-2'), req('educacion', 'sec-2'), req('empleo', 'sec-2'),
+    req('empnombre', 'sec-3'), req('tipoemp', 'sec-3'), req('formalizacion', 'sec-3'), req('categoria', 'sec-3'),
+    { sec:'sec-3', el:subcategoria, label:'Subcategoría', test: () => !subcategoria.disabled && subcategoria.value !== '' },
+    req('dedicacion', 'sec-3'),
+    { sec:'sec-3', el:$('colaboradores'), label:'N° de colaboradores/empleados', test: () => /^\d{1,5}$/.test($('colaboradores').value.trim()) },
+    { sec:'sec-4', el:$('odsChips'), label:'ODS alineados', test: () => { const n = odsChips.boxes.filter(b => b.checked).length; return n >= 1 && n <= 3; } },
+    ...textareas.filter(t => t.closest('#sec-4')).map(ta => ({ sec:'sec-4', el:ta, label:labelOf(ta), test: () => { const n = ta.value.trim().length; return n >= +ta.dataset.min && n <= +ta.dataset.max; } })),
+    { sec:'sec-4', el:ventas, label:'Promedio mensual de ventas', test: () => ventasNumero() !== null },
+    req('rango_ganancias', 'sec-4'),
+    { sec:'sec-4', el:redesList, label:'Redes sociales', optional:true, test: () => redesValues().every(r => normalizeRed(r.red, r.raw) !== false) },
+    { sec:'sec-4', el:$('web'), label:'Página web', optional:true, test: () => normalizeUrl($('web').value) !== false },
+    req('priorizada', 'sec-5'), req('discapacidad', 'sec-5'),
+    { sec:'sec-5', el:tipoDiscapacidadInput, label:'Tipo de discapacidad', countIf: () => tipoDiscapacidadInput.required, test: () => !tipoDiscapacidadInput.required || tipoDiscapacidadInput.value !== '' },
+    req('etapa', 'sec-5'), req('financiacion', 'sec-5'), req('vendiendo', 'sec-5'),
+    { sec:'sec-5', el:$('necesitaChips'), label:'Lo que más necesita tu emprendimiento', test: () => { const n = necesitaChips.boxes.filter(b => b.checked).length; return n >= 1 && n <= 3; } },
+    ...fileInputs.map(input => ({ sec:'sec-6', el:input, label:input.dataset.label, test: () => fileProblem(input) === null })),
+    { sec:'sec-6', el:$('videoEnlace'), label:'Enlace del video', test: () => !!videoUrl() },
+    { sec:'sec-7', el:$('terminos'), label:'Aceptación de términos y condiciones', test: () => $('terminos').checked },
+    { sec:'sec-7', el:$('datos'), label:'Autorización de tratamiento de datos', test: () => $('datos').checked },
+  ];
+
+  let attempted = false;
+  function markField(chk, ok){
+    const field = chk.el.closest('.field');
+    if (field) field.classList.toggle('invalid', !ok);
+    if (chk.el === redesList) {
+      $('redesErr').style.display = ok ? 'none' : 'block';
+      redesValues().forEach(r => r.row.classList.toggle('bad', normalizeRed(r.red, r.raw) === false));
+    }
+    if (chk.el.id === 'odsChips') $('odsErr').style.display = ok ? 'none' : 'block';
+    if (chk.el.id === 'necesitaChips') $('necesitaErr').style.display = ok ? 'none' : 'block';
+    if (chk.msg && field) { const e = field.querySelector('.err'); if (e) e.textContent = chk.msg(); }
+  }
+  function evaluate(){
+    const results = CHECKS.map(c => ({ c, ok: !!c.test() }));
+    const counted = results.filter(r => !r.c.optional && r.c.sec !== 'sec-7' && (!r.c.countIf || r.c.countIf()));
+    const pct = Math.round(counted.filter(r => r.ok).length / counted.length * 100);
+    $('progressFill').style.width = pct + '%';
+    $('progressText').textContent = pct + ' % completado';
+    SECTIONS.concat('sec-7').forEach(sec => {
+      const mine = results.filter(r => r.c.sec === sec);
+      const done = mine.every(r => r.ok);
+      const link = document.querySelector('.progress-steps a[data-sec="' + sec + '"]');
+      if (link) { link.classList.toggle('done', done); link.classList.toggle('bad', attempted && !done); }
+      if (attempted) $(sec).classList.toggle('fset-bad', !done);
     });
+    if (attempted) {
+      results.forEach(r => markField(r.c, r.ok));
+      renderPending(results.filter(r => !r.ok).map(r => r.c));
+    }
+    return results;
+  }
+  function renderPending(bad){
+    const box = $('pendingBox'), list = $('pendingList');
+    if (!bad.length) { box.classList.remove('on'); list.innerHTML = ''; return; }
+    list.innerHTML = '';
+    bad.forEach(c => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '#' + c.sec;
+      a.textContent = c.label;
+      const title = $(c.sec) && $(c.sec).dataset.title;
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = c.el.closest('.field') || c.el;
+        target.scrollIntoView({ behavior:'smooth', block:'center' });
+        setTimeout(() => { const f = c.el.matches('input,select,textarea') ? c.el : c.el.querySelector('input,select,textarea'); if (f && !f.disabled) f.focus({ preventScroll:true }); }, 350);
+      });
+      li.appendChild(a);
+      if (title) li.appendChild(document.createTextNode(' · ' + title));
+      list.appendChild(li);
+    });
+    box.classList.add('on');
+  }
 
-    const odsChecked = document.querySelectorAll('input[name="ods"]:checked').length;
-    if (odsChecked === 0 || odsChecked > 3) {
-      document.getElementById('odsErr').style.display = 'block';
-      if (!firstInvalid) firstInvalid = document.getElementById('odsChips');
+  // ---------- Borrador automático ----------
+  const draftStatus = $('draftStatus');
+  let saveTimer = null;
+  function fieldEls(){ return [...form.querySelectorAll('input[id], select[id], textarea[id]')].filter(el => el.type !== 'file'); }
+  function saveDraft(){
+    try {
+      const data = { v:1, at: new Date().toISOString(), fields:{}, ods:[], necesita:[], redes:[] };
+      fieldEls().forEach(el => { data.fields[el.id] = el.type === 'checkbox' ? el.checked : el.value; });
+      data.ods = odsChips.boxes.filter(b => b.checked).map(b => b.value);
+      data.necesita = necesitaChips.boxes.filter(b => b.checked).map(b => b.value);
+      data.redes = redesValues().map(r => ({ red:r.red, url:r.raw }));
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      draftStatus.textContent = 'Borrador guardado · ' + new Date().toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit', timeZone:'America/Bogota' });
+    } catch (e) { draftStatus.textContent = ''; }
+  }
+  function onChange(){
+    evaluate();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveDraft, 400);
+  }
+  function loadDraft(){
+    let data = null;
+    try { data = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) { data = null; }
+    if (!data || !data.fields) return false;
+    const f = data.fields;
+    const set = (id) => { const el = $(id); if (!el || !(id in f)) return; if (el.type === 'checkbox') el.checked = !!f[id]; else el.value = f[id]; };
+    set('tipo_documento'); syncTipoDocumento(false);
+    set('categoria'); fillSubcats();
+    set('discapacidad'); syncDiscapacidad();
+    fieldEls().forEach(el => { if (!['tipo_documento', 'categoria', 'discapacidad'].includes(el.id)) set(el.id); });
+    odsChips.boxes.forEach(b => { b.checked = (data.ods || []).includes(b.value); }); odsChips.update();
+    necesitaChips.boxes.forEach(b => { b.checked = (data.necesita || []).includes(b.value); }); necesitaChips.update();
+    if (Array.isArray(data.redes) && data.redes.length) {
+      redesList.innerHTML = '';
+      data.redes.slice(0, 3).forEach((r, i) => addRedRow(r.red, r.url, i > 0));
     }
-    const necesitaChecked = document.querySelectorAll('input[name="necesita"]:checked').length;
-    if (necesitaChecked === 0 || necesitaChecked > 3) {
-      document.getElementById('necesitaErr').style.display = 'block';
-      if (!firstInvalid) firstInvalid = document.getElementById('necesitaChips');
+    textareas.forEach(updateCounter);
+    const when = new Date(data.at);
+    if (!isNaN(when)) {
+      $('draftBannerText').textContent = 'Recuperamos tu borrador (guardado el '
+        + when.toLocaleDateString('es-CO', { day:'numeric', month:'short', timeZone:'America/Bogota' }) + ', '
+        + when.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit', timeZone:'America/Bogota' })
+        + '). Vuelve a subir los documentos adjuntos antes de enviar.';
     }
-    if (!document.getElementById('terminos').checked || !document.getElementById('datos').checked) {
-      if (!firstInvalid) firstInvalid = document.getElementById('terminos');
-    }
+    $('draftBanner').style.display = 'block';
+    return true;
+  }
+  $('draftDiscard').addEventListener('click', () => {
+    if (!confirm('¿Borrar el borrador y empezar de cero?')) return;
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    location.reload();
+  });
+  loadDraft();
+  form.addEventListener('input', onChange);
+  form.addEventListener('change', onChange);
+  evaluate();
 
-    if (firstInvalid) {
-      firstInvalid.scrollIntoView({ behavior:'smooth', block:'center' });
+  // ---------- Envío a Supabase ----------
+  function uuid(){
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
+  }
+  function extOf(file){ const m = /\.([a-z0-9]{2,5})$/i.exec(file.name); return m ? m[1].toLowerCase() : 'pdf'; }
+  function siNo(v){ return v === 'Sí'; }
+  function buildPayload(id, documentos){
+    const redes = redesValues().map(r => ({ red:r.red, url:normalizeRed(r.red, r.raw) })).filter(r => r.url);
+    const web = normalizeUrl($('web').value) || null;
+    const tipoEmp = { 'Emprendimiento verde':'Emprendimiento Verde', 'Negocio verde':'Negocio Verde' }[$('tipoemp').value] || null;
+    const tieneDisc = discapacidadSelect.value === 'tiene_discapacidad';
+    return {
+      id,
+      nombre_completo: $('nombre').value.trim(),
+      correo: $('correo').value.trim().toLowerCase(),
+      whatsapp: '+57' + whatsapp.value,
+      tipo_documento: tipoDocumento.value,
+      cedula: numeroDocumento.value.trim(),
+      genero: $('genero').value,
+      fecha_nacimiento: nacimiento.value,
+      domicilio: $('municipio').value,
+      municipio: $('municipio').value,
+      estrato: $('estrato').value,
+      nivel_educacion: $('educacion').value,
+      empleo_formal_adicional: siNo($('empleo').value),
+      nombre_emprendimiento: $('empnombre').value.trim(),
+      tipo_emprendimiento: tipoEmp,
+      tipo_formalizacion: $('formalizacion').value,
+      categoria_negocio_verde: CAT_LABELS[categoria.value] || null,
+      subcategoria: subcategoria.value,
+      dedicacion_tiempo: $('dedicacion').value,
+      num_colaboradores: parseInt($('colaboradores').value, 10),
+      ods: odsChips.boxes.filter(b => b.checked).map(b => parseInt(b.value, 10)),
+      descripcion_producto: $('producto').value.trim(),
+      descripcion_problema: $('problema').value.trim(),
+      descripcion_impacto: $('impacto').value.trim(),
+      descripcion_clientes: $('clientes').value.trim(),
+      promedio_ventas_6_meses: ventasNumero(),
+      redes_sociales: redes.map(r => r.red + ': ' + r.url).join(' · ') || null,
+      redes: redes,
+      pagina_web: web,
+      rango_ganancias: $('rango_ganancias').value,
+      uso_recurso: $('inversion').value.trim(),
+      poblacion_priorizada: $('priorizada').value,
+      discapacidad: tieneDisc ? 'Sí' : 'No',
+      tipo_discapacidad: tieneDisc ? tipoDiscapacidadInput.value : null,
+      etapa_emprendimiento: $('etapa').value,
+      ha_recibido_financiacion: siNo($('financiacion').value),
+      esta_vendiendo: siNo($('vendiendo').value),
+      necesidades: necesitaChips.boxes.filter(b => b.checked).map(b => b.value),
+      video_url: videoUrl(),
+      documentos: documentos,
+    };
+  }
+  function showSendError(msg){
+    $('sendErrorText').textContent = msg;
+    $('sendError').classList.add('on');
+    $('sendError').scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+
+  const submitBtn = $('submitBtn');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    attempted = true;
+    $('sendError').classList.remove('on');
+    const bad = evaluate().filter(r => !r.ok);
+    if (bad.length) {
+      const first = bad[0].c.el.closest('.field') || bad[0].c.el;
+      first.scrollIntoView({ behavior:'smooth', block:'center' });
       return;
     }
 
-    form.style.display = 'none';
-    document.getElementById('successCard').style.display = 'block';
-    document.getElementById('successCard').scrollIntoView({ behavior:'smooth', block:'start' });
+    const cfg = window.INNOVA_SUPABASE || {};
+    if (!window.supabase || !cfg.url || !cfg.anonKey) {
+      showSendError('El sistema de postulaciones no está disponible en este momento. Intenta de nuevo en unos minutos.');
+      return;
+    }
+    const sb = window.supabase.createClient(cfg.url, cfg.anonKey, { auth:{ persistSession:false } });
+
+    submitBtn.disabled = true;
+    submitBtn.querySelector('span').textContent = 'Enviando…';
+    const id = uuid();
+    try {
+      const documentos = {};
+      const DOCS = [['cedula', 'fCedula'], ['rut', 'fRut'], ['recibo_triple_a', 'fRecibo']];
+      for (const [key, inputId] of DOCS) {
+        const file = $(inputId).files[0];
+        const path = id + '/' + key + '.' + extOf(file);
+        submitBtn.querySelector('span').textContent = 'Subiendo documentos…';
+        const up = await sb.storage.from('postulaciones').upload(path, file, { contentType: file.type || undefined, upsert:false });
+        if (up.error) throw { stage:'documentos', error: up.error };
+        documentos[key] = path;
+      }
+      submitBtn.querySelector('span').textContent = 'Guardando postulación…';
+      const ins = await sb.from('postulaciones').insert(buildPayload(id, documentos));
+      if (ins.error) throw { stage:'postulacion', error: ins.error };
+
+      // Aviso al programa y confirmación al postulante. Si falla, la postulación ya quedó guardada
+      // y el equipo puede reenviar los correos desde el panel.
+      sb.functions.invoke('correos', { body: { accion: 'nueva_postulacion', postulacion_id: id } })
+        .then(r => { if (r.error) console.warn('[postulación] correos:', r.error.message || r.error); })
+        .catch(e => console.warn('[postulación] correos:', e));
+
+      try { localStorage.removeItem(DRAFT_KEY); } catch (err) {}
+      form.style.display = 'none';
+      document.querySelector('.progress-wrap').style.display = 'none';
+      $('draftBanner').style.display = 'none';
+      $('successCard').style.display = 'block';
+      $('successCard').scrollIntoView({ behavior:'smooth', block:'start' });
+    } catch (err) {
+      console.error('[postulación] fallo en', err && err.stage, err && err.error ? err.error : err);
+      const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+      showSendError(offline
+        ? 'Parece que no tienes conexión a internet. Conéctate e intenta de nuevo.'
+        : (err && err.stage === 'documentos'
+          ? 'No pudimos subir tus documentos. Intenta de nuevo en unos minutos; si el problema sigue, escríbenos.'
+          : 'El sistema no pudo guardar tu postulación. Intenta de nuevo en unos minutos; si el problema sigue, escríbenos.'));
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.querySelector('span').textContent = 'Postular →';
+    }
   });
 })();
+</script>
+<script>
+/* Analítica propia: registra la visita sin cookies (ver api/track.js). */
+(function(){try{if(/^(localhost|127\.|\[::1\])/.test(location.hostname))return;var r='';try{r=document.referrer?new URL(document.referrer).hostname:'';}catch(e){}var d=JSON.stringify({p:location.pathname.replace(/\.html$/,'').replace(/\/index$/,'/')||'/',r:r});if(navigator.sendBeacon){navigator.sendBeacon('/api/track',new Blob([d],{type:'application/json'}));}else{fetch('/api/track',{method:'POST',body:d,keepalive:true,headers:{'Content-Type':'application/json'}});}}catch(e){}})();
 </script>
 </body>
 </html>
