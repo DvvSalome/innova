@@ -994,7 +994,10 @@
   function buildPayload(id, documentos){
     const redes = redesValues().map(r => ({ red:r.red, url:normalizeRed(r.red, r.raw) })).filter(r => r.url);
     const web = normalizeUrl($('web').value) || null;
-    const tipoEmp = { 'Emprendimiento verde':'Emprendimiento Verde', 'Negocio verde':'Negocio Verde' }[$('tipoemp').value] || null;
+    // El <select> ya envía exactamente los dos valores que acepta el check de la
+    // tabla ('Emprendimiento verde' / 'Negocio verde'). Re-capitalizar la V aquí
+    // hacía que la base rechazara TODA postulación con 23514.
+    const tipoEmp = $('tipoemp').value || null;
     const tieneDisc = discapacidadSelect.value === 'tiene_discapacidad';
     return {
       id,

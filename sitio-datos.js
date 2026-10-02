@@ -113,18 +113,13 @@
   }
 
   /* ---------- Etapas de la convocatoria ---------- */
-  var ICONOS = {
-    lanzamiento: '<path d="M4 14l3-1 4 4-1 3-6-6z"/><path d="M7 13c2-6 7-9 13-9 0 6-3 11-9 13"/><circle cx="14.5" cy="9.5" r="1.6"/>',
-    preseleccion: '<path d="M9 5h9M9 12h9M9 19h9"/><path d="M4 5l1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2"/>',
-    bootcamp: '<path d="M3 9l9-4 9 4-9 4-9-4z"/><path d="M7 11v5c0 1 2 3 5 3s5-2 5-3v-5"/>',
-    pitch: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',
-    ceremonia: '<path d="M8 4h8v5a4 4 0 01-8 0V4z"/><path d="M8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8 20h8"/>',
-    incubacion: '<path d="M12 21v-9"/><path d="M12 12c0-4 3-7 8-7 0 5-3 7-8 7z"/><path d="M12 15c0-3-2-5-7-5 0 4 3 5 7 5z"/>'
-  };
-  var ORDEN_ICONO = ['lanzamiento', 'preseleccion', 'bootcamp', 'pitch', 'ceremonia', 'incubacion'];
+  /* Iconos oficiales de marca (assets/iconos/etapa-*.svg). La columna
+     etapas_convocatoria.icono elige uno; si viene vacía o con un nombre
+     desconocido, se usa el que corresponde por posición. */
+  var ICONOS = ['lanzamiento', 'preseleccion', 'bootcamp', 'pitch', 'ceremonia', 'incubacion'];
   function icono(k) {
-    var p = ICONOS[k] || ICONOS.lanzamiento;
-    return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+    var n = ICONOS.indexOf(k) >= 0 ? k : ICONOS[0];
+    return '<img src="assets/iconos/etapa-' + n + '.svg" alt="" width="32" height="32" loading="lazy" decoding="async">';
   }
 
   var tlWrap = document.querySelector('#tlWrap[data-etapas]');
@@ -137,7 +132,7 @@
         var yaVisible = !!tl.querySelector('.tl-step.in');
         tl.style.setProperty('--n', rows.length);
         tl.innerHTML = rows.map(function (e, i) {
-          var k = ICONOS[e.icono] ? e.icono : ORDEN_ICONO[Math.min(i, ORDEN_ICONO.length - 1)];
+          var k = ICONOS.indexOf(e.icono) >= 0 ? e.icono : ICONOS[Math.min(i, ICONOS.length - 1)];
           return '<div class="tl-step' + (i === rows.length - 1 ? ' last' : '') + (yaVisible ? ' in' : '') + '">'
             + '<div class="tl-dot ic">' + icono(k) + '</div>'
             + '<div class="tl-num">Etapa ' + String(i + 1).padStart(2, '0') + '</div>'
