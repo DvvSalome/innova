@@ -1,0 +1,5 @@
+# Lo que NO debe quedar público en el sitio
+supabase/
+.claude/
+*.md
+hero-options.html
