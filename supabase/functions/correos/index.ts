@@ -16,7 +16,7 @@ const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const REMITENTE = Deno.env.get('CORREO_REMITENTE') ?? 'Innova Social <onboarding@resend.dev>';
 const CORREO_PROGRAMA = Deno.env.get('CORREO_PROGRAMA') ?? '';
-const SITE_URL = (Deno.env.get('SITE_URL') ?? 'https://innova-eta.vercel.app').replace(/\/$/, '');
+const SITE_URL = (Deno.env.get('SITE_URL') ?? 'https://innovasociall.co').replace(/\/$/, '');
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -87,7 +87,7 @@ async function enviar(opts: {
       const r = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: REMITENTE, to: [opts.para], subject: opts.asunto, html: opts.html }),
+        body: JSON.stringify({ from: REMITENTE, to: [opts.para], subject: opts.asunto, html: opts.html, ...(CORREO_PROGRAMA ? { reply_to: CORREO_PROGRAMA } : {}) }),
       });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) { estado = 'error'; error = body?.message ?? `Resend respondió ${r.status}`; }

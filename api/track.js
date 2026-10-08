@@ -49,7 +49,7 @@ export async function POST(request) {
   };
 
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/visitas`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/visitas`, {
       method: 'POST',
       headers: {
         apikey: SUPABASE_ANON_KEY,
@@ -59,8 +59,10 @@ export async function POST(request) {
       },
       body: JSON.stringify(fila),
     });
-  } catch {
+    if (!r.ok) console.error('[track] Supabase respondió', r.status, (await r.text()).slice(0, 200));
+  } catch (e) {
     // La analítica nunca debe romper la navegación.
+    console.error('[track] error', String(e));
   }
   return new Response(null, { status: 204 });
 }
