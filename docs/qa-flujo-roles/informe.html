@@ -1,0 +1,317 @@
+<title>Auditoría de flujo y roles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --paper:#F6F8F9; --card:#FFFFFF; --ink:#0E1C24; --ink-2:#3C535F; --ink-3:#6B8290;
+  --rule:#DCE5EA; --rule-2:#EDF2F4;
+  --azul:#154B73; --azul-claro:#2279BA; --verde:#2F7D32; --ambar:#9A6400; --rojo:#A8333A;
+  --chip-ok-bg:#E6F2E7; --chip-warn-bg:#F7EEDC; --chip-crit-bg:#F7E6E7;
+}
+:root:not([data-theme="light"]){ }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0B1419; --card:#111F26; --ink:#E8EFF2; --ink-2:#AFC3CD; --ink-3:#7D95A1;
+    --rule:#223540; --rule-2:#18272F;
+    --azul:#6FB3E0; --azul-claro:#8FC8EC; --verde:#7ECB83; --ambar:#E0AE57; --rojo:#E88B91;
+    --chip-ok-bg:#17301B; --chip-warn-bg:#352B14; --chip-crit-bg:#361A1D;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0B1419; --card:#111F26; --ink:#E8EFF2; --ink-2:#AFC3CD; --ink-3:#7D95A1;
+  --rule:#223540; --rule-2:#18272F;
+  --azul:#6FB3E0; --azul-claro:#8FC8EC; --verde:#7ECB83; --ambar:#E0AE57; --rojo:#E88B91;
+  --chip-ok-bg:#17301B; --chip-warn-bg:#352B14; --chip-crit-bg:#361A1D;
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Source Serif 4",Georgia,serif; font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{ max-width:1080px; margin:0 auto; padding:0 24px 96px; }
+.col{ max-width:68ch; }
+h1,h2,h3,.lbl,th,.chip,.stat b{ font-family:Archivo,"Helvetica Neue",Arial,sans-serif; }
+h1{ font-size:clamp(32px,5vw,46px); line-height:1.08; font-weight:700; letter-spacing:-.02em; margin:0 0 12px; text-wrap:balance; }
+h2{ font-size:26px; font-weight:700; letter-spacing:-.01em; margin:56px 0 4px; text-wrap:balance; }
+h3{ font-size:18px; font-weight:600; margin:32px 0 6px; text-wrap:balance; }
+p{ margin:0 0 16px; }
+a{ color:var(--azul-claro); }
+code,.mono{ font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.86em; }
+code{ background:var(--rule-2); padding:1px 5px; border-radius:4px; }
+
+header{ border-bottom:1px solid var(--rule); padding:56px 0 32px; margin-bottom:8px; }
+.lbl{ font-size:11.5px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-3); }
+.dek{ font-size:19px; color:var(--ink-2); margin:0; }
+.meta{ font-family:"JetBrains Mono",monospace; font-size:12.5px; color:var(--ink-3); margin-top:20px; }
+
+.stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:1px; background:var(--rule);
+        border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:32px 0 8px; }
+.stat{ background:var(--card); padding:18px 20px; }
+.stat b{ display:block; font-size:30px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.stat span{ display:block; font-size:12.5px; color:var(--ink-3); margin-top:2px; line-height:1.35; }
+.stat.ok b{ color:var(--verde); } .stat.warn b{ color:var(--ambar); } .stat.crit b{ color:var(--rojo); }
+
+.tablewrap{ overflow-x:auto; border:1px solid var(--rule); border-radius:10px; background:var(--card); margin:20px 0 28px; }
+table{ border-collapse:collapse; width:100%; font-size:14.5px; }
+th,td{ text-align:left; padding:11px 16px; border-bottom:1px solid var(--rule-2); vertical-align:top; }
+th{ font-size:11.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); background:var(--rule-2); white-space:nowrap; }
+tr:last-child td{ border-bottom:0; }
+td.n{ font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.si{ color:var(--verde); font-weight:600; } .no{ color:var(--rojo); font-weight:600; }
+
+.chip{ display:inline-block; font-size:11px; font-weight:600; letter-spacing:.07em; text-transform:uppercase;
+       padding:3px 9px; border-radius:999px; white-space:nowrap; }
+.chip.ok{ background:var(--chip-ok-bg); color:var(--verde); }
+.chip.warn{ background:var(--chip-warn-bg); color:var(--ambar); }
+.chip.crit{ background:var(--chip-crit-bg); color:var(--rojo); }
+
+.find{ border:1px solid var(--rule); border-left:4px solid var(--ambar); border-radius:8px;
+       background:var(--card); padding:18px 22px; margin:0 0 14px; }
+.find.baja{ border-left-color:var(--ink-3); }
+.find.alta{ border-left-color:var(--rojo); }
+.find h4{ font-family:Archivo,sans-serif; font-size:16.5px; font-weight:600; margin:8px 0 8px; }
+.find p{ font-size:15.5px; margin:0 0 8px; color:var(--ink-2); }
+.find p:last-child{ margin-bottom:0; }
+.find .q{ color:var(--ink); }
+
+figure{ margin:24px 0 32px; }
+figure img{ display:block; width:100%; height:auto; border:1px solid var(--rule); border-radius:8px; background:var(--card); }
+figcaption{ font-size:13.5px; color:var(--ink-3); margin-top:9px; line-height:1.45; }
+figcaption b{ color:var(--ink-2); font-weight:600; }
+
+.step{ display:flex; gap:18px; align-items:baseline; margin:48px 0 0; }
+.step .num{ font-family:"JetBrains Mono",monospace; font-size:13px; font-weight:600; color:var(--azul);
+            border:1px solid var(--rule); border-radius:6px; padding:3px 9px; flex:none; }
+.step h2{ margin:0; }
+.note{ border-left:3px solid var(--rule); padding:2px 0 2px 18px; color:var(--ink-2); font-size:15.5px; margin:20px 0 24px; }
+ul{ padding-left:22px; margin:0 0 16px; } li{ margin-bottom:7px; }
+hr{ border:0; border-top:1px solid var(--rule); margin:64px 0 0; }
+@media (max-width:620px){ body{ font-size:16px; } .step{ gap:12px; } }
+</style>
+
+<div class="wrap">
+<header>
+  <p class="lbl">Innova Social · Plataforma 5.0</p>
+  <h1>Auditoría de flujo y roles</h1>
+  <p class="dek col">Se recorrió el ciclo completo —postular, calificar, rankear, autorizar y entrar como beneficiario— haciéndose pasar por cada tipo de usuario, sobre un Postgres real con las políticas de seguridad aplicadas.</p>
+  <p class="meta">9 oct 2026 · 21 migraciones · 28 comprobaciones de permisos · 6 cuentas de prueba</p>
+</header>
+
+<div class="stats">
+  <div class="stat ok"><b>28/28</b><span>Comprobaciones de permisos en verde</span></div>
+  <div class="stat ok"><b>21/21</b><span>Migraciones aplican desde cero</span></div>
+  <div class="stat warn"><b>6</b><span>Hallazgos de diseño (0 críticos)</span></div>
+  <div class="stat crit"><b>2</b><span>Bloqueos para salir a producción</span></div>
+</div>
+
+<h2>Veredicto</h2>
+<div class="col">
+<p>El modelo de permisos es la parte más fuerte del proyecto y aguanta el examen. Un jurado no ve la nota del otro, ni siquiera a través del ranking; un beneficiario no alcanza las postulaciones; una cuenta recién creada no ve nada hasta que un administrador la habilita. Nada de esto depende del navegador: lo decide la base de datos, que es donde tiene que decidirse.</p>
+<p>Lo que falta no es seguridad sino <strong>trazabilidad y reglas de juego</strong>. La plataforma hoy registra el resultado de la evaluación pero no su historia: una nota se puede reescribir sin dejar rastro del valor anterior, y nada impide que un jurado califique una postulación en la que tiene interés. En una convocatoria que reparte capital, eso es lo que se le reclama al organizador cuando alguien no queda.</p>
+<p class="note">Calificación global: <strong>sólida en ingeniería, incompleta como instrumento de convocatoria.</strong> Los seis hallazgos son de diseño del proceso, no defectos de código. Ninguno impide abrir; todos conviene resolverlos antes de que entre la primera postulación real.</p>
+</div>
+
+<h2>Las seis cuentas de prueba</h2>
+<div class="col"><p>Todas con dominio <code>example.com</code>, a propósito: así nunca se confunden con cuentas reales ni reciben correo de verdad.</p></div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Persona</th><th>Correo</th><th>Rol</th><th>Jurado</th><th>Qué alcanza en el panel</th></tr></thead>
+<tbody>
+<tr><td>Ana Admin</td><td class="mono">admin@example.com</td><td>Administrador</td><td>—</td><td>12 secciones, todo el ranking</td></tr>
+<tr><td>Elena Editora</td><td class="mono">editor@example.com</td><td>Editor</td><td>—</td><td>8 secciones, solo contenido web y cursos</td></tr>
+<tr><td>Julio Jurado Uno</td><td class="mono">jurado1@example.com</td><td>Evaluador</td><td>Jurado 1</td><td>2 secciones: Calificar y Ayuda</td></tr>
+<tr><td>Julia Jurado Dos</td><td class="mono">jurado2@example.com</td><td>Evaluador</td><td>Jurado 2</td><td>2 secciones: Calificar y Ayuda</td></tr>
+<tr><td>Beto Beneficiario</td><td class="mono">beneficiario@example.com</td><td>Beneficiario</td><td>—</td><td>Ninguna. El panel lo rechaza y lo manda a «Mis cursos»</td></tr>
+<tr><td>Pedro Pendiente</td><td class="mono">pendiente@example.com</td><td>Pendiente</td><td>—</td><td>Ninguna, ni siquiera los cursos</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="step"><span class="num">01</span><h2>La persona que se postula</h2></div>
+<div class="col">
+<p>Sin cuenta, sin sesión. Llena el formulario, sube cédula, RUT y recibo, y envía. A partir de ahí no debería poder tocar nada más — y no puede.</p>
+</div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Intento</th><th>Esperado</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr><td>Enviar la postulación completa</td><td>Permitido</td><td class="si">Permitido</td></tr>
+<tr><td>Subir los tres adjuntos a su propia carpeta</td><td>Permitido</td><td class="si">Permitido</td></tr>
+<tr><td>Subir un archivo a una ruta inventada</td><td>Bloqueado</td><td class="si">Bloqueado</td></tr>
+<tr><td>Leer las postulaciones de los demás</td><td>Bloqueado</td><td class="si">Bloqueado</td></tr>
+<tr><td>Enviarse marcado como «ganador»</td><td>Bloqueado</td><td class="si">Bloqueado</td></tr>
+<tr><td>Volver a leer los adjuntos que subió</td><td>Bloqueado</td><td class="si">Bloqueado</td></tr>
+</tbody>
+</table>
+</div>
+<div class="col"><p class="note">El bloqueo de la ruta inventada es el que más vale: la política exige que el nombre del archivo sea <code>&lt;uuid&gt;/cedula.pdf</code> y nada más, así que nadie puede usar el almacenamiento del programa como disco propio.</p></div>
+
+<div class="step"><span class="num">02</span><h2>Los dos jurados</h2></div>
+<div class="col">
+<p>Cada uno entra y ve exactamente dos cosas en el menú: Calificar y Ayuda. Ni participantes, ni correos, ni equipo. La pantalla le dice en nombre de quién califica y le recuerda que no verá la nota del otro.</p>
+</div>
+<figure>
+  <img src="05-jurado1-calificar.png" alt="Panel visto por el jurado 1: el menú lateral solo ofrece Calificar y Ayuda.">
+  <figcaption><b>Julio Jurado Uno, evaluador de Inngenios.</b> El menú se reduce a dos entradas. El encabezado muestra el jurado al que pertenece, leído de la base, no escrito en el código.</figcaption>
+</figure>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Intento</th><th>Esperado</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr><td>Jurado 1 ve la postulación y abre los adjuntos</td><td>Permitido</td><td class="si">Permitido</td></tr>
+<tr><td>Jurado 1 califica a nombre de su jurado</td><td>Permitido</td><td class="si">Permitido</td></tr>
+<tr><td>Jurado 1 califica suplantando al jurado 2</td><td>Bloqueado</td><td class="si">Bloqueado</td></tr>
+<tr><td>Jurado 2 lee la nota del jurado 1</td><td>Bloqueado</td><td class="si">Bloqueado</td></tr>
+<tr><td>Jurado 1 lee la nota del jurado 2</td><td>Bloqueado</td><td class="si">Bloqueado</td></tr>
+<tr><td>Cada uno lee la suya</td><td>Permitido</td><td class="si">Permitido</td></tr>
+</tbody>
+</table>
+</div>
+<div class="col">
+<p>El aislamiento también se sostiene en el ranking, que es donde suele filtrarse. Consultando la misma vista, cada uno recibe un resultado distinto:</p>
+</div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Quién consulta</th><th class="n">Jurado 1</th><th class="n">Jurado 2</th><th class="n">Global</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td>Administrador</td><td class="n">80,0</td><td class="n">65,0</td><td class="n">77,2</td><td><span class="chip ok">Completo</span></td></tr>
+<tr><td>Julio (jurado 1)</td><td class="n">80,0</td><td class="n">—</td><td class="n">57,7</td><td><span class="chip warn">Parcial</span></td></tr>
+<tr><td>Julia (jurado 2)</td><td class="n">—</td><td class="n">65,0</td><td class="n">53,2</td><td><span class="chip warn">Parcial</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="step"><span class="num">03</span><h2>El administrador</h2></div>
+<div class="col">
+<p>Es el único que ve las dos notas juntas, el puntaje global y quién puso cada calificación.</p>
+</div>
+<figure>
+  <img src="02-admin-ficha.png" alt="Ficha de la postulación vista por el administrador, con el desglose de puntaje y las dos tarjetas de calificación.">
+  <figcaption><b>Ficha completa.</b> Plataforma 84,3 (70 de 83 puntos) · Inngenios 80 · Triple A 65 · Global 77,2. Debajo de cada nota aparece el nombre de quien calificó, y en la tarjeta de la rúbrica el correo y la fecha.</figcaption>
+</figure>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Intento</th><th>Esperado</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr><td>Ver ambas calificaciones con su autor</td><td>Permitido</td><td class="si">Permitido</td></tr>
+<tr><td>Ver el ranking completo</td><td>Permitido</td><td class="si">Permitido</td></tr>
+<tr><td>Renombrar un jurado</td><td>Permitido</td><td class="si">Permitido</td></tr>
+<tr><td>Autorizar al ganador</td><td>Permitido</td><td class="si">Permitido</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="step"><span class="num">04</span><h2>El editor y el beneficiario</h2></div>
+<div class="col">
+<p>El editor gestiona el sitio y los cursos, y nada más: el menú le muestra 8 secciones y las postulaciones no están entre ellas. El beneficiario ni siquiera entra al panel — lo rechaza en la puerta y lo remite a «Mis cursos».</p>
+</div>
+<figure>
+  <img src="09-beneficiario.png" alt="El panel de administración rechaza al beneficiario y muestra la pantalla de acceso.">
+  <figcaption><b>Beto Beneficiario intentando entrar al panel.</b> La sesión es válida, pero el rol no da acceso: el panel cierra la sesión y lo devuelve al inicio. Sus cursos los ve por <code>acceso.html</code>.</figcaption>
+</figure>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Quién</th><th>Intento</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr><td>Editor</td><td>Crear una entrada del blog</td><td class="si">Permitido</td></tr>
+<tr><td>Editor</td><td>Leer postulaciones</td><td class="si">Bloqueado</td></tr>
+<tr><td>Editor</td><td>Calificar</td><td class="si">Bloqueado</td></tr>
+<tr><td>Beneficiario</td><td>Ver los cursos activos</td><td class="si">Permitido</td></tr>
+<tr><td>Beneficiario</td><td>Leer postulaciones o calificaciones</td><td class="si">Bloqueado</td></tr>
+<tr><td>Beneficiario</td><td>Ascenderse a administrador</td><td class="si">Bloqueado</td></tr>
+<tr><td>Cuenta pendiente</td><td>Ver cualquier curso</td><td class="si">Bloqueado</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+<h2>Jurado 1 y Jurado 2, configurables</h2>
+<div class="col">
+<p>Antes, «Inngenios» y «Triple A» estaban escritos dentro del código: en dos restricciones de la base, en la vista del ranking y en la función de correos. Reusar la plataforma en otra convocatoria obligaba a tocar SQL en cuatro sitios y volver a desplegar.</p>
+<p>Ahora los jurados son filas de una tabla. La clave (<code>jurado_1</code>) es estable y es lo que guardan las calificaciones; el nombre visible lo edita un administrador desde el panel. Se verificó renombrando el jurado 2 a <em>Alcaldía de Soledad</em>: el ranking, los encabezados de la tabla y los mensajes de «falta calificar» cambiaron solos, sin tocar una línea.</p>
+<p>Y cada calificación guarda ahora <strong>quién la puso</strong>: nombre y correo copiados en el momento de calificar, no referenciados. Si esa persona sale del equipo y se borra su cuenta, el acta de quién calificó qué sobrevive. Lo sella la base con un disparador, no el navegador, así que un evaluador no puede falsear la autoría aunque manipule la petición.</p>
+</div>
+<figure>
+  <img src="04-admin-pesos.png" alt="Pantalla de puntaje y pesos, con los campos rotulados por el nombre de cada jurado.">
+  <figcaption><b>Puntaje y pesos.</b> Los campos se rotulan con el nombre de cada jurado tal como esté configurado; los pesos 40/30/30 siguen siendo editables.</figcaption>
+</figure>
+
+<hr>
+<h2>Hallazgos</h2>
+<div class="col"><p>Ninguno es un defecto de código. Los seis son decisiones de diseño del proceso que hoy están abiertas.</p></div>
+
+<div class="find">
+  <span class="chip warn">Media</span>
+  <h4>Las notas se reescriben sin historial</h4>
+  <p class="q">Un jurado cambió su calificación de 5 a 1 y lo único que quedó fue la fecha de modificación. El valor anterior se pierde.</p>
+  <p>En una convocatoria que reparte capital no hay cómo demostrar que una nota no se cambió después de hablar con alguien. Se resuelve con una tabla de historial que guarde cada versión con su autor y su fecha.</p>
+</div>
+<div class="find">
+  <span class="chip warn">Media</span>
+  <h4>Nada impide el conflicto de interés</h4>
+  <p class="q">El jurado 1 puede ver y calificar una postulación cuyo correo es el suyo. No hay declaración de impedimento ni bloqueo.</p>
+  <p>Conviene al menos marcar la coincidencia de correo o documento y exigir que el jurado declare el impedimento antes de calificar.</p>
+</div>
+<div class="find">
+  <span class="chip warn">Media</span>
+  <h4>El modelo solo cuenta dos jurados</h4>
+  <p class="q">Se puede dar de alta un tercer jurado y la tabla lo acepta, pero el ranking solo lee el primero y el segundo: la nota del tercero se descarta en silencio.</p>
+  <p>Justo el escenario de reutilización que motivó este cambio. O se generaliza el puntaje a N jurados, o la pantalla debe impedir crear un tercero.</p>
+</div>
+<div class="find">
+  <span class="chip warn">Media</span>
+  <h4>El formulario público no tiene tope de envíos</h4>
+  <p class="q">Se insertaron cinco postulaciones seguidas con el mismo correo y la misma cédula, sin ninguna restricción.</p>
+  <p>Un script puede llenar la tabla y el almacenamiento, y el equipo tendría que depurar a mano antes de poder evaluar. Hoy solo hay topes de tamaño por campo.</p>
+</div>
+<div class="find baja">
+  <span class="chip">Baja</span>
+  <h4>Sin unicidad por cédula ni por correo</h4>
+  <p class="q">La base acepta dos postulaciones del mismo emprendimiento. El panel las marca como «posible duplicada», pero no las impide.</p>
+  <p>Dos fichas del mismo emprendimiento compiten por separado en el ranking.</p>
+</div>
+<div class="find baja">
+  <span class="chip">Baja</span>
+  <h4>Marcar un jurado como inactivo no hace nada</h4>
+  <p class="q">Con el jurado 2 desactivado, su evaluador insertó la calificación igual. Ninguna política consulta esa columna.</p>
+  <p>La opción sugiere que se puede retirar un jurado, pero no retira nada.</p>
+</div>
+
+<h3>Corregido durante la auditoría</h3>
+<div class="col">
+<ul>
+<li><strong>El evaluador veía «Jurado 1» en vez del nombre configurado.</strong> Los jurados se cargaban dentro de la vista de Participantes, a la que un evaluador nunca entra. Ahora se cargan antes de pintar la pantalla.</li>
+<li><strong>Un rótulo del inicio seguía diciendo «(I y A)»</strong>, de la versión anterior del modelo.</li>
+</ul>
+</div>
+
+<h3>Descartado por falso positivo</h3>
+<div class="col">
+<p>Un primer intento reportó que un visitante anónimo podía modificar o borrar adjuntos ajenos. Al repetirlo contando filas afectadas, resultó que afectaba cero: la operación no da error, simplemente no toca nada. Las políticas sí bloquean. <strong>No es un hallazgo.</strong></p>
+</div>
+
+<hr>
+<h2>Lo que bloquea salir a producción</h2>
+<div class="find alta">
+  <span class="chip crit">Bloqueo</span>
+  <h4>Ningún correo se ha entregado nunca</h4>
+  <p class="q">Los seis envíos registrados están en estado de error: <em>«The inngenios.co domain is not verified»</em>.</p>
+  <p>Sin esto no sale el aviso de nueva postulación, ni la confirmación al postulante, ni las credenciales al ganador. Requiere cargar cuatro registros DNS en GoDaddy y verificar el dominio en Resend.</p>
+</div>
+<div class="find alta">
+  <span class="chip crit">Bloqueo</span>
+  <h4>El flujo nunca se ha probado de punta a punta en producción</h4>
+  <p class="q">La única postulación que hay en la base fue sembrada por SQL: tiene el campo de documentos vacío y ninguno de los nueve archivos del almacenamiento le pertenece.</p>
+  <p>Los nueve son huérfanos de tres pruebas borradas. Falta llenar el formulario de verdad, verla llegar al panel y abrir sus adjuntos.</p>
+</div>
+
+<h2>Cómo se hicieron estas pruebas</h2>
+<div class="col">
+<p>Se levantó un Postgres real —PGlite, Postgres compilado a WebAssembly— sin Docker ni permisos de administrador, y se le aplicaron las 21 migraciones del repositorio desde cero. Las 21 entraron limpias, lo que confirma que la base se puede reconstruir de la nada.</p>
+<p>Cada comprobación abre una transacción, fija el rol y el identificador de usuario igual que haría Supabase con una sesión real, ejecuta la consulta y deshace. Nada quedó escrito, y <strong>no se tocó la base de producción</strong>.</p>
+<p>El recorrido por pantallas usa el panel real del repositorio, alimentado con lo que cada rol alcanza a ver según esas mismas políticas. Todo queda en <code>pruebas/</code> y se vuelve a correr con <code>node flow.js</code>.</p>
+<p class="note">Una trampa que vale registrar: el primer intento dio 16 de 28 y parecía que las políticas bloqueaban de más. En realidad faltaban los permisos de tabla que Supabase otorga de fábrica, y todo fallaba antes de llegar a evaluarse. Una matriz de permisos mal montada miente en la dirección tranquilizadora.</p>
+</div>
+</div>

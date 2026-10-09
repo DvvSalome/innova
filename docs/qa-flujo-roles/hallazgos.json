@@ -1,0 +1,44 @@
+[
+  {
+    "sev": "MEDIA",
+    "titulo": "Las notas se reescriben sin historial",
+    "hallazgo": "jurado 1 cambió pertinencia de 5 a 1. Solo queda updated_at; el valor anterior se pierde.",
+    "impacto": "En una convocatoria con premio en dinero no hay cómo auditar si una nota se cambió después de ver la del otro jurado o tras una llamada."
+  },
+  {
+    "sev": "MEDIA",
+    "titulo": "Nada impide el conflicto de interés",
+    "hallazgo": "El jurado 1 ve y puede calificar una postulación cuyo correo es el suyo. No hay declaración de impedimento ni bloqueo.",
+    "impacto": "Un jurado puede calificarse a sí mismo o a un allegado sin que el sistema lo note."
+  },
+  {
+    "sev": "MEDIA",
+    "titulo": "El modelo solo cuenta dos jurados",
+    "hallazgo": "Se puede insertar un jurado_3 y la tabla lo acepta, pero el ranking solo lee orden=1 y orden=2: su nota no entra al puntaje global ni aparece como faltante.",
+    "impacto": "Al reutilizar la plataforma con tres jurados, el tercero califica y su nota se descarta en silencio."
+  },
+  {
+    "sev": "MEDIA",
+    "titulo": "Storage sin política de update/delete para anon",
+    "hallazgo": "update=permitido, delete=permitido sobre objetos del bucket postulaciones.",
+    "impacto": "Revisar que anon no pueda tocar adjuntos ya subidos."
+  },
+  {
+    "sev": "MEDIA",
+    "titulo": "El formulario público no tiene tope de envíos",
+    "hallazgo": "Se insertaron 5 postulaciones seguidas con el mismo correo y la misma cédula, sin restricción.",
+    "impacto": "Un script puede llenar la tabla y el almacenamiento; el equipo tendría que depurar a mano antes de evaluar."
+  },
+  {
+    "sev": "BAJA",
+    "titulo": "El campo activo de jurados no hace nada",
+    "hallazgo": "Con jurados.activo = false, el jurado 2 insertó su calificación igual. Ninguna política ni check consulta esa columna.",
+    "impacto": "La columna sugiere que se puede retirar un jurado, pero no retira nada."
+  },
+  {
+    "sev": "BAJA",
+    "titulo": "Sin unicidad por cédula ni por correo",
+    "hallazgo": "Hay 1 correo(s) con más de una postulación.",
+    "impacto": "El panel marca \"posible duplicada\" pero la base no lo impide; dos fichas del mismo emprendimiento compiten por separado."
+  }
+]
