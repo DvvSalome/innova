@@ -5,11 +5,12 @@ import path from 'node:path';
 
 const MIG = '/home/dvv-salom3/dev/freelance/inngenios/INNOOVASOCIAL/supabase/migrations';
 
-export async function build({ extra = [] } = {}) {
+export async function build({ extra = [], hasta = null } = {}) {
   const db = await PGlite.create({ extensions: { pgcrypto } });
   await db.exec(readFileSync('bootstrap.sql', 'utf8'));
 
-  const files = readdirSync(MIG).filter(f => f.endsWith('.sql')).sort();
+  let files = readdirSync(MIG).filter(f => f.endsWith('.sql')).sort();
+  if (hasta) files = files.filter(f => f <= hasta);
   const applied = [];
   for (const f of files) {
     const sql = readFileSync(path.join(MIG, f), 'utf8');
