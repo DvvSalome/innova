@@ -6,3 +6,6 @@ Momentos_Articulos_InnovaSocial.pdf
 .env.local
 .env*.local
 supabase/.temp/
+
+# Haven lives in DvvSalome/haven-hk
+haven/
