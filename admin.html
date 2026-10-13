@@ -2317,6 +2317,7 @@
 
   // ---------- EQUIPO ----------
   async function loadEquipo(){
+    syncInvEntidad();
     const tb = $('tblEquipo');
     const r = await sb.from('profiles').select('*').in('role', ['admin', 'editor', 'evaluador']).order('role').order('email');
     if (r.error) { tb.innerHTML = '<tr><td colspan="5">Error: ' + esc(r.error.message) + '</td></tr>'; return; }
@@ -2360,6 +2361,9 @@
   });
   function syncInvEntidad(){
     const rol = $('invRol').value;
+    const sel = $('invEntidad'), actual = sel.value;
+    sel.innerHTML = S.jurados.map(j => '<option value="' + esc(j.clave) + '">' + esc(j.nombre) + '</option>').join('') + '<option value="">Sin jurado (no califica)</option>';
+    sel.value = S.jurados.some(j => j.clave === actual) || actual === '' ? actual : '';
     $('invEntidadF').style.visibility = (rol === 'evaluador' || rol === 'admin') ? 'visible' : 'hidden';
     if (rol === 'evaluador' && !$('invEntidad').value) $('invEntidad').value = J1().clave;
   }
