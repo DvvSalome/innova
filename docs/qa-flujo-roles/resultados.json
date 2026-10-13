@@ -1,0 +1,340 @@
+{
+  "matriz": [
+    {
+      "etapa": "1 Postulación",
+      "actor": "anónimo",
+      "accion": "enviar postulación",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[]"
+    },
+    {
+      "etapa": "1 Postulación",
+      "actor": "anónimo",
+      "accion": "subir los 3 adjuntos",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[]"
+    },
+    {
+      "etapa": "1 Postulación",
+      "actor": "anónimo",
+      "accion": "subir adjunto con ruta arbitraria",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "new row violates row-level security policy for table \"objects\""
+    },
+    {
+      "etapa": "1 Postulación",
+      "actor": "anónimo",
+      "accion": "leer postulaciones",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "0 filas (RLS filtra)"
+    },
+    {
+      "etapa": "1 Postulación",
+      "actor": "anónimo",
+      "accion": "enviarse como ganador",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "new row violates row-level security policy for table \"postulaciones\""
+    },
+    {
+      "etapa": "1 Postulación",
+      "actor": "anónimo",
+      "accion": "leer los adjuntos subidos",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "0 filas (RLS filtra)"
+    },
+    {
+      "etapa": "2 Calificación",
+      "actor": "jurado 1",
+      "accion": "ver la postulación",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[{\"nombre_emprendimiento\":\"Raíz Costeña\"}]"
+    },
+    {
+      "etapa": "2 Calificación",
+      "actor": "jurado 1",
+      "accion": "abrir los adjuntos",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[{\"name\":\"bbbbbbbb-0000-4000-8000-000000000001/cedula.pdf\"},{\"name\":\"bbbbbbbb-0000-4000-8000-000000000001/rut."
+    },
+    {
+      "etapa": "2 Calificación",
+      "actor": "jurado 1",
+      "accion": "calificar como jurado_1",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[]"
+    },
+    {
+      "etapa": "2 Calificación",
+      "actor": "jurado 1",
+      "accion": "calificar suplantando a jurado_2",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "new row violates row-level security policy for table \"evaluaciones\""
+    },
+    {
+      "etapa": "3 Calificación",
+      "actor": "jurado 2",
+      "accion": "calificar como jurado_2",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[]"
+    },
+    {
+      "etapa": "3 Calificación",
+      "actor": "jurado 2",
+      "accion": "ver la nota del jurado 1",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "0 filas (RLS filtra)"
+    },
+    {
+      "etapa": "3 Calificación",
+      "actor": "jurado 2",
+      "accion": "ver su propia nota",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[{\"entidad\":\"jurado_2\",\"pertinencia\":3}]"
+    },
+    {
+      "etapa": "3 Calificación",
+      "actor": "jurado 1",
+      "accion": "ver la nota del jurado 2",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "0 filas (RLS filtra)"
+    },
+    {
+      "etapa": "4 Ranking",
+      "actor": "admin",
+      "accion": "ver ambas notas",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[{\"entidad\":\"jurado_1\",\"pertinencia\":4,\"evaluador_nombre\":\"Julio Jurado Uno\",\"evaluador_email\":\"jurado1@exampl"
+    },
+    {
+      "etapa": "4 Ranking",
+      "actor": "admin",
+      "accion": "ver el ranking con identidad del jurado",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[{\"puntaje_p\":\"81.9\",\"puntaje_j1\":\"80.0\",\"puntaje_j2\":\"65.0\",\"puntaje_global\":\"76.3\",\"es_parcial\":false,\"jurad"
+    },
+    {
+      "etapa": "4 Ranking",
+      "actor": "admin",
+      "accion": "renombrar el jurado 2",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[]"
+    },
+    {
+      "etapa": "4 Ranking",
+      "actor": "admin",
+      "accion": "el ranking refleja el nombre nuevo",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[{\"jurado_2_nombre\":\"Alcaldía de Soledad\",\"falta\":null}]"
+    },
+    {
+      "etapa": "4 Ranking",
+      "actor": "admin",
+      "accion": "autorizar ganador",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[]"
+    },
+    {
+      "etapa": "5 Beneficiario",
+      "actor": "beneficiario",
+      "accion": "ver cursos activos",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[{\"titulo\":\"Bootcamp modelo de negocio\"}]"
+    },
+    {
+      "etapa": "5 Beneficiario",
+      "actor": "beneficiario",
+      "accion": "leer postulaciones",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "0 filas (RLS filtra)"
+    },
+    {
+      "etapa": "5 Beneficiario",
+      "actor": "beneficiario",
+      "accion": "leer evaluaciones",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "0 filas (RLS filtra)"
+    },
+    {
+      "etapa": "5 Beneficiario",
+      "actor": "beneficiario",
+      "accion": "calificar",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "new row violates row-level security policy for table \"evaluaciones\""
+    },
+    {
+      "etapa": "5 Beneficiario",
+      "actor": "beneficiario",
+      "accion": "ascenderse a admin",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "update sin efecto (RLS)"
+    },
+    {
+      "etapa": "6 Pendiente",
+      "actor": "cuenta pendiente",
+      "accion": "ver cursos",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "0 filas (RLS filtra)"
+    },
+    {
+      "etapa": "7 Editor",
+      "actor": "editor",
+      "accion": "crear un momento",
+      "esperado": "permitido",
+      "real": "permitido",
+      "pass": true,
+      "detalle": "[]"
+    },
+    {
+      "etapa": "7 Editor",
+      "actor": "editor",
+      "accion": "leer postulaciones",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "0 filas (RLS filtra)"
+    },
+    {
+      "etapa": "7 Editor",
+      "actor": "editor",
+      "accion": "calificar",
+      "esperado": "bloqueado",
+      "real": "bloqueado",
+      "pass": true,
+      "detalle": "new row violates row-level security policy for table \"evaluaciones\""
+    }
+  ],
+  "ranking": {
+    "id": "bbbbbbbb-0000-4000-8000-000000000001",
+    "created_at": "2026-10-09T18:18:03.627Z",
+    "estado": "ganador",
+    "orden_desempate": null,
+    "nota_desempate": null,
+    "puntaje_p": "81.9",
+    "detalle_p": {
+      "P": 81.9,
+      "max": 83,
+      "pts": 68,
+      "detalle": [
+        [
+          "¿Está vendiendo?",
+          10,
+          10
+        ],
+        [
+          "Promedio de ventas",
+          5,
+          10
+        ],
+        [
+          "Etapa",
+          7,
+          10
+        ],
+        [
+          "Colaboradores",
+          7,
+          10
+        ],
+        [
+          "Formalización",
+          8,
+          8
+        ],
+        [
+          "Dedicación",
+          6,
+          6
+        ],
+        [
+          "Empleo formal adicional",
+          6,
+          6
+        ],
+        [
+          "Tipo de emprendimiento",
+          6,
+          6
+        ],
+        [
+          "ODS prioritarios",
+          9,
+          9
+        ],
+        [
+          "Redes sociales",
+          2,
+          6
+        ],
+        [
+          "Página web",
+          2,
+          2
+        ]
+      ]
+    },
+    "puntaje_j1": "80.0",
+    "puntaje_j2": "65.0",
+    "jurado_1_nombre": "Inngenios",
+    "jurado_2_nombre": "Alcaldía de Soledad",
+    "calificado_por_j1": "Julio Jurado Uno",
+    "calificado_por_j1_email": "jurado1@example.com",
+    "calificado_j1_en": "2026-10-09T18:18:03.643Z",
+    "calificado_por_j2": "Julia Jurado Dos",
+    "calificado_por_j2_email": "jurado2@example.com",
+    "calificado_j2_en": "2026-10-09T18:18:03.647Z",
+    "puntaje_global": "76.3",
+    "es_parcial": false,
+    "falta": null,
+    "revisar_conjunto": false
+  }
+}

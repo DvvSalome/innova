@@ -469,7 +469,7 @@
       <!-- ============ PARTICIPANTES ============ -->
       <section class="view" id="view-participantes">
         <div class="view-head">
-          <div><h2>Participantes y ranking</h2><p>Postulaciones recibidas desde el formulario, con el puntaje de la plataforma (P), Inngenios (I), Triple A (A) y el global.</p></div>
+          <div><h2>Participantes y ranking</h2><p>Postulaciones recibidas desde el formulario, con el puntaje de la plataforma (P), el de cada jurado (J1 y J2) y el global.</p></div>
           <div class="toolbar-row">
             <button class="btn ghost" id="btnRecargarPart">Actualizar</button>
             <button class="btn ghost" id="btnExportar"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="m8 10 4 4 4-4"/><path d="M5 19h14"/></svg> Exportar CSV</button>
@@ -487,7 +487,7 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>#</th><th>Postulante</th><th>Emprendimiento</th><th>Enviada</th><th title="Plataforma">P</th><th title="Inngenios">I</th><th title="Triple A">A</th><th>Global</th><th>Estado</th><th></th></tr></thead>
+              <thead><tr><th>#</th><th>Postulante</th><th>Emprendimiento</th><th>Enviada</th><th title="Plataforma">P</th><th id="thJ1" title="Jurado 1">J1</th><th id="thJ2" title="Jurado 2">J2</th><th>Global</th><th>Estado</th><th></th></tr></thead>
               <tbody id="tblParticipantes"></tbody>
             </table>
           </div>
@@ -637,7 +637,7 @@
             <div class="field"><label for="invNombre">Nombre</label><input type="text" id="invNombre" placeholder="Nombre y apellido"></div>
             <div class="field"><label for="invEmail">Correo *</label><input type="email" id="invEmail" placeholder="persona@correo.com" required></div>
             <div class="field"><label for="invRol">Rol *</label><select id="invRol"><option value="evaluador">Evaluador (califica postulaciones)</option><option value="editor">Editor (contenido web y cursos)</option><option value="admin">Administrador (todo el panel)</option></select></div>
-            <div class="field" id="invEntidadF"><label for="invEntidad">Entidad (para calificar)</label><select id="invEntidad"><option value="inngenios">Inngenios</option><option value="triple_a">Triple A</option><option value="">Sin entidad (no califica)</option></select></div>
+            <div class="field" id="invEntidadF"><label for="invEntidad">Entidad (para calificar)</label><select id="invEntidad"><option value="jurado_1">Jurado 1</option><option value="jurado_2">Jurado 2</option><option value="">Sin jurado (no califica)</option></select></div>
             <div style="grid-column:1/-1; display:flex; gap:10px; align-items:center; flex-wrap:wrap;"><button class="btn solid" type="submit" id="btnInvitar">Enviar invitación</button><span class="save-status" id="invStatus"></span></div>
           </form>
         </div>
@@ -658,8 +658,8 @@
           <p class="muted" style="font-size:12.5px; margin:0 0 14px;">Los pesos deben sumar 100 %. Por defecto 40 / 30 / 30 (pendiente de confirmar por el equipo; la alternativa es un tercio cada uno).</p>
           <div class="grid2 g3">
             <div class="field"><label for="wP">Plataforma (P) %</label><input type="number" id="wP" min="0" max="100" step="1"></div>
-            <div class="field"><label for="wI">Inngenios (I) %</label><input type="number" id="wI" min="0" max="100" step="1"></div>
-            <div class="field"><label for="wA">Triple A (A) %</label><input type="number" id="wA" min="0" max="100" step="1"></div>
+            <div class="field"><label for="wI" id="wILabel">Jurado 1 %</label><input type="number" id="wI" min="0" max="100" step="1"></div>
+            <div class="field"><label for="wA" id="wALabel">Jurado 2 %</label><input type="number" id="wA" min="0" max="100" step="1"></div>
           </div>
           <p class="save-status" id="pesosStatus" style="margin-top:10px;"></p>
         </div>
@@ -855,11 +855,20 @@
     perfil: null, rol: null,
     participantes: [], ranking: {}, rankingOk: true, evals: {}, correos: [],
     momentos: [], cursos: [], sliders: [], etapas: [], resultados: [], equipo: [],
-    pesos: { plataforma: 0.40, inngenios: 0.30, triple_a: 0.30 },
+    pesos: { plataforma: 0.40, jurado_1: 0.30, jurado_2: 0.30 },
+    jurados: [{ clave: 'jurado_1', nombre: 'Jurado 1', orden: 1 }, { clave: 'jurado_2', nombre: 'Jurado 2', orden: 2 }],
     misEvals: {}, partPage: 0, cargado: {}
   };
   const ROLES = { admin: 'Administrador', editor: 'Editor', evaluador: 'Evaluador', beneficiario: 'Beneficiario', pendiente: 'Sin acceso' };
-  const ENTIDADES = { inngenios: 'Inngenios', triple_a: 'Triple A' };
+  // Los jurados son datos, no código: la clave (jurado_1) es estable y el nombre
+  // visible lo edita un admin, para reusar la plataforma en otra convocatoria.
+  const J = (orden) => S.jurados.find(j => j.orden === orden) || { clave: 'jurado_' + orden, nombre: 'Jurado ' + orden, orden };
+  const J1 = () => J(1), J2 = () => J(2);
+  const nombreJurado = (clave) => (S.jurados.find(j => j.clave === clave) || {}).nombre || clave;
+  async function loadJurados(){
+    const r = await sb.from('jurados').select('clave,nombre,orden').order('orden');
+    if (!r.error && r.data && r.data.length) S.jurados = r.data;
+  }
   const ESTADOS = { postulado: 'Postulado', preseleccionado: 'Preseleccionado', participante: 'Participante', ganador: 'Ganador', rechazado: 'Rechazado' };
   const VISTAS = {
     inicio: ['admin', 'editor'], participantes: ['admin'], calificar: ['admin', 'evaluador'], cursos: ['admin', 'editor'],
@@ -963,7 +972,7 @@
     const name = perfil.full_name || perfil.email || 'IS';
     $('userAvatar').textContent = ini(String(name).replace(/@.*/, '').replace(/[._-]+/g, ' '));
     $('userAvatar').title = (perfil.email || '') + ' · Clic para cerrar sesión';
-    $('rolTag').innerHTML = '<b>' + esc(perfil.full_name || perfil.email) + '</b>' + esc(ROLES[perfil.role] || perfil.role) + (perfil.entidad ? ' · ' + esc(ENTIDADES[perfil.entidad] || perfil.entidad) : '');
+    $('rolTag').innerHTML = '<b>' + esc(perfil.full_name || perfil.email) + '</b>' + esc(ROLES[perfil.role] || perfil.role) + (perfil.entidad ? ' · ' + esc(nombreJurado(perfil.entidad)) : '');
     aplicarPermisos();
     const m = location.hash.match(/participante=([0-9a-f-]{36})/i);
     if (m && S.rol === 'admin') { S.abrirAlCargar = m[1]; ir('participantes'); }
@@ -983,9 +992,13 @@
     }
     if (perfil.role === 'evaluador' && !perfil.entidad) {
       await sb.auth.signOut();
-      showLogin('Tu cuenta de evaluador no tiene entidad asignada (Inngenios o Triple A). Pide a un administrador que la configure.');
+      showLogin('Tu cuenta de evaluador no tiene jurado asignado. Pide a un administrador que la configure.');
       return null;
     }
+    // Antes de pintar nada: sin esto el evaluador ve «Jurado 1» en vez del
+    // nombre configurado, porque los jurados se cargaban dentro de Participantes
+    // y un evaluador nunca entra a esa vista.
+    await loadJurados();
     showApp(perfil);
     return perfil;
   }
@@ -1073,13 +1086,15 @@
     if (r) {
       const det = r.detalle_p || {};
       return {
-        P: Number(r.puntaje_p), I: r.puntaje_i == null ? null : Number(r.puntaje_i), A: r.puntaje_a == null ? null : Number(r.puntaje_a),
+        P: Number(r.puntaje_p), I: r.puntaje_j1 == null ? null : Number(r.puntaje_j1), A: r.puntaje_j2 == null ? null : Number(r.puntaje_j2),
+        porJ1: r.calificado_por_j1, emailJ1: r.calificado_por_j1_email, fechaJ1: r.calificado_j1_en,
+        porJ2: r.calificado_por_j2, emailJ2: r.calificado_por_j2_email, fechaJ2: r.calificado_j2_en,
         G: Number(r.puntaje_global), parcial: !!r.es_parcial, falta: r.falta, revisar: !!r.revisar_conjunto,
         pts: det.pts, max: det.max, detalle: det.detalle || puntajeP(p).detalle
       };
     }
     const c = puntajeP(p);
-    return { P: c.P, I: null, A: null, G: Math.round(S.pesos.plataforma * c.P * 10) / 10, parcial: true, falta: 'Faltan Inngenios y Triple A', revisar: false, pts: c.pts, max: c.max, detalle: c.detalle };
+    return { P: c.P, I: null, A: null, G: Math.round(S.pesos.plataforma * c.P * 10) / 10, parcial: true, falta: 'Faltan ' + J1().nombre + ' y ' + J2().nombre, revisar: false, pts: c.pts, max: c.max, detalle: c.detalle };
   }
   function empates(list){
     const cuenta = {};
@@ -1099,7 +1114,8 @@
       sb.from('postulaciones').select('*').order('created_at', { ascending: false }),
       sb.from('ranking_postulaciones').select('*'),
       sb.from('evaluaciones').select('*'),
-      loadPesos()
+      loadPesos(),
+      loadJurados()
     ]);
     if (p.error) { tb.innerHTML = '<tr><td colspan="10">No se pudieron cargar las postulaciones: ' + esc(p.error.message) + '</td></tr>'; return; }
     S.participantes = p.data || [];
@@ -1107,8 +1123,10 @@
     S.rankingOk = !r.error;
     S.evals = {}; (e.data || []).forEach(x => { (S.evals[x.postulacion_id] = S.evals[x.postulacion_id] || {})[x.entidad] = x; });
     $('partAviso').style.display = S.rankingOk ? 'none' : 'block';
-    $('partAviso').textContent = 'El ranking con las calificaciones de Inngenios y Triple A aún no está disponible en la base de datos (falta aplicar la migración). Se muestra solo el puntaje de la plataforma.';
+    $('partAviso').textContent = 'El ranking con las calificaciones de los jurados no está disponible: ' + ((r.error && r.error.message) || 'error desconocido') + '. Se muestra solo el puntaje de la plataforma.';
     $('navParticipantesCount').textContent = S.participantes.length;
+    if ($('thJ1')) { $('thJ1').title = J1().nombre; }
+    if ($('thJ2')) { $('thJ2').title = J2().nombre; }
     renderParticipantes();
     if (S.abrirAlCargar) { const id = S.abrirAlCargar; S.abrirAlCargar = null; verParticipante(id); }
   }
@@ -1266,7 +1284,7 @@
   // Tarjeta de la calificación de una entidad dentro de la ficha: puntaje grande,
   // los cuatro criterios con sus puntos y el botón para calificar si es tu entidad.
   function evalTarjeta(entidad, ev, pid){
-    const mia = miEntidad() === entidad, nombre = ENTIDADES[entidad];
+    const mia = miEntidad() === entidad, nombre = nombreJurado(entidad);
     let h = '<div class="eval-card' + (ev ? ' done' : '') + (mia ? ' mia' : '') + '">'
       + '<div class="eval-head"><b>' + esc(nombre) + (mia ? ' <span class="muted" style="font-weight:600;font-size:11.5px">(tu entidad)</span>' : '') + '</b>'
       + (ev ? '<span class="pill green">Calificada</span>' : '<span class="pill grey">Sin calificar</span>') + '</div>';
@@ -1280,7 +1298,9 @@
               + '<span class="v">' + (v || '—') + '/5</span></div>';
           }).join('')
         + (ev.comentario ? '<p class="eval-com"><span>Comentario del evaluador</span>' + esc(ev.comentario) + '</p>' : '')
-        + '<p class="eval-fecha">Calificada el ' + esc(fmtFecha(ev.updated_at || ev.created_at, true)) + '</p>';
+        + '<p class="eval-fecha">Calificada el ' + esc(fmtFecha(ev.updated_at || ev.created_at, true))
+        + (ev.evaluador_nombre ? ' por ' + esc(ev.evaluador_nombre) : '')
+        + (ev.evaluador_email ? ' <span class="muted">&lt;' + esc(ev.evaluador_email) + '&gt;</span>' : '') + '</p>';
     } else {
       h += '<p class="eval-vacio">' + (mia ? 'Todavía no la has calificado. Pulsa el botón para abrir la rúbrica.' : 'El evaluador de ' + esc(nombre) + ' todavía no la ha calificado.') + '</p>';
     }
@@ -1295,24 +1315,26 @@
     const s = score(p), ev = S.evals[id] || {};
     const tie = empates(S.participantes), enEmpate = !s.parcial && tie[s.G] > 1;
     const est = p.estado || 'postulado';
-    const falta = ['inngenios', 'triple_a'].filter(k => !ev[k]);
+    const falta = [J1().clave, J2().clave].filter(k => !ev[k]);
     // Primero se lee la postulación; puntajes y calificación van al final.
     let body = fichaHtml(p);
     body += '<div class="sec-title">Puntaje</div><div class="score-box"><div class="score-grid">'
       + '<div><span>Plataforma (P)</span><b>' + num(s.P) + '</b><div class="muted" style="font-size:11.5px">' + (s.pts != null ? s.pts + ' de ' + s.max + ' puntos' : '') + '</div></div>'
-      + '<div><span>Inngenios (I)</span><b>' + (s.I == null ? '—' : num(s.I)) + '</b></div>'
-      + '<div><span>Triple A (A)</span><b>' + (s.A == null ? '—' : num(s.A)) + '</b></div>'
+      + '<div><span>' + esc(J1().nombre) + '</span><b>' + (s.I == null ? '—' : num(s.I)) + '</b>'
+        + (s.porJ1 ? '<div class="muted" style="font-size:11.5px">' + esc(s.porJ1) + '</div>' : '') + '</div>'
+      + '<div><span>' + esc(J2().nombre) + '</span><b>' + (s.A == null ? '—' : num(s.A)) + '</b>'
+        + (s.porJ2 ? '<div class="muted" style="font-size:11.5px">' + esc(s.porJ2) + '</div>' : '') + '</div>'
       + '<div><span>Global</span><b>' + num(s.G) + '</b><div class="muted" style="font-size:11.5px">' + (s.parcial ? 'Parcial · ' + esc(s.falta || '') : 'Completo') + '</div></div>'
       + '</div>'
-      + (s.revisar ? '<div class="alert err" style="margin-top:10px">I y A difieren en más de 25 puntos: revisen esta postulación en conjunto.</div>' : '')
-      + '<p class="muted" style="font-size:12px;margin:10px 0 0">Global = ' + Math.round(S.pesos.plataforma * 100) + ' % P + ' + Math.round(S.pesos.inngenios * 100) + ' % I + ' + Math.round(S.pesos.triple_a * 100) + ' % A.</p></div>';
+      + (s.revisar ? '<div class="alert err" style="margin-top:10px">Los dos jurados difieren en más de 25 puntos: revisen esta postulación en conjunto.</div>' : '')
+      + '<p class="muted" style="font-size:12px;margin:10px 0 0">Global = ' + Math.round(S.pesos.plataforma * 100) + ' % plataforma + ' + Math.round((S.pesos[J1().clave] || 0) * 100) + ' % ' + esc(J1().nombre) + ' + ' + Math.round((S.pesos[J2().clave] || 0) * 100) + ' % ' + esc(J2().nombre) + '.</p></div>';
     body += '<details style="margin:12px 0 0"><summary class="muted" style="cursor:pointer;font-size:12.5px;font-weight:700">Detalle del puntaje de la plataforma</summary>'
       + '<table class="mini-table" style="margin-top:8px">' + (s.detalle || []).map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + ' / ' + r[2] + '</td></tr>').join('') + '</table></details>';
     body += '<div class="sec-title">Calificación con la rúbrica</div>'
-      + (falta.length ? '<p class="muted" style="font-size:13px;margin:0 0 12px;line-height:1.5">' + (falta.length === 2 ? 'Ninguna de las dos entidades ha calificado esta postulación.' : 'Falta la calificación de ' + esc(ENTIDADES[falta[0]]) + '.') + ' El puntaje global queda parcial hasta que estén las dos.</p>' : '')
-      + '<div class="grid2">' + evalTarjeta('inngenios', ev.inngenios, p.id) + evalTarjeta('triple_a', ev.triple_a, p.id) + '</div>';
+      + (falta.length ? '<p class="muted" style="font-size:13px;margin:0 0 12px;line-height:1.5">' + (falta.length === 2 ? 'Ninguno de los dos jurados ha calificado esta postulación.' : 'Falta la calificación de ' + esc(nombreJurado(falta[0])) + '.') + ' El puntaje global queda parcial hasta que estén las dos.</p>' : '')
+      + '<div class="grid2">' + evalTarjeta(J1().clave, ev[J1().clave], p.id) + evalTarjeta(J2().clave, ev[J2().clave], p.id) + '</div>';
     body += '<div class="sec-title">Desempate</div>'
-      + (enEmpate ? '<div class="alert warn" style="margin-bottom:10px">Esta postulación tiene el mismo puntaje global (' + num(s.G) + ') que otra. Registren el orden acordado en la reunión de Inngenios y Triple A.</div>' : '<p class="muted" style="font-size:12.5px;margin:0 0 10px">Solo se usa si hay empate en el puntaje global.</p>')
+      + (enEmpate ? '<div class="alert warn" style="margin-bottom:10px">Esta postulación tiene el mismo puntaje global (' + num(s.G) + ') que otra. Registren el orden acordado en la reunión entre los dos jurados.</div>' : '<p class="muted" style="font-size:12.5px;margin:0 0 10px">Solo se usa si hay empate en el puntaje global.</p>')
       + '<div class="grid2 gds"><div class="field"><label for="dsOrden">Orden acordado</label><input type="number" id="dsOrden" min="1" step="1" value="' + (p.orden_desempate == null ? '' : p.orden_desempate) + '"></div>'
       + '<div class="field"><label for="dsNota">Nota con la decisión</label><input type="text" id="dsNota" maxlength="500" value="' + esc(p.nota_desempate || '') + '" placeholder="Ej.: Acordado en reunión del 12 nov: mayor impacto territorial"></div></div>';
     body += '<div class="sec-title">Estado y acceso</div>'
@@ -1389,7 +1411,7 @@
     if (p.error) { tb.innerHTML = '<tr><td colspan="7">No se pudieron cargar las postulaciones: ' + esc(p.error.message) + '</td></tr>'; return; }
     S.participantes = p.data || [];
     S.misEvals = {}; (e.data || []).forEach(x => { S.misEvals[x.postulacion_id] = x; });
-    $('califSub').textContent = 'Calificas en nombre de ' + (ENTIDADES[S.perfil.entidad] || S.perfil.entidad) + '. Cada criterio va de 1 a 5; tu calificación es independiente y no ves la de la otra entidad.';
+    $('califSub').textContent = 'Calificas en nombre de ' + nombreJurado(S.perfil.entidad) + '. Cada criterio va de 1 a 5; tu calificación es independiente y no ves la del otro jurado.';
     renderCalificar();
     if (S.abrirAlCargar) { const id = S.abrirAlCargar; S.abrirAlCargar = null; abrirRubrica(id); }
   }
@@ -1417,7 +1439,7 @@
     const p = S.participantes.find(x => x.id === id); if (!p) { toast('No encontramos esa postulación'); return; }
     const ev = S.misEvals[id] || (S.evals[id] && S.evals[id][S.perfil.entidad]) || {};
     // Leer primero; calificar al final.
-    let body = '<div class="alert info" style="margin-bottom:16px">Calificas como <b>' + esc(ENTIDADES[S.perfil.entidad]) + '</b>. Lee la postulación completa y, al final, elige en cada criterio la descripción que mejor la representa.</div>';
+    let body = '<div class="alert info" style="margin-bottom:16px">Calificas como <b>' + esc(nombreJurado(S.perfil.entidad)) + '</b>. Lee la postulación completa y, al final, elige en cada criterio la descripción que mejor la representa.</div>';
     body += fichaHtml(p);
     body += '<div class="sec-title" id="rubInicio">Calificación · rúbrica</div>'
       + '<p class="muted" style="font-size:13px;margin:0 0 14px;line-height:1.5">Marca un nivel (1 a 5) por criterio. El total se calcula solo cuando están los cuatro.</p>'
@@ -1433,7 +1455,7 @@
     const total = () => {
       const vals = CRITERIOS.map(c => { const r = document.querySelector('input[name="r_' + c.k + '"]:checked'); return r ? Number(r.value) : null; });
       const faltan = vals.filter(v => v == null).length, suma = vals.reduce((a, v) => a + (v || 0), 0);
-      $('rubTotal').innerHTML = faltan ? 'Faltan <b>' + faltan + '</b> criterio' + (faltan === 1 ? '' : 's') + ' por calificar.' : 'Total: <b>' + suma + ' de 20</b> → puntaje ' + ENTIDADES[S.perfil.entidad] + ' = <b>' + num(suma / 20 * 100) + '</b>';
+      $('rubTotal').innerHTML = faltan ? 'Faltan <b>' + faltan + '</b> criterio' + (faltan === 1 ? '' : 's') + ' por calificar.' : 'Total: <b>' + suma + ' de 20</b> → puntaje ' + nombreJurado(S.perfil.entidad) + ' = <b>' + num(suma / 20 * 100) + '</b>';
       return { vals, faltan };
     };
     $('genBody').querySelectorAll('.rubric input').forEach(inp => inp.addEventListener('change', () => {
@@ -1458,7 +1480,7 @@
   }
 
   // Exponer a la segunda parte del script.
-  window.__panel = { sb, S, $, esc, safeUrl, linkHtml, ini, num, fmtFecha, hoyBogota, diaBogota, toast, openModal, closeModal, puede, iconBtn, IC, invocar, estadoCorreo, ir, CARGAS, genAbrir, genCerrar, score, puntajeP, loadParticipantes, loadPesos, verParticipante, reenviarCorreo, TIPOS_CORREO, ROLES, ENTIDADES, ESTADOS, CRITERIOS, requireStaff, abrirRubrica };
+  window.__panel = { sb, S, $, esc, safeUrl, linkHtml, ini, num, fmtFecha, hoyBogota, diaBogota, toast, openModal, closeModal, puede, iconBtn, IC, invocar, estadoCorreo, ir, CARGAS, genAbrir, genCerrar, score, puntajeP, loadParticipantes, loadPesos, verParticipante, reenviarCorreo, TIPOS_CORREO, ROLES, ESTADOS, CRITERIOS, requireStaff, abrirRubrica, nombreJurado, J1, J2, loadJurados };
 })();
 </script>
 <script>
@@ -1566,7 +1588,7 @@
       S.ranking = S.ranking || {}; (r.data || []).forEach(x => { S.ranking[x.id] = Object.assign(S.ranking[x.id] || {}, x); });
       const completas = (r.data || []).filter(x => !x.es_parcial).length;
       html += statHtml(posts.length, 'Postulaciones recibidas', semana ? '+' + semana + ' en los últimos 7 días' : '');
-      html += statHtml(r.error ? '—' : completas + ' / ' + posts.length, 'Con calificación completa (I y A)');
+      html += statHtml(r.error ? '—' : completas + ' / ' + posts.length, 'Con los dos jurados');
     }
     html += statHtml(mom.error ? '—' : mom.count, 'Momentos publicados');
     html += statHtml(visitas == null ? '—' : num(visitas, 0), 'Visitas en los últimos 30 días');
@@ -2226,7 +2248,7 @@
   'use strict';
   if (!window.__panel || !window.__panel2) return;
   const P = window.__panel, P2 = window.__panel2;
-  const { sb, S, $, esc, num, fmtFecha, hoyBogota, toast, ir, CARGAS, invocar, estadoCorreo, reenviarCorreo, TIPOS_CORREO, ROLES, ENTIDADES, requireStaff } = P;
+  const { sb, S, $, esc, num, fmtFecha, hoyBogota, toast, ir, CARGAS, invocar, estadoCorreo, reenviarCorreo, TIPOS_CORREO, ROLES, requireStaff, nombreJurado, J1, J2 } = P;
   const { drawBars, drawLine, drawDonut, top, diaCorto, PALETA } = P2;
 
   // ---------- ANALÍTICAS ----------
@@ -2303,7 +2325,7 @@
     const entSelect = (u) => {
       if (u.role !== 'evaluador' && u.role !== 'admin') return '<span class="muted">—</span>';
       return '<select data-ent style="width:auto;padding:6px 8px;font-size:12.5px"><option value="">— Sin entidad —</option>'
-        + Object.keys(ENTIDADES).map(k => '<option value="' + k + '"' + (u.entidad === k ? ' selected' : '') + '>' + ENTIDADES[k] + '</option>').join('')
+        + S.jurados.map(j => '<option value="' + j.clave + '"' + (u.entidad === j.clave ? ' selected' : '') + '>' + esc(j.nombre) + '</option>').join('')
         + '</select>';
     };
     tb.innerHTML = S.equipo.map(u => '<tr data-id="' + esc(u.id) + '"><td><b>' + esc(u.full_name || '—') + '</b><div class="muted" style="font-size:12px">' + esc(u.email) + '</div></td>'
@@ -2331,7 +2353,7 @@
     if (id === S.perfil.id) {
       S.perfil = Object.assign({}, S.perfil, r.data);
       S.rol = S.perfil.role;
-      $('rolTag').innerHTML = '<b>' + esc(S.perfil.full_name || S.perfil.email) + '</b>' + esc(ROLES[S.perfil.role] || S.perfil.role) + (S.perfil.entidad ? ' · ' + esc(ENTIDADES[S.perfil.entidad] || S.perfil.entidad) : '');
+      $('rolTag').innerHTML = '<b>' + esc(S.perfil.full_name || S.perfil.email) + '</b>' + esc(ROLES[S.perfil.role] || S.perfil.role) + (S.perfil.entidad ? ' · ' + esc(nombreJurado(S.perfil.entidad)) : '');
       aplicarPermisos();
     }
     loadEquipo();
@@ -2339,7 +2361,7 @@
   function syncInvEntidad(){
     const rol = $('invRol').value;
     $('invEntidadF').style.visibility = (rol === 'evaluador' || rol === 'admin') ? 'visible' : 'hidden';
-    if (rol === 'evaluador' && !$('invEntidad').value) $('invEntidad').value = 'inngenios';
+    if (rol === 'evaluador' && !$('invEntidad').value) $('invEntidad').value = J1().clave;
   }
   $('invRol').addEventListener('change', syncInvEntidad);
   syncInvEntidad();
@@ -2349,7 +2371,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { st.textContent = 'Escribe un correo válido.'; $('invEmail').focus(); return; }
     const entidad = (rol === 'evaluador' || rol === 'admin') ? ($('invEntidad').value || null) : null;
     if (rol === 'evaluador' && !entidad) { st.textContent = 'El evaluador necesita una entidad.'; return; }
-    const quien = ROLES[rol] + (entidad ? ' de ' + ENTIDADES[entidad] : '');
+    const quien = ROLES[rol] + (entidad ? ' de ' + nombreJurado(entidad) : '');
     if (!confirm('¿Invitar a ' + email + ' como ' + quien + '?')) return;
     $('btnInvitar').disabled = true; st.textContent = 'Creando la cuenta y enviando la invitación…';
     try {
@@ -2367,14 +2389,17 @@
   $('tablaModeloP').innerHTML = MODELO_P.map(r => '<tr><td><b>' + esc(r[0]) + '</b><div class="muted" style="font-size:11.5px">' + esc(r[1]) + '</div></td><td>' + r[2] + '</td></tr>').join('') + '<tr><td><b>Total</b></td><td><b>83</b></td></tr>';
   async function loadConfig(){
     await P.loadPesos();
-    $('wP').value = Math.round(S.pesos.plataforma * 100); $('wI').value = Math.round(S.pesos.inngenios * 100); $('wA').value = Math.round(S.pesos.triple_a * 100);
+    $('wP').value = Math.round(S.pesos.plataforma * 100); $('wI').value = Math.round((S.pesos[J1().clave] || 0) * 100); $('wA').value = Math.round((S.pesos[J2().clave] || 0) * 100);
+    $('wILabel').textContent = J1().nombre + ' %'; $('wALabel').textContent = J2().nombre + ' %';
     sumaPesos();
   }
   function sumaPesos(){ const s = ['wP', 'wI', 'wA'].reduce((a, k) => a + (Number($(k).value) || 0), 0); $('pesosStatus').textContent = 'Suma: ' + s + ' %' + (s === 100 ? '' : ' — debe ser 100 %'); return s; }
   ['wP', 'wI', 'wA'].forEach(k => $(k).addEventListener('input', sumaPesos));
   $('btnSavePesos').addEventListener('click', async () => {
     if (sumaPesos() !== 100) { toast('Los pesos deben sumar 100 %'); return; }
-    const valor = { plataforma: Number($('wP').value) / 100, inngenios: Number($('wI').value) / 100, triple_a: Number($('wA').value) / 100 };
+    const valor = { plataforma: Number($('wP').value) / 100 };
+    valor[J1().clave] = Number($('wI').value) / 100;
+    valor[J2().clave] = Number($('wA').value) / 100;
     const r = await sb.from('configuracion').upsert({ clave: 'pesos', valor, updated_at: new Date().toISOString() });
     if (r.error) { toast('No se pudo guardar: ' + r.error.message); return; }
     S.pesos = valor; toast('Pesos guardados: el ranking se recalcula al instante'); $('pesosStatus').textContent = 'Guardado. Suma: 100 %';

@@ -156,11 +156,9 @@ function correoGanador(p: Postulacion, enlace: string) {
 const ROLES: Record<string, string> = {
   admin: 'administrador del panel', editor: 'editor de contenido', evaluador: 'evaluador de postulaciones',
 };
-const ENTIDADES: Record<string, string> = { inngenios: 'Inngenios', triple_a: 'Triple A' };
-
-function correoEquipo(nombre: string, rol: string, entidad: string | null, enlace: string) {
+function correoEquipo(nombre: string, rol: string, entidad: string | null, enlace: string, nombreEntidad?: string) {
   const quien = entidad && (rol === 'evaluador' || rol === 'admin')
-    ? `${ROLES[rol]} de ${ENTIDADES[entidad] ?? entidad}`
+    ? `${ROLES[rol]} de ${nombreEntidad ?? entidad}`
     : ROLES[rol] ?? rol;
   const html = layout('Te invitaron al panel de Innova Social 5.0', `
     <p style="font-size:14px;line-height:1.6;margin:0 0 12px">Hola ${esc(nombre || '')}, te dieron acceso al panel de Innova Social 5.0 como <b>${esc(quien)}</b>.</p>
@@ -211,12 +209,14 @@ async function invitarGanador(id: string, porId: string) {
 async function invitarEquipo(email: string, nombre: string, rol: string, entidad: string | null, porId: string) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ error: 'Correo no válido' }, 400);
   if (!['admin', 'editor', 'evaluador'].includes(rol)) return json({ error: 'Rol no válido' }, 400);
-  if (rol === 'evaluador' && !['inngenios', 'triple_a'].includes(entidad ?? '')) return json({ error: 'El evaluador necesita entidad (inngenios o triple_a)' }, 400);
-  if (rol === 'admin' && entidad && !['inngenios', 'triple_a'].includes(entidad)) return json({ error: 'Entidad no válida' }, 400);
-  const ent = (rol === 'evaluador' || rol === 'admin') && ['inngenios', 'triple_a'].includes(entidad ?? '') ? entidad : null;
+  const { data: jurados } = await admin.from('jurados').select('clave,nombre').eq('activo', true);
+  const nombres: Record<string, string> = Object.fromEntries((jurados ?? []).map((j: { clave: string; nombre: string }) => [j.clave, j.nombre]));
+  if (rol === 'evaluador' && !(entidad && entidad in nombres)) return json({ error: 'El evaluador necesita un jurado válido' }, 400);
+  if (rol === 'admin' && entidad && !(entidad in nombres)) return json({ error: 'Jurado no válido' }, 400);
+  const ent = (rol === 'evaluador' || rol === 'admin') && entidad && entidad in nombres ? entidad : null;
   const { enlace, userId } = await enlaceAcceso(email.toLowerCase(), nombre);
   await admin.from('profiles').update({ role: rol, entidad: ent, full_name: nombre || null }).eq('id', userId);
-  const c = correoEquipo(nombre, rol, ent, enlace);
+  const c = correoEquipo(nombre, rol, ent, enlace, ent ? nombres[ent] : undefined);
   const r = await enviar({ tipo: 'invitacion_equipo', para: email.toLowerCase(), asunto: c.asunto, html: c.html, enviado_por: porId, datos: { nombre, rol, entidad: ent } });
   return json({ ok: true, correo: r });
 }
