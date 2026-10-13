@@ -247,6 +247,8 @@
   .num-cell{ font-variant-numeric:tabular-nums; white-space:nowrap; }
   .num-cell small{ display:block; font-size:10.5px; color:var(--muted); font-weight:600; }
   .g-cell b{ font-size:15px; }
+  .g-cell{ white-space:normal; min-width:120px; }
+  #view-participantes th, #view-participantes td{ padding-left:12px; padding-right:12px; }
   .muted{ color:var(--muted); }
   #inicioStats, #anStats{ grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); }
   .grid2.g4{ grid-template-columns:repeat(4,minmax(0,1fr)); } .grid2.g3{ grid-template-columns:repeat(3,minmax(0,1fr)); } .grid2.gds{ grid-template-columns:140px minmax(0,1fr); }
@@ -498,7 +500,7 @@
       <!-- ============ CALIFICAR (evaluadores) ============ -->
       <section class="view" id="view-calificar">
         <div class="view-head">
-          <div><h2>Calificar postulaciones</h2><p id="califSub">Califica cada postulación con la rúbrica de cuatro criterios (1 a 5). Tu calificación es independiente: no ves la de la otra entidad.</p></div>
+          <div><h2>Calificar postulaciones</h2><p id="califSub">Califica cada postulación con la rúbrica de cuatro criterios (1 a 5). Tu calificación es independiente: no ves la del otro jurado.</p></div>
           <div class="toolbar-row">
             <select id="califFiltro" aria-label="Filtrar"><option value="pendientes">Pendientes</option><option value="todas">Todas</option><option value="calificadas">Ya calificadas</option></select>
           </div>
@@ -637,14 +639,14 @@
             <div class="field"><label for="invNombre">Nombre</label><input type="text" id="invNombre" placeholder="Nombre y apellido"></div>
             <div class="field"><label for="invEmail">Correo *</label><input type="email" id="invEmail" placeholder="persona@correo.com" required></div>
             <div class="field"><label for="invRol">Rol *</label><select id="invRol"><option value="evaluador">Evaluador (califica postulaciones)</option><option value="editor">Editor (contenido web y cursos)</option><option value="admin">Administrador (todo el panel)</option></select></div>
-            <div class="field" id="invEntidadF"><label for="invEntidad">Entidad (para calificar)</label><select id="invEntidad"><option value="jurado_1">Jurado 1</option><option value="jurado_2">Jurado 2</option><option value="">Sin jurado (no califica)</option></select></div>
+            <div class="field" id="invEntidadF"><label for="invEntidad">Jurado (para calificar)</label><select id="invEntidad"><option value="jurado_1">Jurado 1</option><option value="jurado_2">Jurado 2</option><option value="">Sin jurado (no califica)</option></select></div>
             <div style="grid-column:1/-1; display:flex; gap:10px; align-items:center; flex-wrap:wrap;"><button class="btn solid" type="submit" id="btnInvitar">Enviar invitación</button><span class="save-status" id="invStatus"></span></div>
           </form>
         </div>
         <div class="card">
-          <div class="table-wrap"><table><thead><tr><th>Persona</th><th>Rol</th><th>Entidad</th><th>Desde</th><th></th></tr></thead><tbody id="tblEquipo"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Persona</th><th>Rol</th><th>Jurado</th><th>Desde</th><th></th></tr></thead><tbody id="tblEquipo"></tbody></table></div>
         </div>
-        <p class="muted" style="font-size:12.5px; margin:10px 2px 0;">Roles: <b>Administrador</b> ve todo; si tiene entidad (Inngenios o Triple A), también califica. <b>Editor</b> gestiona el contenido web y los cursos. <b>Evaluador</b> solo califica con la rúbrica de su entidad. Los beneficiarios se crean al autorizar ganadores en Participantes.</p>
+        <p class="muted" style="font-size:12.5px; margin:10px 2px 0;">Roles: <b>Administrador</b> ve todo; si tiene un jurado asignado, también califica. <b>Editor</b> gestiona el contenido web y los cursos. <b>Evaluador</b> solo califica con la rúbrica, en nombre de su jurado. Los beneficiarios se crean al autorizar ganadores en Participantes.</p>
       </section>
 
       <!-- ============ CONFIGURACIÓN ============ -->
@@ -654,7 +656,7 @@
           <button class="btn solid" id="btnSavePesos">Guardar pesos</button>
         </div>
         <div class="card" style="padding:20px; margin-bottom:16px;">
-          <h4 style="margin:0 0 6px; font-size:14px;">Puntaje global = w<sub>P</sub>·P + w<sub>I</sub>·I + w<sub>A</sub>·A</h4>
+          <h4 style="margin:0 0 6px; font-size:14px;">Puntaje global = w<sub>P</sub>·P + w<sub>J1</sub>·J1 + w<sub>J2</sub>·J2</h4>
           <p class="muted" style="font-size:12.5px; margin:0 0 14px;">Los pesos deben sumar 100 %. Por defecto 40 / 30 / 30 (pendiente de confirmar por el equipo; la alternativa es un tercio cada uno).</p>
           <div class="grid2 g3">
             <div class="field"><label for="wP">Plataforma (P) %</label><input type="number" id="wP" min="0" max="100" step="1"></div>
@@ -1168,7 +1170,7 @@
         + '<td class="mono muted">' + (porRanking ? (desde + i + 1) : '') + '</td>'
         + '<td><div class="cell-user"><span class="av">' + esc(ini(p.nombre_completo)) + '</span><div><b>' + esc(p.nombre_completo || '') + '</b><span>' + esc(p.correo || '') + '</span></div></div></td>'
         + '<td><b style="font-size:13px">' + esc(p.nombre_emprendimiento || '—') + '</b><div class="muted" style="font-size:11.5px">' + esc(p.municipio || '') + '</div></td>'
-        + '<td class="mono" style="font-size:12px; white-space:nowrap">' + esc(fmtFecha(p.created_at, true)) + '</td>'
+        + '<td class="mono" style="font-size:12px; min-width:118px">' + esc(fmtFecha(p.created_at, true)) + '</td>'
         + '<td class="num-cell">' + num(s.P) + '</td>'
         + '<td class="num-cell">' + (s.I == null ? '<span class="muted">—</span>' : num(s.I)) + '</td>'
         + '<td class="num-cell">' + (s.A == null ? '<span class="muted">—</span>' : num(s.A)) + '</td>'
@@ -1286,7 +1288,7 @@
   function evalTarjeta(entidad, ev, pid){
     const mia = miEntidad() === entidad, nombre = nombreJurado(entidad);
     let h = '<div class="eval-card' + (ev ? ' done' : '') + (mia ? ' mia' : '') + '">'
-      + '<div class="eval-head"><b>' + esc(nombre) + (mia ? ' <span class="muted" style="font-weight:600;font-size:11.5px">(tu entidad)</span>' : '') + '</b>'
+      + '<div class="eval-head"><b>' + esc(nombre) + (mia ? ' <span class="muted" style="font-weight:600;font-size:11.5px">(tu jurado)</span>' : '') + '</b>'
       + (ev ? '<span class="pill green">Calificada</span>' : '<span class="pill grey">Sin calificar</span>') + '</div>';
     if (ev) {
       const suma = CRITERIOS.reduce((a, c) => a + (ev[c.k] || 0), 0);
@@ -1525,7 +1527,7 @@
   function drawBars(canvas, labels, values, color){
     const c = prepCanvas(canvas); if (!c) return; const { ctx, w, h } = c;
     if (!values.length || values.every(v => !v)) return vacio(c);
-    const max = Math.max(...values, 1), padL = 30, padB = 24, gap = Math.max(6, Math.min(14, w / values.length / 5));
+    const max = Math.ceil(Math.max(...values, 1) / 3) * 3, padL = 30, padB = 24, gap = Math.max(6, Math.min(14, w / values.length / 5));
     const bw = Math.max(4, (w - padL - gap * values.length) / values.length);
     ctx.strokeStyle = '#E2ECF1'; ctx.lineWidth = 1; ctx.font = '10.5px Nunito'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     for (let g = 0; g <= 3; g++) { const y = h - padB - (g / 3) * (h - padB - 16); ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w, y); ctx.stroke(); ctx.fillStyle = '#4F697A'; ctx.fillText(Math.round(max * g / 3), 2, y + 3); }
@@ -1539,7 +1541,7 @@
   function drawLine(canvas, labels, values, color){
     const c = prepCanvas(canvas); if (!c) return; const { ctx, w, h } = c;
     if (!values.length) return vacio(c);
-    const max = Math.max(...values, 1), padL = 30, padB = 24, padT = 18, n = values.length;
+    const max = Math.ceil(Math.max(...values, 1) / 3) * 3, padL = 30, padB = 24, padT = 18, n = values.length;
     const stepX = n > 1 ? (w - padL - 12) / (n - 1) : 0, cada = Math.ceil(n / Math.max(2, Math.floor(w / 64)));
     ctx.strokeStyle = '#E2ECF1'; ctx.lineWidth = 1; ctx.font = '10.5px Nunito'; ctx.textBaseline = 'alphabetic';
     for (let g = 0; g <= 3; g++) { const y = padT + (g / 3) * (h - padB - padT); ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w, y); ctx.stroke(); ctx.fillStyle = '#4F697A'; ctx.textAlign = 'left'; ctx.fillText(Math.round(max * (3 - g) / 3), 2, y + 3); }
@@ -1584,6 +1586,7 @@
     let html = '';
     if (admin) {
       const semana = posts.filter(p => Date.now() - new Date(p.created_at) < 7 * 864e5).length;
+      $('navParticipantesCount').textContent = posts.length;
       const r = await sb.from('ranking_postulaciones').select('id,puntaje_global,es_parcial');
       S.ranking = S.ranking || {}; (r.data || []).forEach(x => { S.ranking[x.id] = Object.assign(S.ranking[x.id] || {}, x); });
       const completas = (r.data || []).filter(x => !x.es_parcial).length;
@@ -2325,7 +2328,7 @@
     const yo = S.perfil.id;
     const entSelect = (u) => {
       if (u.role !== 'evaluador' && u.role !== 'admin') return '<span class="muted">—</span>';
-      return '<select data-ent style="width:auto;padding:6px 8px;font-size:12.5px"><option value="">— Sin entidad —</option>'
+      return '<select data-ent style="width:auto;padding:6px 8px;font-size:12.5px"><option value="">— Sin jurado —</option>'
         + S.jurados.map(j => '<option value="' + j.clave + '"' + (u.entidad === j.clave ? ' selected' : '') + '>' + esc(j.nombre) + '</option>').join('')
         + '</select>';
     };
@@ -2374,7 +2377,7 @@
     const email = $('invEmail').value.trim().toLowerCase(), rol = $('invRol').value, st = $('invStatus');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { st.textContent = 'Escribe un correo válido.'; $('invEmail').focus(); return; }
     const entidad = (rol === 'evaluador' || rol === 'admin') ? ($('invEntidad').value || null) : null;
-    if (rol === 'evaluador' && !entidad) { st.textContent = 'El evaluador necesita una entidad.'; return; }
+    if (rol === 'evaluador' && !entidad) { st.textContent = 'El evaluador necesita un jurado.'; return; }
     const quien = ROLES[rol] + (entidad ? ' de ' + nombreJurado(entidad) : '');
     if (!confirm('¿Invitar a ' + email + ' como ' + quien + '?')) return;
     $('btnInvitar').disabled = true; st.textContent = 'Creando la cuenta y enviando la invitación…';

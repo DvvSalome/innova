@@ -5,3 +5,5 @@ supabase/
 hero-options.html
 docs/
 pruebas/
+serve.json
+sw-simulado.js

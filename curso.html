@@ -226,6 +226,12 @@
       const lid = el.getAttribute('data-id');
       el.classList.toggle('done', !!prog[lid]);
     });
+    document.querySelectorAll('.mod').forEach(m => {
+      const ls = [...m.querySelectorAll('.lec')];
+      const n = ls.filter(l => prog[l.getAttribute('data-id')]).length;
+      const s = m.querySelector('.mod-h small');
+      if (s) s.textContent = n + '/' + ls.length + ' · ' + ls.length + (ls.length === 1 ? ' lección' : ' lecciones');
+    });
     const markBtn = document.getElementById('markBtn');
     if (markBtn && actual) {
       const done = !!prog[actual.id];

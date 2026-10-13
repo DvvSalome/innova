@@ -70,50 +70,50 @@ select t.rec('admin: el ranking se calcula sin errores (ventas en texto)', t.cnt
 select t.rec('admin: lee adjuntos de postulaciones', t.cnt($$select 1 from storage.objects where bucket_id='postulaciones'$$) >= 3);
 select t.rec('admin: cambia estado (incluido participante) y desempate', t.try($$update public.postulaciones set estado='participante', orden_desempate=1, nota_desempate='n' where id='a0000000-0000-4000-8000-000000000002'$$) = 'ok:1');
 select t.rec('admin: estado inválido se rechaza', t.try($$update public.postulaciones set estado='aceptado' where id='a0000000-0000-4000-8000-000000000002'$$) like 'ERR%');
-select t.rec('admin: edita pesos', t.try($$update public.configuracion set valor='{"plataforma":0.40,"inngenios":0.30,"triple_a":0.30}' where clave='pesos'$$) = 'ok:1');
+select t.rec('admin: edita pesos', t.try($$update public.configuracion set valor='{"plataforma":0.40,"jurado_1":0.30,"jurado_2":0.30}' where clave='pesos'$$) = 'ok:1');
 select t.rec('admin: CRUD de momentos (y slug duplicado rechazado)', t.try($$insert into public.momentos(slug,titulo,estado) values ('t-slug','T','borrador')$$) = 'ok:1' and t.try($$update public.momentos set estado='publicado' where slug='t-slug'$$) = 'ok:1' and t.try($$insert into public.momentos(slug,titulo) values ('t-slug','Dup')$$) like 'ERR%' and t.try($$delete from public.momentos where slug='t-slug'$$) = 'ok:1');
 select t.rec('admin: CRUD de fotos, etapas y resultados', t.try($$insert into public.hero_sliders(imagen_url,orden) values ('https://x.co/a.jpg',99)$$) = 'ok:1' and t.try($$insert into public.etapas_convocatoria(nombre,fechas_texto,orden,icono) values ('x','y',99,'pitch')$$) = 'ok:1' and t.try($$insert into public.resultados_programa(grupo,etiqueta,valor,orden) values ('actual','x',1,99)$$) = 'ok:1');
 select t.rec('admin: lee correos, visitas y usa la analítica', t.cnt('select 1 from public.correos_enviados') >= 0 and t.cnt('select 1 from public.visitas') >= 1 and t.try($$select public.analitica_resumen(current_date-30, current_date)$$) like 'ok%');
-select t.rec('admin SIN entidad: no puede calificar', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','inngenios',(select cid from t.ctx),3,3,3,3)$$) like 'ERR%');
+select t.rec('admin SIN entidad: no puede calificar', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','jurado_1',(select cid from t.ctx),3,3,3,3)$$) like 'ERR%');
 select t.rec('admin: ve perfiles del equipo y puede cambiar roles', t.cnt('select 1 from public.profiles') >= 1);
 select t.root();
 
 -- Admin CON entidad (los admins de Inngenios califican)
-update public.profiles set role='admin', entidad='inngenios' where id=(select cid from t.ctx);
+update public.profiles set role='admin', entidad='jurado_1' where id=(select cid from t.ctx);
 select t.login((select cid from t.ctx));
-select t.rec('admin CON entidad Inngenios: califica como Inngenios', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000005','inngenios',(select cid from t.ctx),3,3,3,3)$$) = 'ok:1');
-select t.rec('admin CON entidad Inngenios: NO califica como Triple A', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000005','triple_a',(select cid from t.ctx),3,3,3,3)$$) like 'ERR%');
+select t.rec('admin CON entidad Inngenios: califica como Inngenios', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000005','jurado_1',(select cid from t.ctx),3,3,3,3)$$) = 'ok:1');
+select t.rec('admin CON entidad Inngenios: NO califica como Triple A', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000005','jurado_2',(select cid from t.ctx),3,3,3,3)$$) like 'ERR%');
 select t.try($$delete from public.evaluaciones where postulacion_id='a0000000-0000-4000-8000-000000000005'$$);
 select t.root();
 
 -- ================= EVALUADOR INNGENIOS =================
-update public.profiles set role='evaluador', entidad='inngenios' where id=(select cid from t.ctx);
+update public.profiles set role='evaluador', entidad='jurado_1' where id=(select cid from t.ctx);
 select t.login((select cid from t.ctx));
 select t.rec('eval Inngenios: lee postulaciones y adjuntos', t.cnt('select 1 from public.postulaciones') >= 6 and t.cnt($$select 1 from storage.objects where bucket_id='postulaciones'$$) >= 3);
 select t.rec('eval Inngenios: NO cambia estados', t.try($$update public.postulaciones set estado='ganador'$$) = 'ok:0');
-select t.rec('eval Inngenios: califica (F1 = 16/20, F2 = 20/20)', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','inngenios',(select cid from t.ctx),4,4,4,4),('a0000000-0000-4000-8000-000000000002','inngenios',(select cid from t.ctx),5,5,5,5)$$) = 'ok:2');
-select t.rec('eval Inngenios: NO califica como Triple A', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000003','triple_a',(select cid from t.ctx),3,3,3,3)$$) like 'ERR%');
-select t.rec('eval Inngenios: nota fuera de 1–5 y doble calificación se rechazan', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000003','inngenios',(select cid from t.ctx),6,3,3,3)$$) like 'ERR%' and t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','inngenios',(select cid from t.ctx),1,1,1,1)$$) like 'ERR%');
-select t.rec('eval Inngenios: edita su calificación (upsert del panel)', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','inngenios',(select cid from t.ctx),4,4,4,4) on conflict (postulacion_id,entidad) do update set potencial=excluded.potencial$$) = 'ok:1');
+select t.rec('eval Inngenios: califica (F1 = 16/20, F2 = 20/20)', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','jurado_1',(select cid from t.ctx),4,4,4,4),('a0000000-0000-4000-8000-000000000002','jurado_1',(select cid from t.ctx),5,5,5,5)$$) = 'ok:2');
+select t.rec('eval Inngenios: NO califica como Triple A', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000003','jurado_2',(select cid from t.ctx),3,3,3,3)$$) like 'ERR%');
+select t.rec('eval Inngenios: nota fuera de 1–5 y doble calificación se rechazan', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000003','jurado_1',(select cid from t.ctx),6,3,3,3)$$) like 'ERR%' and t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','jurado_1',(select cid from t.ctx),1,1,1,1)$$) like 'ERR%');
+select t.rec('eval Inngenios: edita su calificación (upsert del panel)', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','jurado_1',(select cid from t.ctx),4,4,4,4) on conflict (postulacion_id,entidad) do update set potencial=excluded.potencial$$) = 'ok:1');
 select t.rec('eval Inngenios: no usa analítica, correos ni cursos', t.try($$select public.analitica_resumen(current_date-1,current_date)$$) like 'ERR%' and t.cnt('select 1 from public.correos_enviados') <= 0 and t.cnt('select 1 from public.cursos') <= 0);
-select t.rec('eval Inngenios: el ranking no le revela la nota de Triple A', t.cnt('select 1 from public.ranking_postulaciones where puntaje_a is not null') = 0);
+select t.rec('eval Inngenios: el ranking no le revela la nota de Triple A', t.cnt('select 1 from public.ranking_postulaciones where puntaje_j2 is not null') = 0);
 select t.root();
 
 -- ================= EVALUADOR TRIPLE A =================
-update public.profiles set entidad='triple_a' where id=(select cid from t.ctx);
+update public.profiles set entidad='jurado_2' where id=(select cid from t.ctx);
 select t.login((select cid from t.ctx));
-select t.rec('eval Triple A: califica (F1 = 14/20, F2 = 5/20)', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','triple_a',(select cid from t.ctx),4,4,3,3),('a0000000-0000-4000-8000-000000000002','triple_a',(select cid from t.ctx),1,1,1,2)$$) = 'ok:2');
-select t.rec('eval Triple A: NO ve ni edita la nota de Inngenios', t.cnt($$select 1 from public.evaluaciones where entidad='inngenios'$$) = 0 and t.try($$update public.evaluaciones set potencial=1 where entidad='inngenios'$$) = 'ok:0');
+select t.rec('eval Triple A: califica (F1 = 14/20, F2 = 5/20)', t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000001','jurado_2',(select cid from t.ctx),4,4,3,3),('a0000000-0000-4000-8000-000000000002','jurado_2',(select cid from t.ctx),1,1,1,2)$$) = 'ok:2');
+select t.rec('eval Triple A: NO ve ni edita la nota de Inngenios', t.cnt($$select 1 from public.evaluaciones where entidad='jurado_1'$$) = 0 and t.try($$update public.evaluaciones set potencial=1 where entidad='jurado_1'$$) = 'ok:0');
 select t.root();
 
 -- ================= RANKING (como admin) =================
 update public.profiles set role='admin', entidad=null where id=(select cid from t.ctx);
 select t.login((select cid from t.ctx));
-select t.rec('ranking: F1 I=80, A=70, global = 0,4·100 + 0,3·80 + 0,3·70 = 85', (select puntaje_p = 100 and puntaje_i = 80 and puntaje_a = 70 and puntaje_global = 85 and not es_parcial from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000001') is true, (select puntaje_p||' / '||puntaje_i||' / '||puntaje_a||' → '||puntaje_global from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000001'));
+select t.rec('ranking: F1 I=80, A=70, global = 0,4·100 + 0,3·80 + 0,3·70 = 85', (select puntaje_p = 100 and puntaje_j1 = 80 and puntaje_j2 = 70 and puntaje_global = 85 and not es_parcial from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000001') is true, (select puntaje_p||' / '||puntaje_j1||' / '||puntaje_j2||' → '||puntaje_global from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000001'));
 select t.rec('ranking: F2 se marca para revisar en conjunto (|100 − 25| > 25)', (select revisar_conjunto from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000002') is true);
 select t.rec('ranking: sin calificar queda parcial y dice qué falta', (select es_parcial and falta = 'Faltan Inngenios y Triple A' from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000003') is true);
 select t.rec('puntaje: «$1.800.000 / mes» cuenta en el rango $1–5M (5 puntos)', (select (public.puntaje_plataforma(p)->'detalle'->1->>1)::int = 5 from public.postulaciones p where id='a0000000-0000-4000-8000-000000000004'));
-select t.try($$update public.configuracion set valor='{"plataforma":0.3333,"inngenios":0.3333,"triple_a":0.3334}' where clave='pesos'$$);
+select t.try($$update public.configuracion set valor='{"plataforma":0.3333,"jurado_1":0.3333,"jurado_2":0.3334}' where clave='pesos'$$);
 select t.rec('ranking: cambiar pesos recalcula (1/3 cada uno → 83,3)', (select puntaje_global between 83.3 and 83.4 from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000001') is true);
 select t.root();
 
@@ -129,7 +129,7 @@ select t.root();
 -- ================= EVALUADOR SIN ENTIDAD =================
 update public.profiles set role='evaluador', entidad=null where id=(select cid from t.ctx);
 select t.login((select cid from t.ctx));
-select t.rec('evaluador sin entidad: no ve postulaciones ni califica', t.cnt('select 1 from public.postulaciones') = 0 and t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000003','inngenios',(select cid from t.ctx),3,3,3,3)$$) like 'ERR%');
+select t.rec('evaluador sin entidad: no ve postulaciones ni califica', t.cnt('select 1 from public.postulaciones') = 0 and t.try($$insert into public.evaluaciones(postulacion_id,entidad,evaluador_id,pertinencia,modelo_negocio,innovacion,potencial) values ('a0000000-0000-4000-8000-000000000003','jurado_1',(select cid from t.ctx),3,3,3,3)$$) like 'ERR%');
 select t.root();
 
 -- ================= CUENTA NUEVA (registro) Y BENEFICIARIO =================
@@ -158,10 +158,27 @@ select t.rec('beneficiario: ve solo los materiales de esos cursos (y el conteo d
 select t.rec('beneficiario: ve solo SU postulación y no la modifica', t.cnt('select 1 from public.postulaciones') = 1 and t.try($$update public.postulaciones set estado='rechazado'$$) = 'ok:0');
 select t.rec('beneficiario: no ve evaluaciones, correos, adjuntos ni analítica', t.cnt('select 1 from public.evaluaciones') = 0 and t.cnt('select 1 from public.correos_enviados') <= 0 and t.cnt($$select 1 from storage.objects where bucket_id='postulaciones'$$) = 0 and t.try($$select public.analitica_resumen(current_date-1,current_date)$$) like 'ERR%');
 select t.root();
-update public.profiles set role='evaluador', entidad='inngenios' where id=(select cid from t.ctx);
+update public.profiles set role='evaluador', entidad='jurado_1' where id=(select cid from t.ctx);
 update public.postulaciones set estado='postulado' where id='a0000000-0000-4000-8000-000000000001';
 update public.postulaciones set user_id=(select cid from t.ctx), estado='ganador' where id='a0000000-0000-4000-8000-000000000001';
 select t.rec('marcar ganador NO degrada a un evaluador o admin', (select role from public.profiles where id=(select cid from t.ctx)) = 'evaluador');
+
+-- ================= JURADOS CONFIGURABLES =================
+select t.login((select cid from t.ctx));
+select t.rec('jurados: el equipo lee los dos jurados; el ranking usa sus nombres', t.cnt('select 1 from public.jurados') = 2);
+select t.root();
+update public.profiles set role='evaluador', entidad='jurado_1', full_name='Jurado Uno Prueba' where id=(select cid from t.ctx);
+select t.login((select cid from t.ctx));
+select t.rec('jurados: un evaluador NO renombra jurados', t.try($$update public.jurados set nombre='X'$$) = 'ok:0');
+select t.try($$insert into public.evaluaciones(postulacion_id,entidad,pertinencia,modelo_negocio,innovacion,potencial,evaluador_nombre,evaluador_email) values ('a0000000-0000-4000-8000-000000000005','jurado_1',3,3,3,3,'Falso','falso@x.co')$$);
+select t.root();
+select t.rec('sello: la calificación guarda nombre y correo reales de quien califica, aunque el cliente mande otros', (select evaluador_nombre = 'Jurado Uno Prueba' and evaluador_email = (select email from auth.users where id=(select cid from t.ctx)) and evaluador_id = (select cid from t.ctx) from public.evaluaciones where postulacion_id='a0000000-0000-4000-8000-000000000005' and entidad='jurado_1') is true, (select evaluador_nombre||' <'||evaluador_email||'>' from public.evaluaciones where postulacion_id='a0000000-0000-4000-8000-000000000005' and entidad='jurado_1'));
+select t.rec('jurados: una entidad que no existe se rechaza', t.try($$update public.profiles set entidad='inngenios' where id=(select cid from t.ctx)$$) like 'ERR%');
+update public.profiles set role='admin', entidad=null where id=(select cid from t.ctx);
+select t.login((select cid from t.ctx));
+create temp table t_ren as select t.try($$update public.jurados set nombre='Alcaldía' where clave='jurado_2'$$) r;
+select t.rec('jurados: el admin renombra un jurado y el ranking lo refleja', (select r from t_ren) = 'ok:1' and (select falta = 'Faltan Inngenios y Alcaldía' from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000003') is true, (select r from t_ren)||' · '||(select falta from public.ranking_postulaciones where id='a0000000-0000-4000-8000-000000000003'));
+select t.root();
 
 -- ================= INTEGRIDAD =================
 select t.rec('integridad: RLS activo en todas las tablas', (select count(*) from pg_tables where schemaname='public' and not rowsecurity) = 0, (select string_agg(tablename, ',') from pg_tables where schemaname='public' and not rowsecurity));
