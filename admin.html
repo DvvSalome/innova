@@ -509,7 +509,7 @@
         <div class="card">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Emprendimiento</th><th>Municipio</th><th>Categoría</th><th>Enviada</th><th>P</th><th>Mi calificación</th><th></th></tr></thead>
+              <thead id="califHead"><tr><th>Emprendimiento</th><th>Municipio</th><th>Categoría</th><th>Enviada</th><th>P</th><th>Mi calificación</th><th></th></tr></thead>
               <tbody id="tblCalificar"></tbody>
             </table>
           </div>
@@ -646,7 +646,7 @@
         <div class="card">
           <div class="table-wrap"><table><thead><tr><th>Persona</th><th>Rol</th><th>Jurado</th><th>Desde</th><th></th></tr></thead><tbody id="tblEquipo"></tbody></table></div>
         </div>
-        <p class="muted" style="font-size:12.5px; margin:10px 2px 0;">Roles: <b>Administrador</b> ve todo; si tiene un jurado asignado, también califica. <b>Editor</b> gestiona el contenido web y los cursos. <b>Evaluador</b> solo califica con la rúbrica, en nombre de su jurado. Los beneficiarios se crean al autorizar ganadores en Participantes.</p>
+        <p class="muted" style="font-size:12.5px; margin:10px 2px 0;">Roles: <b>Administrador</b> ve todo y califica como cualquiera de los jurados, dejando registrado quién califica. <b>Editor</b> gestiona el contenido web y los cursos. <b>Evaluador</b> solo califica con la rúbrica, en nombre de su jurado. Los beneficiarios se crean al autorizar ganadores en Participantes.</p>
       </section>
 
       <!-- ============ CONFIGURACIÓN ============ -->
@@ -867,6 +867,7 @@
   const J = (orden) => S.jurados.find(j => j.orden === orden) || { clave: 'jurado_' + orden, nombre: 'Jurado ' + orden, orden };
   const J1 = () => J(1), J2 = () => J(2);
   const nombreJurado = (clave) => (S.jurados.find(j => j.clave === clave) || {}).nombre || clave;
+  const etiquetaJurado = (clave) => { const j = S.jurados.find(x => x.clave === clave); return j ? j.nombre + ' (Jurado ' + j.orden + ')' : clave; };
   async function loadJurados(){
     const r = await sb.from('jurados').select('clave,nombre,orden').order('orden');
     if (!r.error && r.data && r.data.length) S.jurados = r.data;
@@ -907,11 +908,10 @@
   const toast = window.toast;
   function openModal(id){ $(id).classList.add('open'); }
   function closeModal(id){ $(id).classList.remove('open'); }
-  // «Calificar» aparece solo si la cuenta tiene entidad (Inngenios o Triple A):
-  // hay administradores que califican (los de Inngenios) y otros que no.
+  // Un admin califica como cualquier jurado; un evaluador, solo como el suyo.
   function puede(v){
     if (!S.rol || !(VISTAS[v] || []).includes(S.rol)) return false;
-    if (v === 'calificar') return !!(S.perfil && S.perfil.entidad);
+    if (v === 'calificar') return S.rol === 'admin' || !!(S.perfil && S.perfil.entidad);
     return true;
   }
   function miEntidad(){ return (S.perfil && S.perfil.entidad) || null; }
@@ -1038,6 +1038,7 @@
     $('genBody').innerHTML = body || ''; $('genFoot').innerHTML = foot || '';
     $('modalGenBox').className = 'modal ' + (ancho || 'xl');
     openModal('modalGen');
+    [$('genBody'), $('modalGenBox'), $('modalGen')].forEach(el => { el.scrollTop = 0; });
   }
   function genCerrar(){
     if (S.genSucio && !confirm('Tienes cambios sin guardar en esta calificación. ¿Cerrar de todas formas?')) return;
@@ -1286,7 +1287,7 @@
   // Tarjeta de la calificación de una entidad dentro de la ficha: puntaje grande,
   // los cuatro criterios con sus puntos y el botón para calificar si es tu entidad.
   function evalTarjeta(entidad, ev, pid){
-    const mia = miEntidad() === entidad, nombre = nombreJurado(entidad);
+    const esAdmin = S.rol === 'admin', mia = !esAdmin && miEntidad() === entidad, nombre = etiquetaJurado(entidad);
     let h = '<div class="eval-card' + (ev ? ' done' : '') + (mia ? ' mia' : '') + '">'
       + '<div class="eval-head"><b>' + esc(nombre) + (mia ? ' <span class="muted" style="font-weight:600;font-size:11.5px">(tu jurado)</span>' : '') + '</b>'
       + (ev ? '<span class="pill green">Calificada</span>' : '<span class="pill grey">Sin calificar</span>') + '</div>';
@@ -1302,11 +1303,12 @@
         + (ev.comentario ? '<p class="eval-com"><span>Comentario del evaluador</span>' + esc(ev.comentario) + '</p>' : '')
         + '<p class="eval-fecha">Calificada el ' + esc(fmtFecha(ev.updated_at || ev.created_at, true))
         + (ev.evaluador_nombre ? ' por ' + esc(ev.evaluador_nombre) : '')
-        + (ev.evaluador_email ? ' <span class="muted">&lt;' + esc(ev.evaluador_email) + '&gt;</span>' : '') + '</p>';
+        + (ev.evaluador_email ? ' <span class="muted">&lt;' + esc(ev.evaluador_email) + '&gt;</span>' : '')
+        + (ev.registrado_por_email && ev.registrado_por_email !== ev.evaluador_email ? '<br><span class="muted">Registrada desde la cuenta ' + esc(ev.registrado_por_email) + '</span>' : '') + '</p>';
     } else {
-      h += '<p class="eval-vacio">' + (mia ? 'Todavía no la has calificado. Pulsa el botón para abrir la rúbrica.' : 'El evaluador de ' + esc(nombre) + ' todavía no la ha calificado.') + '</p>';
+      h += '<p class="eval-vacio">' + (mia ? 'Todavía no la has calificado. Pulsa el botón para abrir la rúbrica.' : 'Nadie ha calificado todavía como ' + esc(nombre) + '.') + '</p>';
     }
-    if (mia) h += '<button type="button" class="btn ' + (ev ? 'ghost' : 'solid') + ' sm" data-rubrica="' + esc(pid) + '">' + (ev ? 'Editar mi calificación' : 'Calificar como ' + esc(nombre)) + '</button>';
+    if (esAdmin || mia) h += '<button type="button" class="btn ' + (ev ? 'ghost' : 'solid') + ' sm" data-rubrica="' + esc(pid) + '" data-ent="' + esc(entidad) + '">' + (ev ? (mia ? 'Editar mi calificación' : 'Editar calificación') : 'Calificar como ' + esc(nombre)) + '</button>';
     return h + '</div>';
   }
 
@@ -1322,9 +1324,9 @@
     let body = fichaHtml(p);
     body += '<div class="sec-title">Puntaje</div><div class="score-box"><div class="score-grid">'
       + '<div><span>Plataforma (P)</span><b>' + num(s.P) + '</b><div class="muted" style="font-size:11.5px">' + (s.pts != null ? s.pts + ' de ' + s.max + ' puntos' : '') + '</div></div>'
-      + '<div><span>' + esc(J1().nombre) + '</span><b>' + (s.I == null ? '—' : num(s.I)) + '</b>'
+      + '<div><span>' + esc(etiquetaJurado(J1().clave)) + '</span><b>' + (s.I == null ? '—' : num(s.I)) + '</b>'
         + (s.porJ1 ? '<div class="muted" style="font-size:11.5px">' + esc(s.porJ1) + '</div>' : '') + '</div>'
-      + '<div><span>' + esc(J2().nombre) + '</span><b>' + (s.A == null ? '—' : num(s.A)) + '</b>'
+      + '<div><span>' + esc(etiquetaJurado(J2().clave)) + '</span><b>' + (s.A == null ? '—' : num(s.A)) + '</b>'
         + (s.porJ2 ? '<div class="muted" style="font-size:11.5px">' + esc(s.porJ2) + '</div>' : '') + '</div>'
       + '<div><span>Global</span><b>' + num(s.G) + '</b><div class="muted" style="font-size:11.5px">' + (s.parcial ? 'Parcial · ' + esc(s.falta || '') : 'Completo') + '</div></div>'
       + '</div>'
@@ -1333,7 +1335,7 @@
     body += '<details style="margin:12px 0 0"><summary class="muted" style="cursor:pointer;font-size:12.5px;font-weight:700">Detalle del puntaje de la plataforma</summary>'
       + '<table class="mini-table" style="margin-top:8px">' + (s.detalle || []).map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + ' / ' + r[2] + '</td></tr>').join('') + '</table></details>';
     body += '<div class="sec-title">Calificación con la rúbrica</div>'
-      + (falta.length ? '<p class="muted" style="font-size:13px;margin:0 0 12px;line-height:1.5">' + (falta.length === 2 ? 'Ninguno de los dos jurados ha calificado esta postulación.' : 'Falta la calificación de ' + esc(nombreJurado(falta[0])) + '.') + ' El puntaje global queda parcial hasta que estén las dos.</p>' : '')
+      + (falta.length ? '<p class="muted" style="font-size:13px;margin:0 0 12px;line-height:1.5">' + (falta.length === 2 ? 'Ninguno de los dos jurados ha calificado esta postulación.' : 'Falta la calificación de ' + esc(etiquetaJurado(falta[0])) + '.') + ' El puntaje global queda parcial hasta que estén las dos.</p>' : '')
       + '<div class="grid2">' + evalTarjeta(J1().clave, ev[J1().clave], p.id) + evalTarjeta(J2().clave, ev[J2().clave], p.id) + '</div>';
     body += '<div class="sec-title">Desempate</div>'
       + (enEmpate ? '<div class="alert warn" style="margin-bottom:10px">Esta postulación tiene el mismo puntaje global (' + num(s.G) + ') que otra. Registren el orden acordado en la reunión entre los dos jurados.</div>' : '<p class="muted" style="font-size:12.5px;margin:0 0 10px">Solo se usa si hay empate en el puntaje global.</p>')
@@ -1350,7 +1352,7 @@
     $('genFoot').querySelector('[data-gen-close]').onclick = genCerrar;
     $('btnGuardarPart').onclick = () => guardarParticipante(p);
     $('btnAutorizar').onclick = () => autorizarGanador(p);
-    $('genBody').querySelectorAll('[data-rubrica]').forEach(b => b.onclick = () => abrirRubrica(b.dataset.rubrica, { volverAFicha: true }));
+    $('genBody').querySelectorAll('[data-rubrica]').forEach(b => b.onclick = () => abrirRubrica(b.dataset.rubrica, b.dataset.ent, { desde: 'ficha' }));
     cargarCorreosDe(p.id);
   }
   async function guardarParticipante(p){
@@ -1402,87 +1404,142 @@
     if (S.vista === 'correos') loadCorreos();
   }
 
-  // ---------- CALIFICAR (evaluadores) ----------
+  // ---------- CALIFICAR ----------
+  // Evaluador: lista con su propia nota. Admin: las dos notas por postulación y
+  // eligen con qué jurado calificar dentro de la postulación.
+  const pillEval = (ev) => {
+    if (!ev) return '<span class="pill grey">Pendiente</span>';
+    const suma = CRITERIOS.reduce((a, c) => a + (ev[c.k] || 0), 0);
+    return '<span class="pill green">' + num(suma / 20 * 100) + ' · ' + suma + '/20</span>';
+  };
   async function loadCalificar(){
-    const tb = $('tblCalificar');
-    if (!S.participantes.length) tb.innerHTML = '<tr><td colspan="7" class="muted">Cargando…</td></tr>';
+    const tb = $('tblCalificar'), esAdmin = S.rol === 'admin';
+    if (!S.participantes.length) tb.innerHTML = '<tr><td colspan="8" class="muted">Cargando…</td></tr>';
     const [p, e] = await Promise.all([
       sb.from('postulaciones').select('*').neq('estado', 'rechazado').order('created_at', { ascending: true }),
-      sb.from('evaluaciones').select('*').eq('entidad', S.perfil.entidad)
+      esAdmin ? sb.from('evaluaciones').select('*') : sb.from('evaluaciones').select('*').eq('entidad', S.perfil.entidad),
+      loadJurados()
     ]);
-    if (p.error) { tb.innerHTML = '<tr><td colspan="7">No se pudieron cargar las postulaciones: ' + esc(p.error.message) + '</td></tr>'; return; }
+    if (p.error) { tb.innerHTML = '<tr><td colspan="8">No se pudieron cargar las postulaciones: ' + esc(p.error.message) + '</td></tr>'; return; }
     S.participantes = p.data || [];
-    S.misEvals = {}; (e.data || []).forEach(x => { S.misEvals[x.postulacion_id] = x; });
-    $('califSub').textContent = 'Calificas en nombre de ' + nombreJurado(S.perfil.entidad) + '. Cada criterio va de 1 a 5; tu calificación es independiente y no ves la del otro jurado.';
+    S.misEvals = {}; S.evals = {};
+    (e.data || []).forEach(x => { (S.evals[x.postulacion_id] = S.evals[x.postulacion_id] || {})[x.entidad] = x; if (!esAdmin) S.misEvals[x.postulacion_id] = x; });
+    $('califSub').textContent = esAdmin
+      ? 'Como administrador puedes calificar como ' + etiquetaJurado(J1().clave) + ' o como ' + etiquetaJurado(J2().clave) + '. Abre la postulación, elige el jurado y escribe el nombre y el correo de quien califica.'
+      : 'Calificas en nombre de ' + etiquetaJurado(S.perfil.entidad) + '. Cada criterio va de 1 a 5; tu calificación es independiente y no ves la del otro jurado.';
     renderCalificar();
-    if (S.abrirAlCargar) { const id = S.abrirAlCargar; S.abrirAlCargar = null; abrirRubrica(id); }
+    if (S.abrirAlCargar) { const id = S.abrirAlCargar; S.abrirAlCargar = null; esAdmin ? abrirPostulacionCalificar(id) : abrirRubrica(id); }
   }
   function renderCalificar(){
-    const f = $('califFiltro').value, all = S.participantes;
-    const hechas = all.filter(p => S.misEvals[p.id]).length;
+    const f = $('califFiltro').value, all = S.participantes, esAdmin = S.rol === 'admin';
+    const evDe = (id, k) => (S.evals[id] || {})[k];
+    const completa = (p) => esAdmin ? !!(evDe(p.id, J1().clave) && evDe(p.id, J2().clave)) : !!S.misEvals[p.id];
+    const hechas = all.filter(completa).length;
     $('navCalificarCount').textContent = all.length - hechas;
-    $('califProgreso').innerHTML = 'Llevas <b>' + hechas + ' de ' + all.length + '</b> postulaciones calificadas.' + (all.length && hechas === all.length ? ' ¡Terminaste!' : '');
-    const list = all.filter(p => f === 'todas' || (f === 'pendientes' ? !S.misEvals[p.id] : !!S.misEvals[p.id]));
+    $('califProgreso').innerHTML = (esAdmin ? 'Hay <b>' + hechas + ' de ' + all.length + '</b> postulaciones con las dos calificaciones.' : 'Llevas <b>' + hechas + ' de ' + all.length + '</b> postulaciones calificadas.') + (all.length && hechas === all.length ? ' ¡Terminaste!' : '');
+    $('califHead').innerHTML = '<tr><th>Emprendimiento</th><th>Municipio</th><th>Categoría</th><th>Enviada</th><th>P</th>'
+      + (esAdmin ? '<th>' + esc(etiquetaJurado(J1().clave)) + '</th><th>' + esc(etiquetaJurado(J2().clave)) + '</th>' : '<th>Mi calificación</th>') + '<th></th></tr>';
+    const list = all.filter(p => f === 'todas' || (f === 'pendientes' ? !completa(p) : completa(p)));
     $('tblCalificar').innerHTML = list.length ? list.map(p => {
-      const ev = S.misEvals[p.id], suma = ev ? CRITERIOS.reduce((a, c) => a + ev[c.k], 0) : 0;
+      const celdas = esAdmin ? '<td>' + pillEval(evDe(p.id, J1().clave)) + '</td><td>' + pillEval(evDe(p.id, J2().clave)) + '</td>' : '<td>' + pillEval(S.misEvals[p.id]) + '</td>';
+      const boton = esAdmin ? (completa(p) ? 'Ver' : 'Calificar') : (S.misEvals[p.id] ? 'Editar' : 'Calificar');
       return '<tr><td><b>' + esc(p.nombre_emprendimiento || '—') + '</b><div class="muted" style="font-size:11.5px">' + esc(p.nombre_completo || '') + '</div></td>'
         + '<td>' + esc(p.municipio || '—') + '</td><td style="font-size:12.5px">' + esc(p.categoria_negocio_verde || '—') + '</td>'
         + '<td class="mono" style="font-size:12px">' + esc(fmtFecha(p.created_at)) + '</td>'
-        + '<td class="num-cell">' + num(puntajeP(p).P) + '</td>'
-        + '<td>' + (ev ? '<span class="pill green">' + num(suma / 20 * 100) + ' · ' + suma + '/20</span>' : '<span class="pill grey">Pendiente</span>') + '</td>'
-        + '<td><button class="btn ' + (ev ? 'ghost' : 'solid') + ' sm" data-calificar="' + esc(p.id) + '">' + (ev ? 'Editar' : 'Calificar') + '</button></td></tr>';
-    }).join('') : '<tr><td colspan="7" class="muted">' + (all.length ? (f === 'pendientes' ? 'No tienes postulaciones pendientes.' : 'Nada para mostrar con este filtro.') : 'Aún no hay postulaciones para calificar.') + '</td></tr>';
+        + '<td class="num-cell">' + num(puntajeP(p).P) + '</td>' + celdas
+        + '<td><button class="btn ' + (completa(p) ? 'ghost' : 'solid') + ' sm" data-calificar="' + esc(p.id) + '">' + boton + '</button></td></tr>';
+    }).join('') : '<tr><td colspan="8" class="muted">' + (all.length ? (f === 'pendientes' ? 'No hay postulaciones pendientes.' : 'Nada para mostrar con este filtro.') : 'Aún no hay postulaciones para calificar.') + '</td></tr>';
   }
   $('califFiltro').addEventListener('change', renderCalificar);
-  $('tblCalificar').addEventListener('click', (e) => { const b = e.target.closest('[data-calificar]'); if (b) abrirRubrica(b.dataset.calificar); });
+  $('tblCalificar').addEventListener('click', (e) => { const b = e.target.closest('[data-calificar]'); if (!b) return; S.rol === 'admin' ? abrirPostulacionCalificar(b.dataset.calificar) : abrirRubrica(b.dataset.calificar); });
   CARGAS.calificar = loadCalificar;
 
-  function abrirRubrica(id){
+  // Admin: la postulación completa y, al final, una tarjeta por jurado con su botón.
+  function abrirPostulacionCalificar(id){
     const p = S.participantes.find(x => x.id === id); if (!p) { toast('No encontramos esa postulación'); return; }
-    const ev = S.misEvals[id] || (S.evals[id] && S.evals[id][S.perfil.entidad]) || {};
-    // Leer primero; calificar al final.
-    let body = '<div class="alert info" style="margin-bottom:16px">Calificas como <b>' + esc(nombreJurado(S.perfil.entidad)) + '</b>. Lee la postulación completa y, al final, elige en cada criterio la descripción que mejor la representa.</div>';
-    body += fichaHtml(p);
+    const ev = S.evals[id] || {};
+    let body = fichaHtml(p);
+    body += '<div class="sec-title" id="calJurados">Calificación con la rúbrica</div>'
+      + '<p class="muted" style="font-size:13px;margin:0 0 12px;line-height:1.5">Elige el jurado con el que vas a calificar. Te pediremos el nombre y el correo de quien califica para dejarlo registrado.</p>'
+      + '<div class="grid2">' + evalTarjeta(J1().clave, ev[J1().clave], p.id) + evalTarjeta(J2().clave, ev[J2().clave], p.id) + '</div>';
+    const foot = '<button class="btn ghost" type="button" data-gen-close>Cerrar</button><button class="btn solid" type="button" id="btnIrJurados">Ir a calificar</button>';
+    genAbrir(p.nombre_emprendimiento || 'Postulación', (p.nombre_completo || '') + ' · ' + (p.municipio || ''), body, foot);
+    S.genSucio = false;
+    $('genFoot').querySelector('[data-gen-close]').onclick = genCerrar;
+    $('btnIrJurados').onclick = () => { const el = $('calJurados'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    $('genBody').querySelectorAll('[data-rubrica]').forEach(b => b.onclick = () => abrirRubrica(b.dataset.rubrica, b.dataset.ent, { desde: 'calificar' }));
+  }
+
+  function abrirRubrica(id, entidad, opts){
+    const p = S.participantes.find(x => x.id === id); if (!p) { toast('No encontramos esa postulación'); return; }
+    const esAdmin = S.rol === 'admin';
+    entidad = esAdmin ? entidad : S.perfil.entidad;
+    if (!entidad) { toast('Elige el jurado con el que vas a calificar'); return; }
+    const ev = (S.evals[id] && S.evals[id][entidad]) || (!esAdmin && S.misEvals[id]) || {};
+    const etiqueta = etiquetaJurado(entidad);
+    let body = '<div class="alert info" style="margin-bottom:16px">Calificas como <b>' + esc(etiqueta) + '</b>. '
+      + (esAdmin ? 'Escribe quién califica y elige en cada criterio la descripción que mejor representa la postulación.' : 'Lee la postulación completa y, al final, elige en cada criterio la descripción que mejor la representa.') + '</div>';
+    if (esAdmin) {
+      body += '<div class="sec-title">Quién califica</div>'
+        + '<div class="grid2"><div class="field"><label for="rubNombre">Nombre de quien califica *</label><input type="text" id="rubNombre" maxlength="120" autocomplete="name" placeholder="Nombre y apellido" value="' + esc(ev.evaluador_nombre || '') + '"></div>'
+        + '<div class="field"><label for="rubEmail">Correo de quien califica *</label><input type="email" id="rubEmail" maxlength="200" autocomplete="email" placeholder="persona@correo.com" value="' + esc(ev.evaluador_email || '') + '"></div></div>'
+        + '<p class="muted" style="font-size:12px;margin:6px 0 0">Queda en el registro de la calificación, junto con la cuenta desde la que la guardas.</p>';
+    } else {
+      body += fichaHtml(p);
+    }
     body += '<div class="sec-title" id="rubInicio">Calificación · rúbrica</div>'
       + '<p class="muted" style="font-size:13px;margin:0 0 14px;line-height:1.5">Marca un nivel (1 a 5) por criterio. El total se calcula solo cuando están los cuatro.</p>'
       + CRITERIOS.map(c => '<div class="rubric" data-crit="' + c.k + '"><h5>' + esc(c.t) + '</h5><p class="d">' + esc(c.d) + '</p>'
       + c.n.map((txt, i) => '<label class="' + (ev[c.k] === i + 1 ? 'on' : '') + '"><input type="radio" name="r_' + c.k + '" value="' + (i + 1) + '"' + (ev[c.k] === i + 1 ? ' checked' : '') + '><b>' + (i + 1) + '</b><span>' + esc(txt) + '</span></label>').join('') + '</div>').join('');
     body += '<div class="field" style="margin-top:16px"><label for="rubComentario">Comentario (opcional, lo ve el administrador)</label><textarea id="rubComentario" maxlength="1500" rows="3" placeholder="Fortalezas, dudas o lo que conviene revisar en la entrevista.">' + esc(ev.comentario || '') + '</textarea></div>';
     body += '<div class="rubric-sticky" id="rubTotal"></div><div class="save-status" id="rubStatus" style="margin-top:8px"></div>';
-    const foot = '<button class="btn ghost" type="button" data-gen-close>Cerrar</button><button class="btn ghost" type="button" id="btnIrRub">Ir a calificar</button><button class="btn solid" type="button" id="btnGuardarRub">Guardar calificación</button>';
-    genAbrir(p.nombre_emprendimiento || 'Postulación', (p.nombre_completo || '') + ' · ' + (p.municipio || ''), body, foot);
+    const foot = '<button class="btn ghost" type="button" data-gen-close>Cerrar</button>' + (esAdmin ? '' : '<button class="btn ghost" type="button" id="btnIrRub">Ir a calificar</button>') + '<button class="btn solid" type="button" id="btnGuardarRub">Guardar calificación</button>';
+    genAbrir(p.nombre_emprendimiento || 'Postulación', etiqueta + ' · ' + (p.nombre_completo || ''), body, foot);
     S.genSucio = false;
     $('genFoot').querySelector('[data-gen-close]').onclick = genCerrar;
-    $('btnIrRub').onclick = () => { const el = $('rubInicio'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    if ($('btnIrRub')) $('btnIrRub').onclick = () => { const el = $('rubInicio'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     const total = () => {
       const vals = CRITERIOS.map(c => { const r = document.querySelector('input[name="r_' + c.k + '"]:checked'); return r ? Number(r.value) : null; });
       const faltan = vals.filter(v => v == null).length, suma = vals.reduce((a, v) => a + (v || 0), 0);
-      $('rubTotal').innerHTML = faltan ? 'Faltan <b>' + faltan + '</b> criterio' + (faltan === 1 ? '' : 's') + ' por calificar.' : 'Total: <b>' + suma + ' de 20</b> → puntaje ' + nombreJurado(S.perfil.entidad) + ' = <b>' + num(suma / 20 * 100) + '</b>';
+      $('rubTotal').innerHTML = faltan ? 'Faltan <b>' + faltan + '</b> criterio' + (faltan === 1 ? '' : 's') + ' por calificar.' : 'Total: <b>' + suma + ' de 20</b> → puntaje ' + esc(etiqueta) + ' = <b>' + num(suma / 20 * 100) + '</b>';
       return { vals, faltan };
     };
     $('genBody').querySelectorAll('.rubric input').forEach(inp => inp.addEventListener('change', () => {
       inp.closest('.rubric').querySelectorAll('label').forEach(l => l.classList.toggle('on', l.contains(inp)));
       S.genSucio = true; total();
     }));
-    $('rubComentario').addEventListener('input', () => { S.genSucio = true; });
+    ['rubComentario', 'rubNombre', 'rubEmail'].forEach(k => { if ($(k)) $(k).addEventListener('input', () => { S.genSucio = true; }); });
     total();
     $('btnGuardarRub').onclick = async () => {
       const t = total(), st = $('rubStatus');
+      let quien = null;
+      if (esAdmin) {
+        quien = { evaluador_nombre: $('rubNombre').value.trim(), evaluador_email: $('rubEmail').value.trim().toLowerCase() };
+        if (!quien.evaluador_nombre) { st.textContent = 'Escribe el nombre de quien califica.'; $('rubNombre').focus(); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(quien.evaluador_email)) { st.textContent = 'Escribe un correo válido de quien califica.'; $('rubEmail').focus(); return; }
+      }
       if (t.faltan) { st.textContent = 'Califica los cuatro criterios antes de guardar.'; $('rubInicio').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
       const { data: { user } } = await sb.auth.getUser();
-      const row = { postulacion_id: p.id, entidad: S.perfil.entidad, evaluador_id: user.id, comentario: $('rubComentario').value.trim() || null };
+      const row = Object.assign({ postulacion_id: p.id, entidad, evaluador_id: user.id, comentario: $('rubComentario').value.trim() || null }, quien || {});
       CRITERIOS.forEach((c, i) => { row[c.k] = t.vals[i]; });
       st.textContent = 'Guardando…';
       const r = await sb.from('evaluaciones').upsert(row, { onConflict: 'postulacion_id,entidad' }).select().maybeSingle();
       if (r.error) { st.textContent = /jwt|session/i.test(r.error.message) ? 'Tu sesión venció. Entra de nuevo: tu selección sigue en pantalla hasta que cierres.' : 'No se pudo guardar: ' + r.error.message; return; }
-      S.misEvals[p.id] = r.data || row; S.genSucio = false;
-      toast('Calificación guardada'); renderCalificar(); closeModal('modalGen');
+      const guardada = r.data || row;
+      (S.evals[p.id] = S.evals[p.id] || {})[entidad] = guardada;
+      if (!esAdmin) S.misEvals[p.id] = guardada;
+      S.genSucio = false;
+      toast('Calificación guardada como ' + etiqueta);
+      if (opts && opts.desde === 'ficha') { await loadParticipantes(); verParticipante(p.id); return; }
+      renderCalificar();
+      if (esAdmin) { abrirPostulacionCalificar(p.id); const el = $('calJurados'); if (el) el.scrollIntoView({ block: 'start' }); return; }
+      closeModal('modalGen');
       if (/participante=/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
     };
   }
 
   // Exponer a la segunda parte del script.
-  window.__panel = { sb, S, $, esc, safeUrl, linkHtml, ini, num, fmtFecha, hoyBogota, diaBogota, toast, openModal, closeModal, puede, iconBtn, IC, invocar, estadoCorreo, ir, CARGAS, genAbrir, genCerrar, score, puntajeP, loadParticipantes, loadPesos, verParticipante, reenviarCorreo, TIPOS_CORREO, ROLES, ESTADOS, CRITERIOS, requireStaff, abrirRubrica, nombreJurado, J1, J2, loadJurados };
+  window.__panel = { sb, S, $, esc, safeUrl, linkHtml, ini, num, fmtFecha, hoyBogota, diaBogota, toast, openModal, closeModal, puede, iconBtn, IC, invocar, estadoCorreo, ir, CARGAS, genAbrir, genCerrar, score, puntajeP, loadParticipantes, loadPesos, verParticipante, reenviarCorreo, TIPOS_CORREO, ROLES, ESTADOS, CRITERIOS, requireStaff, abrirRubrica, nombreJurado, etiquetaJurado, J1, J2, loadJurados };
 })();
 </script>
 <script>
@@ -1590,6 +1647,7 @@
       const r = await sb.from('ranking_postulaciones').select('id,puntaje_global,es_parcial');
       S.ranking = S.ranking || {}; (r.data || []).forEach(x => { S.ranking[x.id] = Object.assign(S.ranking[x.id] || {}, x); });
       const completas = (r.data || []).filter(x => !x.es_parcial).length;
+      if (!r.error) $('navCalificarCount').textContent = posts.filter(p => p.estado !== 'rechazado' && (S.ranking[p.id] || {}).es_parcial !== false).length;
       html += statHtml(posts.length, 'Postulaciones recibidas', semana ? '+' + semana + ' en los últimos 7 días' : '');
       html += statHtml(r.error ? '—' : completas + ' / ' + posts.length, 'Con los dos jurados');
     }
@@ -2327,7 +2385,7 @@
     S.equipo = r.data || [];
     const yo = S.perfil.id;
     const entSelect = (u) => {
-      if (u.role !== 'evaluador' && u.role !== 'admin') return '<span class="muted">—</span>';
+      if (u.role !== 'evaluador') return '<span class="muted">' + (u.role === 'admin' ? 'Cualquiera' : '—') + '</span>';
       return '<select data-ent style="width:auto;padding:6px 8px;font-size:12.5px"><option value="">— Sin jurado —</option>'
         + S.jurados.map(j => '<option value="' + j.clave + '"' + (u.entidad === j.clave ? ' selected' : '') + '>' + esc(j.nombre) + '</option>').join('')
         + '</select>';
@@ -2345,7 +2403,7 @@
     if (e.target.hasAttribute('data-rol')) {
       const v = e.target.value;
       if (v === 'pendiente' && !confirm('¿Quitar el acceso al panel a ' + u.email + '? Su cuenta queda sin acceso a nada.')) { e.target.value = u.role; return; }
-      if (v === 'evaluador' && !u.entidad) { toast('Elige la entidad del evaluador en la siguiente columna'); }
+      if (v === 'evaluador' && !u.entidad) { toast('Elige el jurado del evaluador en la siguiente columna'); }
       row.role = v;
       // Solo editor / sin acceso pierden entidad; admin y evaluador la conservan (o la eligen).
       if (v !== 'evaluador' && v !== 'admin') row.entidad = null;
@@ -2367,7 +2425,7 @@
     const sel = $('invEntidad'), actual = sel.value;
     sel.innerHTML = S.jurados.map(j => '<option value="' + esc(j.clave) + '">' + esc(j.nombre) + '</option>').join('') + '<option value="">Sin jurado (no califica)</option>';
     sel.value = S.jurados.some(j => j.clave === actual) || actual === '' ? actual : '';
-    $('invEntidadF').style.visibility = (rol === 'evaluador' || rol === 'admin') ? 'visible' : 'hidden';
+    $('invEntidadF').style.visibility = rol === 'evaluador' ? 'visible' : 'hidden';
     if (rol === 'evaluador' && !$('invEntidad').value) $('invEntidad').value = J1().clave;
   }
   $('invRol').addEventListener('change', syncInvEntidad);
@@ -2376,7 +2434,7 @@
     e.preventDefault();
     const email = $('invEmail').value.trim().toLowerCase(), rol = $('invRol').value, st = $('invStatus');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { st.textContent = 'Escribe un correo válido.'; $('invEmail').focus(); return; }
-    const entidad = (rol === 'evaluador' || rol === 'admin') ? ($('invEntidad').value || null) : null;
+    const entidad = rol === 'evaluador' ? ($('invEntidad').value || null) : null;
     if (rol === 'evaluador' && !entidad) { st.textContent = 'El evaluador necesita un jurado.'; return; }
     const quien = ROLES[rol] + (entidad ? ' de ' + nombreJurado(entidad) : '');
     if (!confirm('¿Invitar a ' + email + ' como ' + quien + '?')) return;

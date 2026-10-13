@@ -248,7 +248,12 @@ async function rest(req, url, s, w) {
         if (w.perfil.role !== 'admin' && b.entidad !== w.perfil.entidad) return J({ code: '42501', message: 'new row violates row-level security policy for table "evaluaciones"' }, 403);
         if (!s.jurados.some((j) => j.clave === b.entidad)) return J({ code: '23503', message: 'insert or update on table "evaluaciones" violates foreign key constraint' }, 409);
         for (const k of ['pertinencia', 'modelo_negocio', 'innovacion', 'potencial']) if (!(b[k] >= 1 && b[k] <= 5)) return J({ code: '23514', message: 'new row violates check constraint "evaluaciones_' + k + '_check"' }, 400);
-        Object.assign(b, { evaluador_id: w.id, evaluador_nombre: w.perfil.full_name || w.email, evaluador_email: w.email, updated_at: now() });
+        const declara = w.perfil.role === 'admin' && String(b.evaluador_nombre || '').trim() && String(b.evaluador_email || '').trim();
+        if (declara && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(String(b.evaluador_email).trim())) return J({ code: '22023', message: 'El correo de quien califica no es válido' }, 400);
+        Object.assign(b, declara
+          ? { evaluador_nombre: String(b.evaluador_nombre).trim().slice(0, 120), evaluador_email: String(b.evaluador_email).trim().toLowerCase() }
+          : { evaluador_nombre: w.perfil.full_name || w.email, evaluador_email: w.email },
+          { evaluador_id: w.id, registrado_por_email: w.email, updated_at: now() });
       }
       if (tabla === 'postulaciones' && (!w || w.perfil.role !== 'admin') && (b.estado && b.estado !== 'postulado' || b.user_id || b.orden_desempate != null)) return J({ code: '42501', message: 'new row violates row-level security policy for table "postulaciones"' }, 403);
       const ex = upsert && s[tabla].find((r) => pk.every((k) => String(r[k]) === String(b[k])));
