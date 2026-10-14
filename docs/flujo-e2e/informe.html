@@ -83,7 +83,7 @@ nav.toc a:hover { border-color: var(--accent); }
 <header>
   <span class="eyebrow">Auditoría de punta a punta · 13 oct 2026</span>
   <h1>Recorrido de Innova Social 5.0</h1>
-  <p class="lead">El flujo funciona en pantallas y en la base: postular, revisar, calificar con dos jurados, elegir ganador, darle acceso y ver sus cursos. En producción hay un bloqueo de configuración en los enlaces de los correos (ver «Pendiente»). En el camino encontré y corregí 6 fallos de pantalla. Después se agregó que cualquier administrador califique como cualquiera de los dos jurados, dejando registrado quién califica. Queda un problema de contenido en producción que debe resolver el equipo.</p>
+  <p class="lead">El flujo funciona en pantallas y en la base: postular, revisar, calificar con dos jurados, elegir ganador, darle acceso y ver sus cursos. En producción hay un bloqueo de configuración en los enlaces de los correos (ver «Pendiente»). En el camino encontré y corregí 6 fallos de pantalla. Después se agregó que cualquier administrador califique como cualquiera de los dos jurados, dejando registrado quién califica.</p>
   <nav class="toc" aria-label="Secciones">
     <a href="#como">Cómo se probó</a><a href="#visitante">Postulante</a><a href="#admin1">Administrador</a><a href="#jurados">Jurados</a><a href="#calificar-admin">Calificar como admin</a><a href="#decision">Decisión</a><a href="#beneficiaria">Beneficiaria</a><a href="#editor">Editor</a><a href="#arreglos">Correcciones</a><a href="#pendiente">Pendiente</a><a href="#bateria">Permisos</a>
   </nav>
@@ -193,7 +193,7 @@ nav.toc a:hover { border-color: var(--accent); }
 <section id="pendiente">
   <div class="sec-head"><h2>Pendiente</h2></div>
   <div class="callout warn"><b>Bloqueante: los enlaces de los correos apuntan a un dominio que no existe.</b> El secreto <code>SITE_URL</code> de la función <code>correos</code> vale <code>https://innovasociall.co</code>, que no resuelve. Con eso, el enlace «Crear mi contraseña» de la ganadora, el «Ver ficha» del aviso al programa y la invitación al equipo no abren. Hay que cambiarlo a <code>https://convocatoria.innovasocial.co</code> y permitir <code>https://convocatoria.innovasocial.co/acceso.html</code> en Supabase → Authentication → URL Configuration. La prueba en pantallas no lo detectó porque el simulador arma el enlace con la dirección local.</div>
-  <div class="callout warn"><b>Imágenes rotas en el blog de producción.</b> 3 de los 4 momentos publicados («10 negocios sostenibles…», «Ruta de Formación…» y «Lanzamiento Innova Social 4.0») usan imágenes de <code>apischool.innovasocial.co</code> que hoy devuelven 404. Hay que volver a subirlas desde Momentos en el panel. No modifiqué datos de producción.</div>
+  <div class="callout info"><b>Resuelto el 14 oct: imágenes del blog.</b> Las portadas de «10 negocios sostenibles…», «Ruta de Formación…» y «Lanzamiento Innova Social 4.0» daban 404 en <code>apischool.innovasocial.co</code>. Ahora están en el bucket <code>momentos</code> del proyecto, con texto alternativo. «De camino al Pitch Day» todavía usa 3 imágenes de ese servidor, que hoy sí cargan.</div>
   <div class="tbl"><table>
     <thead><tr><th>Qué falta</th><th>Quién</th><th>Estado</th></tr></thead>
     <tbody>
