@@ -90,7 +90,7 @@ supabase db query --linked -o json -f supabase/tests/permisos.sql
 | # | Estado |
 |---|---|
 | 1 Quitar «Impacto colectivo» / Eureka | ✅ |
-| 2 Fotos del blog sin filtro | ✅ — las 3 portadas que daban 404 se pasaron al bucket `momentos` (14 oct) |
+| 2 Fotos del blog sin filtro | ✅ — las imágenes de los 4 momentos están en el bucket `momentos`; 3 daban 404 en el servidor externo (14 oct) |
 | 3 Imagen de categorías: ampliar y cerrar | ✅ |
 | 4 Íconos en las etapas | ✅ íconos oficiales de marca |
 | 5 Enlaces TDR y política en nueva pestaña | ✅ |

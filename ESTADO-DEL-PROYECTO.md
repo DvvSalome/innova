@@ -71,7 +71,7 @@ Los cambios de todas las migraciones de `supabase/migrations/` están en producc
 - Subir un curso con archivos reales y un momento con imagen.
 
 ### Contenido
-- **Imágenes del blog:** resuelto el 14 oct. Las portadas de 3 momentos daban 404 en `apischool.innovasocial.co`; ahora están en el bucket `momentos` del proyecto (`portadas/<slug>.jpg`) y tienen texto alternativo. «De camino al Pitch Day» todavía usa 3 imágenes de `apischool` que hoy sí cargan; conviene pasarlas también.
+- **Imágenes del blog:** resuelto el 14 oct. Las portadas de 3 momentos daban 404 en `apischool.innovasocial.co`; ahora están en el bucket `momentos` del proyecto (`portadas/<slug>.jpg`) y tienen texto alternativo. También se pasaron las 2 imágenes de «De camino al Pitch Day» (portada y cuerpo): ningún momento depende ya de ese servidor.
 - **URL pública del informe** para el botón «Descargar Informe Innova Social 2025» de `casos.html` (hoy apunta a `#`).
 - Logo 5.0 para el encabezado de los correos (hoy la marca va en texto).
 
