@@ -16,7 +16,7 @@ const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const REMITENTE = Deno.env.get('CORREO_REMITENTE') ?? 'Innova Social <onboarding@resend.dev>';
 const CORREO_PROGRAMA = Deno.env.get('CORREO_PROGRAMA') ?? '';
-const SITE_URL = (Deno.env.get('SITE_URL') ?? 'https://innovasociall.co').replace(/\/$/, '');
+const SITE_URL = (Deno.env.get('SITE_URL') ?? 'https://convocatoria.innovasocial.co').replace(/\/$/, '');
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',

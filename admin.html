@@ -1493,10 +1493,16 @@
       + c.n.map((txt, i) => '<label class="' + (ev[c.k] === i + 1 ? 'on' : '') + '"><input type="radio" name="r_' + c.k + '" value="' + (i + 1) + '"' + (ev[c.k] === i + 1 ? ' checked' : '') + '><b>' + (i + 1) + '</b><span>' + esc(txt) + '</span></label>').join('') + '</div>').join('');
     body += '<div class="field" style="margin-top:16px"><label for="rubComentario">Comentario (opcional, lo ve el administrador)</label><textarea id="rubComentario" maxlength="1500" rows="3" placeholder="Fortalezas, dudas o lo que conviene revisar en la entrevista.">' + esc(ev.comentario || '') + '</textarea></div>';
     body += '<div class="rubric-sticky" id="rubTotal"></div><div class="save-status" id="rubStatus" style="margin-top:8px"></div>';
-    const foot = '<button class="btn ghost" type="button" data-gen-close>Cerrar</button>' + (esAdmin ? '' : '<button class="btn ghost" type="button" id="btnIrRub">Ir a calificar</button>') + '<button class="btn solid" type="button" id="btnGuardarRub">Guardar calificación</button>';
+    const volver = esAdmin && opts && opts.desde ? (opts.desde === 'ficha' ? () => verParticipante(p.id) : () => abrirPostulacionCalificar(p.id)) : null;
+    const foot = (volver ? '<button class="btn ghost" type="button" id="btnVolverRub">Volver a la postulación</button>' : '<button class="btn ghost" type="button" data-gen-close>Cerrar</button>')
+      + (esAdmin ? '' : '<button class="btn ghost" type="button" id="btnIrRub">Ir a calificar</button>') + '<button class="btn solid" type="button" id="btnGuardarRub">Guardar calificación</button>';
     genAbrir(p.nombre_emprendimiento || 'Postulación', etiqueta + ' · ' + (p.nombre_completo || ''), body, foot);
     S.genSucio = false;
-    $('genFoot').querySelector('[data-gen-close]').onclick = genCerrar;
+    if (volver) $('btnVolverRub').onclick = () => {
+      if (S.genSucio && !confirm('Tienes cambios sin guardar en esta calificación. ¿Volver de todas formas?')) return;
+      S.genSucio = false; volver();
+    };
+    else $('genFoot').querySelector('[data-gen-close]').onclick = genCerrar;
     if ($('btnIrRub')) $('btnIrRub').onclick = () => { const el = $('rubInicio'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     const total = () => {
       const vals = CRITERIOS.map(c => { const r = document.querySelector('input[name="r_' + c.k + '"]:checked'); return r ? Number(r.value) : null; });
@@ -1581,10 +1587,17 @@
   }
   function vacio(c, msg){ c.ctx.fillStyle = '#4F697A'; c.ctx.font = '13px Nunito'; c.ctx.textAlign = 'center'; c.ctx.textBaseline = 'middle'; c.ctx.fillText(msg || 'Sin datos en este periodo', c.w / 2, c.h / 2); }
   function recorta(ctx, t, max){ t = String(t); if (ctx.measureText(t).width <= max) return t; while (t.length > 1 && ctx.measureText(t + '…').width > max) t = t.slice(0, -1); return t + '…'; }
+  // Máximo del eje con 3 tramos de paso entero y redondo (1, 1,5, 2, 3, 4, 5, 6, 8 × 10ⁿ).
+  function ejeMax(v){
+    const raw = Math.max(v, 1) / 3;
+    if (raw <= 1) return 3;
+    const b = Math.pow(10, Math.floor(Math.log10(raw)));
+    return [1, 1.5, 2, 3, 4, 5, 6, 8, 10].map(m => m * b).find(x => x >= raw && Number.isInteger(x)) * 3;
+  }
   function drawBars(canvas, labels, values, color){
     const c = prepCanvas(canvas); if (!c) return; const { ctx, w, h } = c;
     if (!values.length || values.every(v => !v)) return vacio(c);
-    const max = Math.ceil(Math.max(...values, 1) / 3) * 3, padL = 30, padB = 24, gap = Math.max(6, Math.min(14, w / values.length / 5));
+    const max = ejeMax(Math.max(...values)), padL = 30, padB = 24, gap = Math.max(6, Math.min(14, w / values.length / 5));
     const bw = Math.max(4, (w - padL - gap * values.length) / values.length);
     ctx.strokeStyle = '#E2ECF1'; ctx.lineWidth = 1; ctx.font = '10.5px Nunito'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     for (let g = 0; g <= 3; g++) { const y = h - padB - (g / 3) * (h - padB - 16); ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w, y); ctx.stroke(); ctx.fillStyle = '#4F697A'; ctx.fillText(Math.round(max * g / 3), 2, y + 3); }
@@ -1598,7 +1611,7 @@
   function drawLine(canvas, labels, values, color){
     const c = prepCanvas(canvas); if (!c) return; const { ctx, w, h } = c;
     if (!values.length) return vacio(c);
-    const max = Math.ceil(Math.max(...values, 1) / 3) * 3, padL = 30, padB = 24, padT = 18, n = values.length;
+    const max = ejeMax(Math.max(...values)), padL = 30, padB = 24, padT = 18, n = values.length;
     const stepX = n > 1 ? (w - padL - 12) / (n - 1) : 0, cada = Math.ceil(n / Math.max(2, Math.floor(w / 64)));
     ctx.strokeStyle = '#E2ECF1'; ctx.lineWidth = 1; ctx.font = '10.5px Nunito'; ctx.textBaseline = 'alphabetic';
     for (let g = 0; g <= 3; g++) { const y = padT + (g / 3) * (h - padB - padT); ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w, y); ctx.stroke(); ctx.fillStyle = '#4F697A'; ctx.textAlign = 'left'; ctx.fillText(Math.round(max * (3 - g) / 3), 2, y + 3); }
