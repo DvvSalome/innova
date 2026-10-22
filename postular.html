@@ -101,6 +101,14 @@
   .field.invalid input, .field.invalid select{ border-color:#DD494E; }
   .field.invalid .err{ display:block; }
 
+  /* Interruptor: ver POSTULACIONES_ABIERTAS en el script del formulario. */
+  .cerrado-card{ text-align:center; padding:40px 22px 60px; }
+  .cerrado-card[hidden]{ display:none; }
+  .cerrado-card h2{ margin:0 0 10px; color:var(--blue-dark); }
+  html.postulaciones-cerradas .progress-wrap,
+  html.postulaciones-cerradas #postulacionForm,
+  html.postulaciones-cerradas .draft-banner,
+  html.postulaciones-cerradas .solo-abierto{ display:none !important; }
   #successCard{
     display:none; text-align:center; padding:56px 24px; background:var(--paper); border-radius:20px;
     border:1px solid var(--line); box-shadow:var(--shadow);
@@ -184,8 +192,14 @@
 <header class="top-band wrap">
   <span class="eyebrow">Postulación · Edición 5.0</span>
   <h1>Postúlate a Innova Social 5.0</h1>
-  <p>Completa los datos de tu perfil y de tu emprendimiento; toma unos 15 minutos. Tu avance se guarda automáticamente en este navegador, así que puedes volver y seguir donde ibas.</p>
+  <p class="solo-abierto">Completa los datos de tu perfil y de tu emprendimiento; toma unos 15 minutos. Tu avance se guarda automáticamente en este navegador, así que puedes volver y seguir donde ibas.</p>
 </header>
+
+<div class="wrap cerrado-card" id="cerradoCard" hidden>
+  <h2>Las postulaciones aún no están abiertas</h2>
+  <p>Todavía no puedes postularte a Innova Social 5.0. Estamos preparando la convocatoria y, cuando abramos las postulaciones, este formulario estará disponible aquí mismo.</p>
+  <p><a class="btn" href="convocatoria.html" style="display:inline-flex; width:auto; padding-left:22px; padding-right:22px;">Conocer la convocatoria</a></p>
+</div>
 
 <div class="progress-wrap">
   <div class="wrap">
@@ -609,7 +623,15 @@
 <script>
 (function(){
   'use strict';
+  // Cambia a true el día que abran las postulaciones.
+  const POSTULACIONES_ABIERTAS = false;
   const $ = (id) => document.getElementById(id);
+  if (!POSTULACIONES_ABIERTAS) {
+    document.documentElement.classList.add('postulaciones-cerradas');
+    $('cerradoCard').hidden = false;
+    $('postulacionForm').addEventListener('submit', (e) => { e.preventDefault(); e.stopImmediatePropagation(); }, true);
+    return;
+  }
   const form = $('postulacionForm');
   const DRAFT_KEY = 'innova5_postulacion_borrador_v1';
   const MAX_FILE = 10 * 1024 * 1024;
