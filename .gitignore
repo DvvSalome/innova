@@ -9,3 +9,7 @@ supabase/.temp/
 
 # Haven lives in DvvSalome/haven-hk
 haven/
+pruebas/node_modules/
+pruebas/package-lock.json
+pruebas/hallazgos.json
+pruebas/resultados.json
