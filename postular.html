@@ -1134,8 +1134,11 @@
     } catch (err) {
       console.error('[postulación] fallo en', err && err.stage, err && err.error ? err.error : err);
       const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+      const repetida = err && err.stage === 'postulacion' && err.error && err.error.code === '23505';
       showSendError(offline
         ? 'Parece que no tienes conexión a internet. Conéctate e intenta de nuevo.'
+        : repetida
+        ? 'Ya existe una postulación con ese número de documento. Cada persona puede postularse una sola vez; si crees que es un error, escríbenos.'
         : (err && err.stage === 'documentos'
           ? 'No pudimos subir tus documentos. Intenta de nuevo en unos minutos; si el problema sigue, escríbenos.'
           : 'El sistema no pudo guardar tu postulación. Intenta de nuevo en unos minutos; si el problema sigue, escríbenos.'));
