@@ -3,7 +3,7 @@ import { pgcrypto } from '@electric-sql/pglite/contrib/pgcrypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
-const MIG = '/home/dvv-salom3/dev/freelance/inngenios/INNOOVASOCIAL/supabase/migrations';
+const MIG = new URL('../supabase/migrations', import.meta.url).pathname;
 
 export async function build({ extra = [], hasta = null } = {}) {
   const db = await PGlite.create({ extensions: { pgcrypto } });
