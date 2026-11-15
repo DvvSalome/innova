@@ -515,6 +515,54 @@
           <span class="err">Selecciona un rango.</span>
         </div>
       </div>
+      <div id="bloqueSoporte" style="display:none;">
+        <div class="field">
+          <label>Documentos que soportan tus ventas *</label>
+          <span class="help"><b>Sube al menos uno.</b> Puede ser una factura electrónica, una cuenta de cobro, una certificación comercial o un contrato. Puedes adjuntar hasta 4 archivos.</span>
+        </div>
+        <div class="grid2">
+        <div class="field">
+          <label>Documento 1 *</label>
+          <label class="file" data-file-for="fSoporte1">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fSoporte1" accept=".pdf,.jpg,.jpeg,.png" data-label="Documento soporte de ventas 1">
+          </label>
+          <div class="file-meta" data-meta-for="fSoporte1"></div>
+          <span class="err">Adjunta al menos un documento que soporte tus ventas (PDF, JPG o PNG de máximo 10 MB).</span>
+        </div>
+        <div class="field">
+          <label>Documento 2 <span class="hint">(opcional)</span></label>
+          <label class="file" data-file-for="fSoporte2">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fSoporte2" accept=".pdf,.jpg,.jpeg,.png" data-label="Documento soporte de ventas 2">
+          </label>
+          <div class="file-meta" data-meta-for="fSoporte2"></div>
+          <span class="err">Revisa este archivo: debe ser PDF, JPG o PNG de máximo 10 MB.</span>
+        </div>
+        <div class="field">
+          <label>Documento 3 <span class="hint">(opcional)</span></label>
+          <label class="file" data-file-for="fSoporte3">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fSoporte3" accept=".pdf,.jpg,.jpeg,.png" data-label="Documento soporte de ventas 3">
+          </label>
+          <div class="file-meta" data-meta-for="fSoporte3"></div>
+          <span class="err">Revisa este archivo: debe ser PDF, JPG o PNG de máximo 10 MB.</span>
+        </div>
+        <div class="field">
+          <label>Documento 4 <span class="hint">(opcional)</span></label>
+          <label class="file" data-file-for="fSoporte4">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fSoporte4" accept=".pdf,.jpg,.jpeg,.png" data-label="Documento soporte de ventas 4">
+          </label>
+          <div class="file-meta" data-meta-for="fSoporte4"></div>
+          <span class="err">Revisa este archivo: debe ser PDF, JPG o PNG de máximo 10 MB.</span>
+        </div>
+        </div>
+      </div>
       <div class="field">
         <label>Redes sociales del emprendimiento * <span class="hint">(al menos una, hasta 3)</span></label>
         <div class="redes-list" id="redesList"></div>
@@ -593,6 +641,12 @@
         <span class="help"><b>Máximo 3 minutos.</b> Cuéntanos tres cosas: que tu emprendimiento existe, cuál es tu propuesta de valor y por qué deberías ser elegido en esta versión de Innova Social.</span>
         <span class="hint">Súbelo a YouTube, Google Drive o Vimeo y verifica que sea público o que cualquier persona con el enlace pueda verlo.</span>
         <span class="err">Pega un enlace de YouTube, Google Drive o Vimeo.</span>
+      </div>
+      <div class="field">
+        <label for="fotosEnlace">Fotos de tu servicio o productos *</label>
+        <input type="text" id="fotosEnlace" inputmode="url" placeholder="https://drive.google.com/drive/folders/..." required>
+        <span class="help"><b>Habilita el acceso para que todos puedan verlas.</b> Sube las fotos a una carpeta de Google Drive y, en «Compartir», elige «Cualquier persona con el enlace». Si queda restringida, no podremos abrirla.</span>
+        <span class="err">Pega el enlace de la carpeta de Drive con las fotos.</span>
       </div>
       <p class="hint" style="margin:6px 0 0; font-size:11.5px; color:var(--muted);">Por seguridad, los documentos adjuntos no se guardan en el borrador: si recargas la página, tendrás que volver a subirlos.</p>
     </fieldset>
@@ -700,6 +754,7 @@
   const vende = () => vendiendoSelect.value === 'Sí';
   function syncVendiendo(){
     bloqueVentas.style.display = vende() ? '' : 'none';
+    $('bloqueSoporte').style.display = vende() ? '' : 'none';
     $('ventas').required = $('rango_ganancias').required = vende();
   }
   syncVendiendo();
@@ -862,6 +917,15 @@
     try { return VIDEO_HOSTS.test(new URL(href).hostname) ? href : false; } catch (e) { return false; }
   }
 
+  // Fotos: enlace a una carpeta compartida (Drive, o las nubes más comunes).
+  const FOTOS_OBLIGATORIAS = true;
+  const FOTOS_HOSTS = /(^|\.)(drive\.google\.com|docs\.google\.com|photos\.google\.com|photos\.app\.goo\.gl|dropbox\.com|1drv\.ms|onedrive\.live\.com)$/i;
+  function fotosUrl(){
+    const href = normalizeUrl($('fotosEnlace').value);
+    if (!href) return href;
+    try { return FOTOS_HOSTS.test(new URL(href).hostname) ? href : false; } catch (e) { return false; }
+  }
+
   // ---------- Adjuntos ----------
   function fmtSize(b){ return b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
   function fileProblem(input){
@@ -888,6 +952,8 @@
     meta.classList.add('on');
   }
   const fileInputs = [...form.querySelectorAll('.file input[type=file]')];
+  const soporteInputs = fileInputs.filter(i => i.closest('#bloqueSoporte'));
+  const docInputs = fileInputs.filter(i => !i.closest('#bloqueSoporte'));
   fileInputs.forEach(input => input.addEventListener('change', () => { renderFileMeta(input); onChange(); }));
 
   // ---------- Reglas (validación, progreso y resumen salen de aquí) ----------
@@ -918,8 +984,13 @@
       msg: () => redesValues().some(r => r.raw.trim()) ? 'Revisa los enlaces marcados: deben ser una dirección web válida o un @usuario.' : 'Agrega al menos una red social del emprendimiento (enlace o @usuario).' },
     { sec:'sec-4', el:$('web'), label:'Página web', optional:true, test: () => normalizeUrl($('web').value) !== false },
     { sec:'sec-4', el:$('necesitaChips'), label:'Lo que más necesita tu emprendimiento', test: () => { const n = necesitaChips.boxes.filter(b => b.checked).length; return n >= 1 && n <= 3; } },
-    ...fileInputs.map(input => ({ sec:'sec-6', el:input, label:input.dataset.label, test: () => fileProblem(input) === null })),
+    ...soporteInputs.map((input, i) => i === 0
+      ? { sec:'sec-4', el:input, label:input.dataset.label, countIf: vende, test: () => !vende() || fileProblem(input) === null }
+      : { sec:'sec-4', el:input, label:input.dataset.label, optional:true, test: () => !vende() || !input.files[0] || fileProblem(input) === null }),
+    ...docInputs.map(input => ({ sec:'sec-6', el:input, label:input.dataset.label, test: () => fileProblem(input) === null })),
     { sec:'sec-6', el:$('videoEnlace'), label:'Enlace del video', test: () => !!videoUrl() },
+    { sec:'sec-6', el:$('fotosEnlace'), label:'Fotos de tu servicio o productos', optional: !FOTOS_OBLIGATORIAS, test: () => FOTOS_OBLIGATORIAS ? !!fotosUrl() : fotosUrl() !== false,
+      msg: () => $('fotosEnlace').value.trim() ? 'Pega un enlace de Google Drive (o de Dropbox, OneDrive o Google Fotos).' : 'Pega el enlace de la carpeta de Drive con las fotos.' },
     { sec:'sec-7', el:$('terminos'), label:'Aceptación de términos y condiciones', test: () => $('terminos').checked },
     { sec:'sec-7', el:$('datos'), label:'Autorización de tratamiento de datos', test: () => $('datos').checked },
   ];
@@ -1098,6 +1169,7 @@
       esta_vendiendo: siNo($('vendiendo').value),
       necesidades: necesitaChips.boxes.filter(b => b.checked).map(b => b.value),
       video_url: videoUrl(),
+      fotos_enlace: fotosUrl() || null,
       documentos: documentos,
     };
   }
@@ -1132,7 +1204,9 @@
     try {
       const documentos = {};
       const DOCS = [['cedula', 'fCedula'], ['rut', 'fRut'], ['recibo_triple_a', 'fRecibo']];
-      for (const [key, inputId] of DOCS) {
+      // Los soportes de ventas solo viajan si responde que vende (si cambió a «No», se descartan).
+      const soportes = vende() ? soporteInputs.map((inp, i) => ['soporte_ventas_' + (i + 1), inp.id]).filter(([, inpId]) => $(inpId).files[0]) : [];
+      for (const [key, inputId] of DOCS.concat(soportes)) {
         const file = $(inputId).files[0];
         const path = id + '/' + key + '.' + extOf(file);
         submitBtn.querySelector('span').textContent = 'Subiendo documentos…';

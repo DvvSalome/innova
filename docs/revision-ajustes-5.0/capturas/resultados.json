@@ -387,7 +387,7 @@
   "grupo": "6. Textos y reglas nuevas",
   "n": "Al abrirlo, la página queda en la sección «Etapas»",
   "ok": true,
-  "d": "{\"arriba\":68,\"alto\":900,\"h2\":\"Etapas\"}"
+  "d": "{\"arriba\":70,\"alto\":900,\"h2\":\"Etapas\"}"
  },
  {
   "grupo": "6. Textos y reglas nuevas",
@@ -396,13 +396,175 @@
   "d": ""
  },
  {
-  "grupo": "7. Celular (390 px)",
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "El soporte de ventas empieza oculto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Con «Sí» aparecen 4 espacios para documentos",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Explica los tipos válidos: factura electrónica, cuenta de cobro, certificación comercial y contrato",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Solo el primero es obligatorio; los otros dicen «opcional»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Con «No» el bloque desaparece",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "«Sí» sin ningún documento soporte: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "El aviso nombra «Documento soporte de ventas 1»",
+  "ok": true,
+  "d": "Documento soporte de ventas 1 · Impacto y ODS"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Un soporte .exe en el espacio 2 NO deja enviar",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Un soporte de 10,5 MB NO deja enviar",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Fotos vacío: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Fotos «javascript:»: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Fotos en un sitio que no es una nube de archivos: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Sin enlace de fotos el aviso lo pide",
+  "ok": true,
+  "d": "Pega el enlace de la carpeta de Drive con las fotos."
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "«Sí» con 3 documentos soporte y fotos: se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Guarda cedula, rut, recibo y soporte_ventas_1 a 3",
+  "ok": true,
+  "d": "cedula,recibo_triple_a,rut,soporte_ventas_1,soporte_ventas_2,soporte_ventas_3"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Sube 6 archivos a la carpeta de esa postulación",
+  "ok": true,
+  "d": "6"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Guarda el enlace de fotos de Drive",
+  "ok": true,
+  "d": "https://drive.google.com/drive/folders/abc123?usp=sharing"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Panel: la ficha de quien vende muestra «Soporte de ventas 1», 2 y 3",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Panel: muestra el enlace de fotos como vínculo seguro",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "CSV: incluye la columna fotos_enlace y su valor",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "CSV: la columna documentos lista los soportes",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Sin errores de JavaScript en el panel (quien vende)",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Si cambia a «No» después de elegir archivos, igual se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "…y los soportes NO se suben ni se guardan",
+  "ok": true,
+  "d": "3"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "…y queda ventas 0 y sin ganancias",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Panel: quien no vende no muestra soportes ni «sin adjunto» de soportes",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Sin errores de JavaScript en el panel (quien no vende)",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "8. Celular (390 px)",
   "n": "Sin desplazamiento horizontal",
   "ok": true,
   "d": "ancho=390"
  },
  {
-  "grupo": "7. Celular (390 px)",
+  "grupo": "8. Celular (390 px)",
   "n": "Sin errores de JavaScript",
   "ok": true,
   "d": ""

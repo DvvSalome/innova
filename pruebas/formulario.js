@@ -60,10 +60,13 @@ await (async () => {
     await p.selectOption('#vendiendo', vende ? 'Sí' : 'No');
     if (vende) { await p.fill('#ventas', '2500000'); await pick(p, 'rango_ganancias', 3); }
     await p.fill('#redesList .red-row input', '@minegocio');
+    if (vende) await p.setInputFiles('#fSoporte1', F + '/doc.pdf');
     await p.fill('#inversion', txt(200, pre));
     await p.locator('#necesitaChips label.chip').first().click(); await p.locator('#necesitaChips label.chip').nth(1).click();
     for (const id of ['fCedula', 'fRut', 'fRecibo']) await p.setInputFiles('#' + id, F + '/doc.pdf');
-    await p.fill('#videoEnlace', 'https://youtube.com/watch?v=abc123'); await p.check('#terminos'); await p.check('#datos');
+    await p.fill('#videoEnlace', 'https://youtube.com/watch?v=abc123');
+    await p.fill('#fotosEnlace', 'https://drive.google.com/drive/folders/abc123?usp=sharing');
+    await p.check('#terminos'); await p.check('#datos');
   }
 
   // ===== 1. Estructura del formulario =====
@@ -111,7 +114,7 @@ await (async () => {
   await p.waitForTimeout(700); await p.reload(); await p.waitForTimeout(1200);
   ok(G2, 'El borrador recupera «Sí» y muestra ventas/ganancia', (await p.$eval('#vendiendo', e => e.value)) === 'Sí' && await p.isVisible('#bloqueVentas'));
   ok(G2, 'El borrador recupera discapacidad y su tipo', (await p.$eval('#discapacidad', e => e.value)) === 'tiene_discapacidad' && (await p.$eval('#tipo_discapacidad', e => e.value)) !== '');
-  for (const id of ['fCedula', 'fRut', 'fRecibo']) await p.setInputFiles('#' + id, F + '/doc.pdf');
+  for (const id of ['fCedula', 'fRut', 'fRecibo', 'fSoporte1']) await p.setInputFiles('#' + id, F + '/doc.pdf');
   await p.fill('#ventas', '2500000'); await p.click('#submitBtn'); await p.waitForTimeout(3500);
   ok(G2, '«Sí» completo: se envía', await p.isVisible('#successCard'));
   await cap(p, '#successCard', '09-envio-exitoso');
@@ -251,8 +254,98 @@ await (async () => {
   ok(G7, 'Convocatoria: el requisito de video dice 3 minutos', /máximo 3 minutos/.test(conv) && !/90 segundos/.test(conv));
   await ctx.close();
 
+  // ===== 8. Documentos soporte de ventas y fotos =====
+  const G8 = '7. Soporte de ventas y fotos';
+  ({ ctx, p } = await nuevo());
+  ok(G8, 'El soporte de ventas empieza oculto', !(await p.isVisible('#bloqueSoporte')));
+  await p.selectOption('#vendiendo', 'Sí');
+  ok(G8, 'Con «Sí» aparecen 4 espacios para documentos', await p.isVisible('#bloqueSoporte') && (await p.$$('#bloqueSoporte input[type=file]')).length === 4);
+  const txtSop = await p.$eval('#bloqueSoporte', e => e.innerText);
+  ok(G8, 'Explica los tipos válidos: factura electrónica, cuenta de cobro, certificación comercial y contrato', /factura electrónica/.test(txtSop) && /cuenta de cobro/.test(txtSop) && /certificación comercial/.test(txtSop) && /contrato/.test(txtSop));
+  ok(G8, 'Solo el primero es obligatorio; los otros dicen «opcional»', /Documento 1 \*/.test(txtSop) && (txtSop.match(/opcional/g) || []).length === 3);
+  await p.selectOption('#vendiendo', 'No');
+  ok(G8, 'Con «No» el bloque desaparece', !(await p.isVisible('#bloqueSoporte')));
+  await p.selectOption('#vendiendo', 'Sí');
+  await cap(p, '#bloqueSoporte', '22-soporte-de-ventas');
+  // «Sí» sin ningún soporte
+  await llenar(p, { cedula: '6666666666', correo: 'soporte@example.com', vende: true });
+  await p.evaluate(() => { const i = document.getElementById('fSoporte1'); i.value = ''; i.dispatchEvent(new Event('change', { bubbles: true })); });
+  await p.click('#submitBtn'); await p.waitForTimeout(800);
+  ok(G8, '«Sí» sin ningún documento soporte: NO se envía', !(await p.isVisible('#successCard')));
+  const pendS = await p.$eval('#pendingList', e => e.innerText);
+  ok(G8, 'El aviso nombra «Documento soporte de ventas 1»', /Documento soporte de ventas 1/.test(pendS), pendS.replace(/\s+/g, ' ').slice(0, 90));
+  await cap(p, '#bloqueSoporte', '23-soporte-obligatorio');
+  // soporte inválido en el espacio 2
+  await p.setInputFiles('#fSoporte1', F + '/doc.pdf'); await p.setInputFiles('#fSoporte2', F + '/virus.exe');
+  await p.click('#submitBtn'); await p.waitForTimeout(700);
+  ok(G8, 'Un soporte .exe en el espacio 2 NO deja enviar', !(await p.isVisible('#successCard')));
+  await p.setInputFiles('#fSoporte2', F + '/grande.pdf');
+  await p.click('#submitBtn'); await p.waitForTimeout(700);
+  ok(G8, 'Un soporte de 10,5 MB NO deja enviar', !(await p.isVisible('#successCard')));
+  // fotos
+  await p.setInputFiles('#fSoporte2', []);
+  for (const [v, nombre] of [['', 'vacío'], ['javascript:alert(1)', '«javascript:»'], ['https://ejemplo.com/fotos', 'en un sitio que no es una nube de archivos']]) {
+    await p.fill('#fotosEnlace', v); await p.click('#submitBtn'); await p.waitForTimeout(600);
+    ok(G8, `Fotos ${nombre}: NO se envía`, !(await p.isVisible('#successCard')));
+  }
+  await p.fill('#fotosEnlace', ''); await p.click('#submitBtn'); await p.waitForTimeout(500);
+  const errFotos = await p.$eval('#fotosEnlace', e => e.closest('.field').querySelector('.err').innerText);
+  ok(G8, 'Sin enlace de fotos el aviso lo pide', /Pega el enlace de la carpeta de Drive/.test(errFotos), errFotos);
+  await cap(p, '#fotosEnlace >> xpath=ancestor::div[contains(@class,"field")]', '24-fotos-drive');
+  await p.fill('#fotosEnlace', 'https://drive.google.com/drive/folders/abc123?usp=sharing');
+  // envío con 3 soportes
+  await p.setInputFiles('#fSoporte2', F + '/doc.pdf'); await p.setInputFiles('#fSoporte3', F + '/doc.pdf');
+  await p.click('#submitBtn'); await p.waitForTimeout(4500);
+  ok(G8, '«Sí» con 3 documentos soporte y fotos: se envía', await p.isVisible('#successCard'));
+  let st8 = await estado(p);
+  const sp = st8.postulaciones.find(x => x.correo === 'soporte@example.com');
+  const claves = sp ? Object.keys(typeof sp.documentos === 'string' ? JSON.parse(sp.documentos) : sp.documentos).sort() : [];
+  ok(G8, 'Guarda cedula, rut, recibo y soporte_ventas_1 a 3', claves.join(',') === 'cedula,recibo_triple_a,rut,soporte_ventas_1,soporte_ventas_2,soporte_ventas_3', claves.join(','));
+  ok(G8, 'Sube 6 archivos a la carpeta de esa postulación', sp && st8.storage.filter(x => x.bucket === 'postulaciones' && x.name.startsWith(sp.id + '/')).length === 6, sp && String(st8.storage.filter(x => x.name.startsWith(sp.id + '/')).length));
+  ok(G8, 'Guarda el enlace de fotos de Drive', sp && sp.fotos_enlace === 'https://drive.google.com/drive/folders/abc123?usp=sharing', sp && sp.fotos_enlace);
+  // Panel con la postulación que sí vende: ficha y CSV
+  const a8 = await ctx.newPage(); a8.errs = []; a8.on('pageerror', e => a8.errs.push(e.message));
+  const entrarPanel = async () => { await a8.goto(BASE + '/admin.html'); await a8.waitForTimeout(1500);
+    if (await a8.isVisible('#loginEmail')) { await a8.fill('#loginEmail', 'admin@prueba.local'); await a8.fill('#loginPassword', 'Prueba-2026!'); await a8.click('#loginBtn'); await a8.waitForTimeout(2500); }
+    await a8.click('.navlink[data-view="participantes"]'); await a8.waitForTimeout(1500); };
+  const abrirFicha = async (mail) => { await a8.locator('tr', { hasText: mail }).filter({ has: a8.locator('[data-ver]') }).first().locator('[data-ver]').click(); await a8.waitForTimeout(1000); return await a8.$eval('#genBody', e => e.textContent); };
+  await entrarPanel();
+  const fSi = await abrirFicha('soporte@example.com');
+  ok(G8, 'Panel: la ficha de quien vende muestra «Soporte de ventas 1», 2 y 3', /Soporte de ventas 1/.test(fSi) && /Soporte de ventas 2/.test(fSi) && /Soporte de ventas 3/.test(fSi) && !/Soporte de ventas 4/.test(fSi));
+  ok(G8, 'Panel: muestra el enlace de fotos como vínculo seguro', await a8.$eval('#genBody', e => [...e.querySelectorAll('a')].some(x => x.href.startsWith('https://drive.google.com/') && x.rel.includes('noopener'))));
+  await a8.evaluate(() => { const k = [...document.querySelectorAll('#genBody .k')].find(x => /Documentos adjuntos/i.test(x.textContent)); if (k) k.scrollIntoView({ block: 'center' }); }); await a8.waitForTimeout(300);
+  await a8.screenshot({ path: `${CAP}/25-panel-soporte-y-fotos.png` });
+  await entrarPanel();
+  const [dl] = await Promise.all([a8.waitForEvent('download', { timeout: 8000 }).catch(() => null), a8.click('#btnExportar')]);
+  let csv = ''; if (dl) { const fs = await import('node:fs'); csv = fs.readFileSync(await dl.path(), 'utf8'); }
+  ok(G8, 'CSV: incluye la columna fotos_enlace y su valor', /fotos_enlace/.test(csv.split('\n')[0]) && csv.includes('https://drive.google.com/drive/folders/abc123?usp=sharing'));
+  ok(G8, 'CSV: la columna documentos lista los soportes', /soporte_ventas_1: /.test(csv) && /soporte_ventas_3: /.test(csv));
+  ok(G8, 'Sin errores de JavaScript en el panel (quien vende)', a8.errs.length === 0, a8.errs.join(' | '));
+  await ctx.close();
+  // «Sí» elige archivos y luego cambia a «No»: no se suben
+  ({ ctx, p } = await nuevo());
+  await llenar(p, { cedula: '7777777777', correo: 'cambio@example.com', vende: true });
+  await p.setInputFiles('#fSoporte2', F + '/doc.pdf');
+  await p.selectOption('#vendiendo', 'No'); await p.click('#submitBtn'); await p.waitForTimeout(4500);
+  ok(G8, 'Si cambia a «No» después de elegir archivos, igual se envía', await p.isVisible('#successCard'));
+  st8 = await estado(p);
+  const cm = st8.postulaciones.find(x => x.correo === 'cambio@example.com');
+  ok(G8, '…y los soportes NO se suben ni se guardan', cm && st8.storage.filter(x => x.name.startsWith(cm.id + '/')).length === 3 && !JSON.stringify(cm.documentos).includes('soporte'), cm && String(st8.storage.filter(x => x.name.startsWith(cm.id + '/')).length));
+  ok(G8, '…y queda ventas 0 y sin ganancias', cm && Number(cm.promedio_ventas_6_meses) === 0 && cm.rango_ganancias === 'Aún no tengo ganancias');
+  // Panel con la postulación que NO vende
+  const a9 = await ctx.newPage(); a9.errs = []; a9.on('pageerror', e => a9.errs.push(e.message));
+  const entrarPanel9 = async () => { await a9.goto(BASE + '/admin.html'); await a9.waitForTimeout(1500);
+    if (await a9.isVisible('#loginEmail')) { await a9.fill('#loginEmail', 'admin@prueba.local'); await a9.fill('#loginPassword', 'Prueba-2026!'); await a9.click('#loginBtn'); await a9.waitForTimeout(2500); }
+    await a9.click('.navlink[data-view="participantes"]'); await a9.waitForTimeout(1500); };
+  const abrirFicha9 = async (mail) => { await a9.locator('tr', { hasText: mail }).filter({ has: a9.locator('[data-ver]') }).first().locator('[data-ver]').click(); await a9.waitForTimeout(1000); return await a9.$eval('#genBody', e => e.textContent); };
+  await entrarPanel9();
+  const fNo = await abrirFicha9('cambio@example.com');
+  ok(G8, 'Panel: quien no vende no muestra soportes ni «sin adjunto» de soportes', !/Soporte de ventas/.test(fNo));
+  ok(G8, 'Sin errores de JavaScript en el panel (quien no vende)', a9.errs.length === 0, a9.errs.join(' | '));
+  await ctx.close();
+
   // ===== 6. Celular =====
-  const G6 = '7. Celular (390 px)';
+  const G6 = '8. Celular (390 px)';
   ({ ctx, p } = await nuevo({ width: 390, height: 844 }));
   const ancho = await p.evaluate(() => document.documentElement.scrollWidth);
   ok(G6, 'Sin desplazamiento horizontal', ancho <= 390, 'ancho=' + ancho);

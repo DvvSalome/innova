@@ -1243,10 +1243,12 @@
     const redes = partRedes(p);
     const linksExtras = kv('Redes sociales', redes.length ? redes.map(r => esc(r.red) + ': ' + linkHtml(r.url)).join('<br>') : 'Sin redes')
       + kv('Página web', p.pagina_web ? linkHtml(p.pagina_web) : '—')
-      + kv('Video', p.video_url ? linkHtml(p.video_url) : '—');
+      + kv('Video', p.video_url ? linkHtml(p.video_url) : '—')
+      + kv('Fotos de productos o servicios', p.fotos_enlace ? linkHtml(p.fotos_enlace) : '—');
     let docs = p.documentos || {}; if (typeof docs === 'string') { try { docs = JSON.parse(docs); } catch(e){ docs = {}; } }
-    const DOCN = { cedula: 'Documento de identidad', rut: 'RUT', recibo_triple_a: 'Recibo Triple A' };
-    const docsExtras = kv('Documentos adjuntos', Object.keys(DOCN).map(k => docs[k]
+    const DOCN = { cedula: 'Documento de identidad', rut: 'RUT', recibo_triple_a: 'Recibo Triple A', soporte_ventas_1: 'Soporte de ventas 1', soporte_ventas_2: 'Soporte de ventas 2', soporte_ventas_3: 'Soporte de ventas 3', soporte_ventas_4: 'Soporte de ventas 4' };
+    // Los soportes de ventas solo se listan si existen: quien no vende no los tiene.
+    const docsExtras = kv('Documentos adjuntos', Object.keys(DOCN).filter(k => docs[k] || k.indexOf('soporte_ventas_') !== 0).map(k => docs[k]
       ? '<button type="button" class="btn ghost sm" style="margin:2px 4px 2px 0" data-doc="' + esc(docs[k]) + '">' + DOCN[k] + ' ↗</button>'
       : '<span class="muted" style="font-size:12.5px;margin-right:8px">' + DOCN[k] + ': sin adjunto</span>').join(''));
     const L = [['Producto o servicio', p.descripcion_producto], ['Problema que resuelve', p.descripcion_problema], ['Impacto', p.descripcion_impacto], ['Clientes', p.descripcion_clientes], ['Por qué necesita el recurso y en qué lo invertiría', p.uso_recurso]];
