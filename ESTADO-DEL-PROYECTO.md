@@ -1,6 +1,6 @@
 # Estado del proyecto — Innova Social 5.0
 
-Actualizado: 15 nov 2026. Sitio publicado: https://www.innovasocial.co (también `innovasocial.co`, que redirige a www, y `convocatoria.innovasocial.co`; Vercel, se despliega solo al subir a `main`). Proyecto Supabase: `yivyqorgcagwykedngjv`.
+Actualizado: 16 nov 2026. Sitio publicado: https://www.innovasocial.co (también `innovasocial.co`, que redirige a www, y `convocatoria.innovasocial.co`; Vercel, se despliega solo al subir a `main`). Proyecto Supabase: `yivyqorgcagwykedngjv`.
 
 Este documento resume qué está hecho y qué falta. El detalle de cada prueba está en [AUDITORIA-BACKEND.md](AUDITORIA-BACKEND.md). Cómo aplicar migraciones y desplegar la función de correos está en [supabase/README.md](supabase/README.md). El recorrido de punta a punta por rol, con capturas, está en `docs/flujo-e2e/informe.html`. La revisión de los ajustes de noviembre, con capturas, está en `docs/revision-ajustes-5.0/informe.html`.
 
@@ -10,8 +10,9 @@ Este documento resume qué está hecho y qué falta. El detalle de cada prueba e
 - **Dominio:** `innovasocial.co` (A → 216.198.79.1) y `www` (CNAME → cname.vercel-dns.com) apuntan a Vercel desde el 10 nov; el DNS sigue en Hostinger.
 - **Supabase Auth:** URL permitidas de `acceso.html` en los tres dominios y registro público cerrado. `site_url` ahora es `https://www.innovasocial.co`.
 - **Rotos:** los PDFs de `files_web/` (términos de referencia, política de datos, preguntas frecuentes y resumen PNNV) dan 404 desde que el dominio apunta a Vercel; hay que subirlos al repo.
-- **En la rama `claude/magical-carson-kr6epc`, sin publicar:** secciones del formulario reorganizadas («Contexto adicional» desaparece; «¿Estás vendiendo?» decide si se piden ventas y ganancia), una postulación por cédula y la base para documentos soporte de ventas y fotos (migraciones `20261110120000` y `20261115120000`, **sin aplicar**: se pegan juntas desde `supabase/APLICAR-EN-SQL-EDITOR.sql`; hay que aplicarlas **antes** de publicar la rama, porque el formulario nuevo escribe `fotos_enlace`), documentos soporte de ventas (hasta 4, obligatorio el primero si vende) y fotos con enlace de Drive (obligatorias), visibles en la ficha del panel y en el CSV, beneficio de $12M, notas de ventas y ganancia, redes obligatorias, video de 3 minutos, nube de tipología y «Ruta del programa» llevando a `convocatoria.html#etapas`.
-- **Pendientes de la reunión:** enlace al PNNV, texto de política de datos y galería.
+- **Publicado el 16 nov (commit `b164bfb`)** y verificado en `www.innovasocial.co`: secciones del formulario reorganizadas («Contexto adicional» desaparece; «¿Estás vendiendo?» decide si se piden ventas y ganancia), documentos soporte de ventas (hasta 4; el primero es obligatorio si vende), fotos con enlace de Drive (obligatorias; para hacerlas opcionales, `FOTOS_OBLIGATORIAS` en `postular.html`), nube de tipología, redes obligatorias, video de 3 minutos, notas de ventas y ganancia, beneficio de $12M y «Ruta del programa» hacia `convocatoria.html#etapas`. El panel y el CSV muestran los campos nuevos.
+- **Base de datos:** el 16 nov se aplicó `supabase/APLICAR-EN-SQL-EDITOR.sql` (cédula única, `fotos_enlace` y subida de `soporte_ventas_1` a 4). Permisos: 70 de 70 contra producción.
+- **Pendientes de la reunión:** enlace al PNNV, texto de política de datos y galería. Y los 4 PDFs de `files_web/` (404).
 
 ---
 
