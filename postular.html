@@ -144,6 +144,14 @@
   /* Ayudas y contadores */
   .field .help{ font-size:12px; color:var(--muted); line-height:1.45; background:var(--paper2); border-radius:10px; padding:9px 11px; }
   .field .help b{ color:var(--ink); }
+  .label-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .nube-btn{ font:700 12px "Nunito",sans-serif; color:var(--blue-deep); background:#fff; border:1px solid var(--blue); border-radius:100px; padding:4px 11px; cursor:pointer; }
+  .nube-btn:hover, .nube-btn[aria-expanded="true"]{ background:var(--paper2); }
+  .nube-btn:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
+  .nube{ position:relative; background:var(--paper2); border:1px solid var(--blue); border-radius:18px; padding:12px 16px; font-size:13px; line-height:1.5; color:var(--ink); display:grid; gap:8px; margin:6px 0 4px; }
+  .nube[hidden]{ display:none; }
+  .nube::before{ content:""; position:absolute; top:-8px; left:28px; width:14px; height:14px; background:var(--paper2); border-left:1px solid var(--blue); border-top:1px solid var(--blue); transform:rotate(45deg); }
+  .nube p{ margin:0; }
   .charline{ display:flex; justify-content:space-between; gap:10px; font-size:11.5px; color:var(--muted); }
   .charline .cc{ font-variant-numeric:tabular-nums; white-space:nowrap; }
   .charline .cc.low{ color:#B7353A; font-weight:600; }
@@ -362,11 +370,17 @@
           <span class="err">Escribe el nombre de tu emprendimiento.</span>
         </div>
         <div class="field" style="grid-column:1/-1;">
-          <label for="tipoemp">Tipo de emprendimiento *</label>
+          <div class="label-row">
+            <label for="tipoemp">Tipo de emprendimiento *</label>
+            <button type="button" class="nube-btn" id="nubeBtn" aria-expanded="false" aria-controls="nubeTipo">¿Cuál es la diferencia?</button>
+          </div>
+          <div class="nube" id="nubeTipo" role="note" hidden>
+            <p><b>Emprendimiento verde:</b> una iniciativa en etapa temprana que ofrece un producto o servicio con impacto ambiental positivo, pero todavía no ha sido verificada.</p>
+            <p><b>Negocio verde:</b> un negocio en operación que ya cumple, o tiene verificados por la autoridad ambiental, los criterios del Plan Nacional de Negocios Verdes.</p>
+          </div>
           <select id="tipoemp" required>
             <option value="">Selecciona...</option><option>Emprendimiento verde</option><option>Negocio verde</option>
           </select>
-          <span class="help"><b>Emprendimiento verde:</b> una iniciativa en etapa temprana que ofrece un producto o servicio con impacto ambiental positivo, pero todavía no ha sido verificada. <b>Negocio verde:</b> un negocio en operación que ya cumple, o tiene verificados por la autoridad ambiental, los criterios del Plan Nacional de Negocios Verdes.</span>
           <span class="err">Selecciona una opción.</span>
         </div>
         <div class="field">
@@ -483,7 +497,7 @@
         <div class="field">
           <label for="ventas">Promedio mensual de ventas en los últimos 6 meses (COP) *</label>
           <input type="text" id="ventas" inputmode="numeric" placeholder="Ej: 1.500.000" required autocomplete="off">
-          <span class="hint">Solo números.</span>
+          <span class="help"><b>Lo que facturas.</b> Es el total que vendiste cada mes, antes de restar costos y gastos. Solo números.</span>
           <span class="err">Ingresa un valor en pesos (solo números).</span>
         </div>
         <div class="field">
@@ -497,14 +511,15 @@
             <option>$3.000.000 – $5.000.000</option>
             <option>Más de $5.000.000</option>
           </select>
+          <span class="help"><b>Lo que te queda.</b> Es lo que sobra después de pagar costos y gastos. No es lo mismo que lo facturado: si vendes $2.000.000 y gastas $1.500.000, tu ganancia es $500.000.</span>
           <span class="err">Selecciona un rango.</span>
         </div>
       </div>
       <div class="field">
-        <label>Redes sociales del emprendimiento <span class="hint">(opcional, hasta 3)</span></label>
+        <label>Redes sociales del emprendimiento * <span class="hint">(al menos una, hasta 3)</span></label>
         <div class="redes-list" id="redesList"></div>
         <button type="button" class="add-red" id="addRed">+ Agregar otra red</button>
-        <span class="hint">Pega el enlace o escribe tu @usuario. Si todavía no tienes redes, puedes dejarlo vacío.</span>
+        <span class="hint">Pega el enlace o escribe tu @usuario.</span>
         <span class="err" id="redesErr">Revisa los enlaces marcados: deben ser una dirección web válida o un @usuario.</span>
       </div>
       <div class="field">
@@ -575,7 +590,8 @@
       <div class="field">
         <label for="videoEnlace">Enlace del video del emprendimiento *</label>
         <input type="text" id="videoEnlace" inputmode="url" placeholder="https://youtube.com/watch?v=..." required>
-        <span class="hint">Máximo 90 segundos. Súbelo a YouTube, Google Drive o Vimeo y verifica que sea público o que cualquier persona con el enlace pueda verlo.</span>
+        <span class="help"><b>Máximo 3 minutos.</b> Cuéntanos tres cosas: que tu emprendimiento existe, cuál es tu propuesta de valor y por qué deberías ser elegido en esta versión de Innova Social.</span>
+        <span class="hint">Súbelo a YouTube, Google Drive o Vimeo y verifica que sea público o que cualquier persona con el enlace pueda verlo.</span>
         <span class="err">Pega un enlace de YouTube, Google Drive o Vimeo.</span>
       </div>
       <p class="hint" style="margin:6px 0 0; font-size:11.5px; color:var(--muted);">Por seguridad, los documentos adjuntos no se guardan en el borrador: si recargas la página, tendrás que volver a subirlos.</p>
@@ -669,6 +685,13 @@
     if (!tiene) tipoDiscapacidadInput.value = '';
   }
   discapacidadSelect.addEventListener('change', syncDiscapacidad);
+
+  // ---------- Nube: tipología de negocios ----------
+  const nubeBtn = $('nubeBtn'), nubeTipo = $('nubeTipo');
+  function nube(abrir){ nubeTipo.hidden = !abrir; nubeBtn.setAttribute('aria-expanded', String(abrir)); }
+  nubeBtn.addEventListener('click', () => nube(nubeTipo.hidden));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !nubeTipo.hidden) { nube(false); nubeBtn.focus(); } });
+  document.addEventListener('click', (e) => { if (!nubeTipo.hidden && !nubeTipo.contains(e.target) && e.target !== nubeBtn) nube(false); });
 
   // ---------- ¿Estás vendiendo? ----------
   // Ventas y ganancia solo se piden (y se exigen) a quien vende hoy.
@@ -891,7 +914,8 @@
     req('vendiendo', 'sec-4'),
     { sec:'sec-4', el:ventas, label:'Promedio mensual de ventas', countIf: vende, test: () => !vende() || ventasNumero() !== null },
     { sec:'sec-4', el:$('rango_ganancias'), label:'Ganancia mensual promedio', countIf: vende, test: () => !vende() || $('rango_ganancias').value !== '' },
-    { sec:'sec-4', el:redesList, label:'Redes sociales', optional:true, test: () => redesValues().every(r => normalizeRed(r.red, r.raw) !== false) },
+    { sec:'sec-4', el:redesList, label:'Redes sociales', test: () => { const v = redesValues().map(r => normalizeRed(r.red, r.raw)); return v.some(x => x) && v.every(x => x !== false); },
+      msg: () => redesValues().some(r => r.raw.trim()) ? 'Revisa los enlaces marcados: deben ser una dirección web válida o un @usuario.' : 'Agrega al menos una red social del emprendimiento (enlace o @usuario).' },
     { sec:'sec-4', el:$('web'), label:'Página web', optional:true, test: () => normalizeUrl($('web').value) !== false },
     { sec:'sec-4', el:$('necesitaChips'), label:'Lo que más necesita tu emprendimiento', test: () => { const n = necesitaChips.boxes.filter(b => b.checked).length; return n >= 1 && n <= 3; } },
     ...fileInputs.map(input => ({ sec:'sec-6', el:input, label:input.dataset.label, test: () => fileProblem(input) === null })),

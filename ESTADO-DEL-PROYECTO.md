@@ -8,10 +8,10 @@ Este documento resume qué está hecho y qué falta. El detalle de cada prueba e
 
 - **Formulario abierto** en los tres dominios (interruptor `POSTULACIONES_ABIERTAS` en `postular.html`). Hay 2 postulaciones reales (16 y 22 oct) con sus documentos y correos enviados.
 - **Dominio:** `innovasocial.co` (A → 216.198.79.1) y `www` (CNAME → cname.vercel-dns.com) apuntan a Vercel desde el 10 nov; el DNS sigue en Hostinger.
-- **Supabase Auth:** URL permitidas de `acceso.html` en los tres dominios y registro público cerrado. `site_url` sigue en `http://localhost:3000`.
+- **Supabase Auth:** URL permitidas de `acceso.html` en los tres dominios y registro público cerrado. `site_url` ahora es `https://www.innovasocial.co`.
 - **Rotos:** los PDFs de `files_web/` (términos de referencia, política de datos, preguntas frecuentes y resumen PNNV) dan 404 desde que el dominio apunta a Vercel; hay que subirlos al repo.
-- **En la rama `claude/magical-carson-kr6epc`, sin publicar:** secciones del formulario reorganizadas («Contexto adicional» desaparece; «¿Estás vendiendo?» decide si se piden ventas y ganancia) y una postulación por cédula. La migración `20261110120000_una_postulacion_por_cedula.sql` **no está aplicada**.
-- **Pendientes de la reunión:** beneficio a $12M, notas de ventas y ganancia, redes obligatorias, video de 3 min, nube de tipología, enlace al PNNV, texto de política de datos, enlace de «Ruta del programa» a etapas, galería, documentos soporte de ventas y fotos por Drive.
+- **En la rama `claude/magical-carson-kr6epc`, sin publicar:** secciones del formulario reorganizadas («Contexto adicional» desaparece; «¿Estás vendiendo?» decide si se piden ventas y ganancia), una postulación por cédula (la migración `20261110120000_una_postulacion_por_cedula.sql` **no está aplicada**), beneficio de $12M, notas de ventas y ganancia, redes obligatorias, video de 3 minutos, nube de tipología y «Ruta del programa» llevando a `convocatoria.html#etapas`.
+- **Pendientes de la reunión:** enlace al PNNV, texto de política de datos, galería, documentos soporte de ventas y fotos por Drive (los dos últimos requieren migración).
 
 ---
 

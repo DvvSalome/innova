@@ -264,13 +264,145 @@
   "d": ""
  },
  {
-  "grupo": "6. Celular (390 px)",
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "La nube de tipología empieza cerrada",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Al pulsar «¿Cuál es la diferencia?» se abre y explica las dos tipologías",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Escape cierra la nube",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Pulsar fuera cierra la nube",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "La nube no empuja a «Tipo de emprendimiento» fuera del formulario (sigue el select)",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Ventas tiene la nota de «lo que facturas»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Ganancia tiene la nota de «lo que te queda» con un ejemplo",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Redes sociales ya no dice «opcional» y pide al menos una",
+  "ok": true,
+  "d": "Redes sociales del emprendimiento * (al menos una, hasta 3)"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Sin ninguna red social NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "El aviso pide agregar al menos una red",
+  "ok": true,
+  "d": "Agrega al menos una red social del emprendimiento (enlace o @usuario)."
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "El resumen de pendientes nombra «Redes sociales»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Una red con formato inválido tampoco deja enviar",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Con una red válida el envío pasa",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "La red se guarda como enlace",
+  "ok": true,
+  "d": "[{\"red\":\"Instagram\",\"url\":\"https://www.instagram.com/minegocio\"}]"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Video: «Máximo 3 minutos» con las tres cosas que debe contar",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Sin errores de JavaScript en el formulario",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Inicio: la cifra destacada es $12M",
+  "ok": true,
+  "d": "$12M en especie por ganador 15 municipios habilitados 6 meses de acompañamiento"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Inicio: «hasta $12.000.000 en especie» y ningún $10.000.000",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Inicio: el requisito de video dice 3 minutos",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "«Ruta del programa» ya no abre ruta.html: lleva a convocatoria.html#etapas",
+  "ok": true,
+  "d": "{\"href\":\"convocatoria.html#etapas\",\"txt\":\"Ruta del programa\\n→\"}"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Al abrirlo, la página queda en la sección «Etapas»",
+  "ok": true,
+  "d": "{\"arriba\":68,\"alto\":900,\"h2\":\"Etapas\"}"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Convocatoria: el requisito de video dice 3 minutos",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Celular (390 px)",
   "n": "Sin desplazamiento horizontal",
   "ok": true,
   "d": "ancho=390"
  },
  {
-  "grupo": "6. Celular (390 px)",
+  "grupo": "7. Celular (390 px)",
   "n": "Sin errores de JavaScript",
   "ok": true,
   "d": ""

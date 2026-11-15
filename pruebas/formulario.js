@@ -59,6 +59,7 @@ await (async () => {
     await p.fill('#producto', txt(200, pre)); await p.fill('#problema', txt(200, pre)); await p.fill('#impacto', txt(250, pre)); await p.fill('#clientes', txt(150, pre));
     await p.selectOption('#vendiendo', vende ? 'Sí' : 'No');
     if (vende) { await p.fill('#ventas', '2500000'); await pick(p, 'rango_ganancias', 3); }
+    await p.fill('#redesList .red-row input', '@minegocio');
     await p.fill('#inversion', txt(200, pre));
     await p.locator('#necesitaChips label.chip').first().click(); await p.locator('#necesitaChips label.chip').nth(1).click();
     for (const id of ['fCedula', 'fRut', 'fRecibo']) await p.setInputFiles('#' + id, F + '/doc.pdf');
@@ -186,8 +187,72 @@ await (async () => {
   await a2.screenshot({ path: `${CAP}/13b-panel-ficha-ventas.png` });
   await ctx.close();
 
+  // ===== 7. Ajustes del bloque 2 =====
+  const G7 = '6. Textos y reglas nuevas';
+  ({ ctx, p } = await nuevo());
+  // nube de tipología
+  ok(G7, 'La nube de tipología empieza cerrada', !(await p.isVisible('#nubeTipo')) && (await p.getAttribute('#nubeBtn', 'aria-expanded')) === 'false');
+  await p.click('#nubeBtn');
+  const nubeTxt = await p.$eval('#nubeTipo', e => e.innerText);
+  ok(G7, 'Al pulsar «¿Cuál es la diferencia?» se abre y explica las dos tipologías', await p.isVisible('#nubeTipo') && /Emprendimiento verde/.test(nubeTxt) && /Negocio verde/.test(nubeTxt) && (await p.getAttribute('#nubeBtn', 'aria-expanded')) === 'true');
+  await cap(p, '#tipoemp >> xpath=ancestor::div[contains(@class,"field")]', '16-nube-tipologia');
+  await p.keyboard.press('Escape');
+  ok(G7, 'Escape cierra la nube', !(await p.isVisible('#nubeTipo')));
+  await p.click('#nubeBtn'); await p.click('#empnombre');
+  ok(G7, 'Pulsar fuera cierra la nube', !(await p.isVisible('#nubeTipo')));
+  ok(G7, 'La nube no empuja a «Tipo de emprendimiento» fuera del formulario (sigue el select)', await p.isVisible('#tipoemp'));
+  // notas de ventas y ganancia
+  await p.selectOption('#vendiendo', 'Sí');
+  const notaV = await p.$eval('#ventas', e => e.closest('.field').innerText), notaG = await p.$eval('#rango_ganancias', e => e.closest('.field').innerText);
+  ok(G7, 'Ventas tiene la nota de «lo que facturas»', /Lo que facturas/.test(notaV) && /antes de restar costos y gastos/.test(notaV));
+  ok(G7, 'Ganancia tiene la nota de «lo que te queda» con un ejemplo', /Lo que te queda/.test(notaG) && /\$500\.000/.test(notaG));
+  await p.evaluate(() => document.getElementById('vendiendo').scrollIntoView({ block: 'start' })); await p.waitForTimeout(300);
+  await p.screenshot({ path: `${CAP}/17-notas-ventas-ganancia.png`, fullPage: true, clip: await p.evaluate(() => { const a = document.getElementById('bloqueVentas').getBoundingClientRect(); return { x: 220, y: a.top + scrollY - 14, width: 840, height: a.height + 28 }; }) });
+  // redes obligatorias
+  const etqRedes = await p.$eval('#redesList', e => e.closest('.field').querySelector('label').innerText);
+  ok(G7, 'Redes sociales ya no dice «opcional» y pide al menos una', !/opcional/i.test(etqRedes) && /\*/.test(etqRedes) && /al menos una/.test(etqRedes), etqRedes.replace(/\s+/g, ' '));
+  await llenar(p, { cedula: '5555555555', correo: 'redes@example.com', vende: false });
+  await p.fill('#redesList .red-row input', ''); await p.click('#submitBtn'); await p.waitForTimeout(800);
+  ok(G7, 'Sin ninguna red social NO se envía', !(await p.isVisible('#successCard')));
+  const errRedes = await p.$eval('#redesErr', e => ({ visible: getComputedStyle(e).display !== 'none', txt: e.innerText }));
+  ok(G7, 'El aviso pide agregar al menos una red', errRedes.visible && /al menos una red/.test(errRedes.txt), errRedes.txt);
+  ok(G7, 'El resumen de pendientes nombra «Redes sociales»', /Redes sociales/.test(await p.$eval('#pendingList', e => e.innerText)));
+  await cap(p, '#redesList >> xpath=ancestor::div[contains(@class,"field")]', '18-redes-obligatorias');
+  await p.fill('#redesList .red-row input', '%%%'); await p.click('#submitBtn'); await p.waitForTimeout(600);
+  ok(G7, 'Una red con formato inválido tampoco deja enviar', !(await p.isVisible('#successCard')));
+  await p.fill('#redesList .red-row input', '@minegocio'); await p.click('#submitBtn'); await p.waitForTimeout(3500);
+  ok(G7, 'Con una red válida el envío pasa', await p.isVisible('#successCard'));
+  const rd = (await estado(p)).postulaciones.find(x => x.correo === 'redes@example.com');
+  ok(G7, 'La red se guarda como enlace', rd && /instagram\.com\/minegocio/i.test(JSON.stringify(rd.redes || rd.redes_sociales)), rd && JSON.stringify(rd.redes));
+  await ctx.close();
+  ({ ctx, p } = await nuevo());
+  const vid = await p.$eval('#videoEnlace', e => e.closest('.field').innerText);
+  ok(G7, 'Video: «Máximo 3 minutos» con las tres cosas que debe contar', /Máximo 3 minutos/.test(vid) && /existe/.test(vid) && /propuesta de valor/.test(vid) && /por qué deberías ser elegido/.test(vid) && !/90 segundos/.test(vid));
+  await cap(p, '#videoEnlace >> xpath=ancestor::div[contains(@class,"field")]', '19-video-3-minutos');
+  ok(G7, 'Sin errores de JavaScript en el formulario', p.errs.length === 0, p.errs.join(' | '));
+  await ctx.close();
+  // inicio y convocatoria
+  ({ ctx, p } = await nuevo());
+  await p.goto(BASE + '/index.html'); await p.waitForTimeout(1500);
+  const hero = await p.$eval('.hero-stats', e => e.innerText);
+  ok(G7, 'Inicio: la cifra destacada es $12M', /\$12M/.test(hero) && !/\$10M/.test(hero), hero.replace(/\s+/g, ' '));
+  const cuerpo = await p.evaluate(() => document.body.innerText);
+  ok(G7, 'Inicio: «hasta $12.000.000 en especie» y ningún $10.000.000', /hasta \$12\.000\.000 en especie/.test(cuerpo) && !/\$10\.000\.000/.test(cuerpo));
+  ok(G7, 'Inicio: el requisito de video dice 3 minutos', /máximo 3 minutos/.test(cuerpo) && !/90 segundos/.test(cuerpo));
+  const hv = await p.$eval('.hero-stats', e => { const r = e.getBoundingClientRect(); return { y: r.top + scrollY, h: r.height }; });
+  await p.screenshot({ path: `${CAP}/20-inicio-12-millones.png`, fullPage: true, clip: { x: 0, y: Math.max(0, hv.y - 24), width: 1280, height: hv.h + 48 } });
+  const enlace = await p.$eval('#mas-info a.ml-2', a => ({ href: a.getAttribute('href'), txt: a.innerText.trim() }));
+  ok(G7, '«Ruta del programa» ya no abre ruta.html: lleva a convocatoria.html#etapas', enlace.href === 'convocatoria.html#etapas' && /Ruta del programa/.test(enlace.txt), JSON.stringify(enlace));
+  await p.click('#mas-info a.ml-2'); await p.waitForURL(/convocatoria\.html#etapas/); await p.waitForTimeout(1800);
+  const pos = await p.evaluate(() => { const e = document.getElementById('etapas'); if (!e) return null; const r = e.getBoundingClientRect(); return { arriba: Math.round(r.top), alto: window.innerHeight, h2: e.querySelector('h2').innerText }; });
+  ok(G7, 'Al abrirlo, la página queda en la sección «Etapas»', pos && pos.h2 === 'Etapas' && pos.arriba >= 0 && pos.arriba < pos.alto * 0.5, JSON.stringify(pos));
+  await p.screenshot({ path: `${CAP}/21-convocatoria-etapas.png` });
+  const conv = await p.evaluate(() => document.body.innerText);
+  ok(G7, 'Convocatoria: el requisito de video dice 3 minutos', /máximo 3 minutos/.test(conv) && !/90 segundos/.test(conv));
+  await ctx.close();
+
   // ===== 6. Celular =====
-  const G6 = '6. Celular (390 px)';
+  const G6 = '7. Celular (390 px)';
   ({ ctx, p } = await nuevo({ width: 390, height: 844 }));
   const ancho = await p.evaluate(() => document.documentElement.scrollWidth);
   ok(G6, 'Sin desplazamiento horizontal', ancho <= 390, 'ancho=' + ancho);
