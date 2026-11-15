@@ -1,0 +1,278 @@
+[
+ {
+  "grupo": "1. Estructura",
+  "n": "«priorizada» está en Perfil",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«discapacidad» está en Perfil",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«tipoDiscapacidadField» está en Perfil",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«etapa» está en Emprendimiento",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«financiacion» está en Emprendimiento",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«vendiendo» está en Impacto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«ventas» está en Impacto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«rango_ganancias» está en Impacto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«necesitaChips» está en Impacto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "Ya no existe la sección «Contexto adicional»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«¿Estás vendiendo?» va justo antes de ventas y ganancia",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«Lo que más necesita» va después de «recursos»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "Etiqueta: «Describe el impacto social y ambiental que genera tu emprendimiento»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "Barra de pasos con 5 secciones (01–05)",
+  "ok": true,
+  "d": "01 Tus datos · 02 Perfil · 03 Emprendimiento · 04 Impacto · 05 Documentos"
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "Numeración de secciones consecutiva",
+  "ok": true,
+  "d": "01,02,03,04,05"
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "Sin responder: ventas y ganancia ocultas",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "Con «Sí»: aparecen ventas y ganancia",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "Con «No»: se ocultan",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«Sí» sin promedio de ventas: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "El aviso de pendientes nombra el campo y la sección",
+  "ok": true,
+  "d": "Promedio mensual de ventas · Impacto y ODS"
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "El borrador recupera «Sí» y muestra ventas/ganancia",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "El borrador recupera discapacidad y su tipo",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«Sí» completo: se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«No» sin ventas ni ganancia: se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«Sí» guarda las ventas y el rango elegidos",
+  "ok": true,
+  "d": "2500000 · $500.000 – $1.000.000"
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«No» guarda ventas 0 y «Aún no tengo ganancias»",
+  "ok": true,
+  "d": "0 · Aún no tengo ganancias"
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "Los campos movidos llegan a la base",
+  "ok": true,
+  "d": "Comunidades indígenas · Sí · Discapacidad física · Fortalecimiento — prototipo desarrollado y probado"
+ },
+ {
+  "grupo": "3. Una postulación por cédula",
+  "n": "La misma cédula no se guarda dos veces",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "3. Una postulación por cédula",
+  "n": "Mensaje claro: «Ya existe una postulación con ese número de documento»",
+  "ok": true,
+  "d": "No pudimos enviar tu postulación. Ya existe una postulación con ese número de documento. Cada persona puede postularse u"
+ },
+ {
+  "grupo": "3. Una postulación por cédula",
+  "n": "Sin errores de JavaScript en el formulario",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Archivo de 10,5 MB marcado «supera 10 MB»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Archivo .exe marcado «formato no permitido»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Con archivos inválidos NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Página web «javascript:» rechazada",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Doble clic en «Postular» crea una sola postulación",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "El panel muestra el código malicioso como texto (escapado)",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "No se ejecutó ningún script ni alerta",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Población priorizada»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Etapa»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «¿Está vendiendo?»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Ventas (promedio mensual)»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Ganancia mensual»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Aún no tengo ganancias» para quien no vende",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "Sin errores de JavaScript en el panel",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Celular (390 px)",
+  "n": "Sin desplazamiento horizontal",
+  "ok": true,
+  "d": "ancho=390"
+ },
+ {
+  "grupo": "6. Celular (390 px)",
+  "n": "Sin errores de JavaScript",
+  "ok": true,
+  "d": ""
+ }
+]

@@ -1,0 +1,176 @@
+<title>Revisión de ajustes 5.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Informe técnico de una sola columna: secciones por rol en el orden real del flujo, capturas en rejilla de dos. */
+:root {
+  --bg: #f5f8f7; --surface: #ffffff; --fg: #142630; --muted: #566a73; --line: #dbe4e1;
+  --accent: #2f6ea8; --accent-soft: #e6eff8; --green: #2e7a4f; --green-soft: #e5f3ea;
+  --amber: #9a5b00; --amber-soft: #fbf0dc; --red: #a8322a; --red-soft: #fbe9e7;
+  --display: "Nunito", "Segoe UI", system-ui, sans-serif;
+  --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1a20; --surface: #16242c; --fg: #e3ecef; --muted: #9db0b8; --line: #263a44;
+  --accent: #7fb2e5; --accent-soft: #1b3346; --green: #78c79a; --green-soft: #173327;
+  --amber: #e9b45f; --amber-soft: #3a2c12; --red: #f0958c; --red-soft: #3d1d1a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1a20; --surface: #16242c; --fg: #e3ecef; --muted: #9db0b8; --line: #263a44;
+  --accent: #7fb2e5; --accent-soft: #1b3346; --green: #78c79a; --green-soft: #173327;
+  --amber: #e9b45f; --amber-soft: #3a2c12; --red: #f0958c; --red-soft: #3d1d1a; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); padding-inline: 20px; padding-block: 0 64px; }
+.wrap { max-width: 1000px; margin: 0 auto; display: grid; gap: 56px; }
+header { padding-block: 48px 8px; border-bottom: 1px solid var(--line); display: grid; gap: 14px; }
+.eyebrow { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 800 clamp(30px, 5vw, 44px)/1.1 var(--display); margin: 0; text-wrap: balance; }
+h2 { font: 800 26px/1.2 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 700 18px/1.3 var(--display); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+.lead { font-size: 18px; color: var(--muted); }
+section { display: grid; gap: 18px; min-width: 0; }
+.sec-head { display: grid; gap: 8px; }
+.role { display: inline-flex; align-items: center; gap: 8px; font: 600 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.role i { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); display: inline-block; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 4px; }
+.stat b { font: 800 32px/1 var(--display); font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 14px; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.box.real { border-top: 3px solid var(--green); } .box.sim { border-top: 3px solid var(--accent); }
+.box ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+ol.flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; counter-reset: f; }
+ol.flow li { counter-increment: f; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 4px; font-size: 14px; }
+ol.flow li::before { content: counter(f); font: 500 12px/1 var(--mono); color: var(--accent); }
+ol.flow li b { font-size: 15px; } ol.flow li span { color: var(--muted); }
+.figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+figure { margin: 0; display: grid; gap: 8px; align-content: start; min-width: 0; }
+figure img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); }
+figure a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 10px; }
+figcaption { display: grid; grid-template-columns: auto 1fr; gap: 10px; font-size: 14px; line-height: 1.45; }
+figcaption .num { font: 500 12px/1.7 var(--mono); color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 0 6px; height: fit-content; }
+figcaption small { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
+ul.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+ul.checks li { display: grid; grid-template-columns: 22px 1fr; gap: 6px; font-size: 15px; }
+.ok { color: var(--green); font-weight: 700; }
+.callout { border-radius: 10px; padding: 14px 16px; font-size: 15px; display: grid; gap: 6px; }
+.callout.warn { background: var(--amber-soft); color: var(--fg); border-left: 4px solid var(--amber); }
+.callout.info { background: var(--accent-soft); border-left: 4px solid var(--accent); }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 11px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+code { font: 13px var(--mono); background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.pill { font: 600 11px/1 var(--mono); padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+.ok-p { background: var(--green-soft); color: var(--green); }
+.pend { background: var(--amber-soft); color: var(--amber); }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+details + details { margin-top: 8px; }
+summary { cursor: pointer; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+ul.bat { margin: 10px 0 2px; padding-left: 4px; list-style: none; display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+pre { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; overflow-x: auto; font: 13px/1.6 var(--mono); margin: 0; }
+nav.toc { display: flex; flex-wrap: wrap; gap: 8px; }
+nav.toc a { font-size: 14px; color: var(--accent); text-decoration: none; border: 1px solid var(--line); background: var(--surface); padding: 6px 10px; border-radius: 999px; }
+nav.toc a:hover { border-color: var(--accent); }
+@media (max-width: 520px) { .figs { grid-template-columns: 1fr; } }
+
+.fail-p { background: var(--red-soft); color: var(--red); }
+.rama-p { background: var(--accent-soft); color: var(--accent); }
+.callout.bad { background: var(--red-soft); border-left: 4px solid var(--red); }
+td.st { white-space: nowrap; }
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Revisión de ajustes · 15 nov 2026 · rama claude/magical-carson-kr6epc</span>
+  <h1>Revisión de los ajustes de Innova Social 5.0</h1>
+  <p class="lead">Lo que se hizo funciona y está probado (46 de 46 comprobaciones del formulario y 70 de 70 de permisos en producción). Pero de la lista de la reunión solo está hecho el Bloque 1, y todavía sin publicar. Tres cosas bloquean: los PDFs de términos y política dan 404, el índice de una postulación por cédula no está aplicado en la base y el Bloque 1 espera aprobación.</p>
+  <nav class="toc" aria-label="Secciones"><a href="#estado">Estado de cada tarea</a><a href="#correcciones">Correcciones de esta revisión</a><a href="#abiertos">Problemas abiertos</a><a href="#interpretaciones">Por confirmar</a><a href="#evidencia">Capturas</a><a href="#pruebas">Comprobaciones</a><a href="#repetir">Cómo repetir</a></nav>
+</header>
+
+<section aria-label="Resumen">
+  <div class="stats">
+    <div class="stat"><b>46/46</b><span>formulario en navegador (backend simulado)</span></div>
+    <div class="stat"><b>70/70</b><span>permisos contra producción (se deshace al terminar)</span></div>
+    <div class="stat"><b>28/28</b><span>flujo por roles con las migraciones reales</span></div>
+    <div class="stat"><b>2</b><span>postulaciones reales en producción, intactas</span></div>
+  </div>
+</section>
+
+<section id="estado">
+  <div class="sec-head"><h2>Estado de cada tarea</h2><p>«Hecho · sin publicar» está en la rama y en la vista previa de Vercel, no en innovasocial.co.</p></div>
+  <div class="tbl"><table><thead><tr><th>Tarea</th><th>Estado</th><th>Detalle</th></tr></thead><tbody><tr><td>Formulario cerrado y luego habilitado (interruptor <code>POSTULACIONES_ABIERTAS</code>)</td><td class="st"><span class="pill ok-p">En producción</span></td><td>Abierto en innovasocial.co, www y convocatoria.</td></tr><tr><td>Dominio innovasocial.co y www apuntando a Vercel</td><td class="st"><span class="pill ok-p">En producción</span></td><td>Vercel: sin errores de configuración; el raíz redirige a www con HTTPS.</td></tr><tr><td>Supabase: URL permitidas de acceso.html y registro público cerrado</td><td class="st"><span class="pill ok-p">En producción</span></td><td>Verificado leyendo la configuración de Auth.</td></tr><tr><td>Pruebas de seguridad y funcionamiento del formulario</td><td class="st"><span class="pill ok-p">En producción</span></td><td>70/70 permisos en producción; formulario 46/46.</td></tr><tr><td>Una postulación por cédula</td><td class="st"><span class="pill fail-p">Bloqueado</span></td><td>Código y mensaje listos en la rama; el índice <b>no está en producción</b>: falta ejecutar el SQL.</td></tr><tr><td>Bloque 1: secciones reorganizadas y «¿Estás vendiendo?» condicional</td><td class="st"><span class="pill rama-p">Hecho · sin publicar</span></td><td>Probado; espera tu aprobación para pasar a <code>main</code>.</td></tr><tr><td>Etiqueta «Describe el impacto social y ambiental que genera tu emprendimiento»</td><td class="st"><span class="pill rama-p">Hecho · sin publicar</span></td><td>Viaja con el Bloque 1.</td></tr><tr><td>Enlaces de términos, política, preguntas frecuentes y resumen PNNV</td><td class="st"><span class="pill fail-p">Bloqueado</span></td><td>Dan 404: los PDFs no están en el repo ni en Supabase. Hacen falta los archivos.</td></tr><tr><td>Beneficio de $10M a $12M</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 2.</td></tr><tr><td>Nota que diferencia ventas (facturado) y ganancia</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 2.</td></tr><tr><td>Redes sociales obligatorias (quitar «opcional»)</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 2.</td></tr><tr><td>Video de máximo 3 minutos con la guía de contenido</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 2 (hoy dice 90 segundos).</td></tr><tr><td>Nube explicativa de la tipología de negocios</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 2.</td></tr><tr><td>Texto con enlace al Plan Nacional de Negocios Verdes</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 2; falta confirmar dónde va.</td></tr><tr><td>Texto de aceptación de la política de datos</td><td class="st"><span class="pill pend">Pendiente</span></td><td>La casilla existe; falta confirmar el texto.</td></tr><tr><td>Quitar el enlace «Ruta del programa» y llevar a etapas</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 3.</td></tr><tr><td>Galería en «Esto no es una promesa. Ya pasó.»</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 3; faltan las fotos.</td></tr><tr><td>Documentos soporte de ventas (si vende)</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 4; requiere cambio en la base.</td></tr><tr><td>Fotos de productos con enlace de Drive</td><td class="st"><span class="pill pend">Pendiente</span></td><td>Bloque 4; requiere cambio en la base.</td></tr></tbody></table></div>
+</section>
+
+<section id="correcciones">
+  <div class="sec-head"><h2>Correcciones hechas en esta revisión</h2></div>
+  <div class="two">
+    <div class="box sim"><h3>El mensaje de cédula repetida nunca se había probado</h3><p>El backend simulado no imitaba la regla de una postulación por cédula, así que el mensaje «Ya existe una postulación con ese número de documento» no tenía prueba. Ahora el simulador responde como la base real (código <code>23505</code>) y la prueba lo confirma (captura 10).</p></div>
+    <div class="box sim"><h3>Ventas y ganancia exigidas aunque estén ocultas</h3><p>Los campos quedaban marcados como obligatorios en el HTML aunque se ocultaran al responder «No». Ahora se activan y desactivan con la respuesta, igual que el tipo de discapacidad.</p></div>
+    <div class="box sim"><h3>La auditoría no se podía repetir</h3><p>Las pruebas vivían en una carpeta temporal que ya se borró una vez. Quedaron en el repo como <code>pruebas/formulario.js</code>, con las capturas en esta carpeta.</p></div>
+  </div>
+</section>
+
+<section id="abiertos">
+  <div class="sec-head"><h2>Problemas abiertos</h2></div>
+  <div class="callout bad"><b>Los PDFs de términos y política dan 404 en producción.</b> Los enlaces del formulario y de la convocatoria apuntan a <code>www.innovasocial.co/files_web/…pdf</code>. Lo más probable es que esos archivos vivieran en el sitio viejo de Hostinger, y que al apuntar el dominio a Vercel dejaran de responder. No están en el repo ni en Supabase. Hacen falta los 4 archivos para publicarlos.</div>
+  <div class="callout warn"><b>El índice de una postulación por cédula no está en la base.</b> El sistema de permisos bloqueó el cambio de esquema en producción. Mientras no se ejecute el SQL, la base acepta cédulas repetidas.</div>
+  <div class="callout warn"><b><code>site_url</code> de Supabase sigue en <code>http://localhost:3000</code>.</b> Los correos del programa no dependen de él, pero cualquier correo de Supabase sin destino propio apuntaría a localhost.</div>
+  <div class="callout info"><b>Riesgo bajo, por decidir:</b> el campo <code>documentos</code> acepta cualquier ruta; si alguien repite cédula, sus 3 archivos quedan subidos sin postulación; y en celular «Redes sociales» queda algo pegado al campo anterior (ya venía así).</div>
+</section>
+
+<section id="interpretaciones">
+  <div class="sec-head"><h2>Interpretaciones que conviene confirmar</h2></div>
+  <div class="box"><ul>
+    <li><b>«Las de abajo como la de la etapa»:</b> además de la etapa, se movió «¿Has recibido financiación?» a Emprendimiento.</li>
+    <li><b>«Ponlo en recursos»:</b> «¿Qué es lo que más necesita tu emprendimiento?» quedó justo después de «¿Por qué necesitas el recurso y en qué lo invertirías?».</li>
+    <li><b>Si responde «No vendo»:</b> se guarda ventas en 0 y ganancia «Aún no tengo ganancias», para que el ranking siga calculando.</li>
+  </ul></div>
+</section>
+
+<section id="evidencia">
+  <div class="sec-head"><h2>Capturas</h2><p>Tomadas por <code>pruebas/formulario.js</code> sobre la versión de la rama con el backend simulado.</p></div>
+  <div class="figs">
+    <figure><a href="capturas/01-barra-de-pasos.png"><img src="capturas/01-barra-de-pasos.png" alt="Barra de pasos con 5 secciones" loading="lazy"></a><figcaption><span class="num">01</span><span>Barra de pasos con 5 secciones<small>«Contexto adicional» ya no existe; Documentos pasa a ser la 05.</small></span></figcaption></figure>
+    <figure><a href="capturas/02-perfil.png"><img src="capturas/02-perfil.png" alt="Perfil con población priorizada y discapacidad" loading="lazy"></a><figcaption><span class="num">02</span><span>Perfil con población priorizada y discapacidad<small>Al responder «Sí» aparece «Indica cuál».</small></span></figcaption></figure>
+    <figure><a href="capturas/03-emprendimiento.png"><img src="capturas/03-emprendimiento.png" alt="Emprendimiento con etapa y financiación" loading="lazy"></a><figcaption><span class="num">03</span><span>Emprendimiento con etapa y financiación<small>Antes estaban en «Contexto adicional».</small></span></figcaption></figure>
+    <figure><a href="capturas/04-vendiendo-sin-responder.png"><img src="capturas/04-vendiendo-sin-responder.png" alt="«¿Estás vendiendo?» sin responder" loading="lazy"></a><figcaption><span class="num">04</span><span>«¿Estás vendiendo?» sin responder<small>Ventas y ganancia todavía no se muestran.</small></span></figcaption></figure>
+    <figure><a href="capturas/05-vendiendo-si.png"><img src="capturas/05-vendiendo-si.png" alt="Respuesta «Sí»" loading="lazy"></a><figcaption><span class="num">05</span><span>Respuesta «Sí»<small>Aparecen el promedio de ventas y la ganancia, obligatorios.</small></span></figcaption></figure>
+    <figure><a href="capturas/06-vendiendo-no.png"><img src="capturas/06-vendiendo-no.png" alt="Respuesta «No»" loading="lazy"></a><figcaption><span class="num">06</span><span>Respuesta «No»<small>Ventas y ganancia no se piden.</small></span></figcaption></figure>
+    <figure><a href="capturas/07-recursos-y-necesidades.png"><img src="capturas/07-recursos-y-necesidades.png" alt="«Lo que más necesita» junto a recursos" loading="lazy"></a><figcaption><span class="num">07</span><span>«Lo que más necesita» junto a recursos<small>Justo después de «¿Por qué necesitas el recurso…?».</small></span></figcaption></figure>
+    <figure><a href="capturas/08-aviso-falta-ventas.png"><img src="capturas/08-aviso-falta-ventas.png" alt="Aviso cuando falta el promedio de ventas" loading="lazy"></a><figcaption><span class="num">08</span><span>Aviso cuando falta el promedio de ventas<small>Nombra el campo y la sección.</small></span></figcaption></figure>
+    <figure><a href="capturas/09-envio-exitoso.png"><img src="capturas/09-envio-exitoso.png" alt="Envío exitoso" loading="lazy"></a><figcaption><span class="num">09</span><span>Envío exitoso<small>Tarjeta de confirmación.</small></span></figcaption></figure>
+    <figure><a href="capturas/10-cedula-repetida.png"><img src="capturas/10-cedula-repetida.png" alt="Cédula repetida" loading="lazy"></a><figcaption><span class="num">10</span><span>Cédula repetida<small>Mensaje claro en lugar del error genérico.</small></span></figcaption></figure>
+    <figure><a href="capturas/11-archivos-invalidos.png"><img src="capturas/11-archivos-invalidos.png" alt="Archivos inválidos" loading="lazy"></a><figcaption><span class="num">11</span><span>Archivos inválidos<small>Uno de 10,5 MB y un .exe quedan marcados y bloquean el envío.</small></span></figcaption></figure>
+    <figure><a href="capturas/12-panel-ficha-xss-escapado.png"><img src="capturas/12-panel-ficha-xss-escapado.png" alt="Código malicioso en el panel" loading="lazy"></a><figcaption><span class="num">12</span><span>Código malicioso en el panel<small>Se ve como texto y no se ejecuta.</small></span></figcaption></figure>
+    <figure><a href="capturas/13-panel-ficha.png"><img src="capturas/13-panel-ficha.png" alt="Ficha del panel: persona postulante" loading="lazy"></a><figcaption><span class="num">13</span><span>Ficha del panel: persona postulante<small>Población priorizada y discapacidad.</small></span></figcaption></figure>
+    <figure><a href="capturas/13b-panel-ficha-ventas.png"><img src="capturas/13b-panel-ficha-ventas.png" alt="Ficha del panel: emprendimiento" loading="lazy"></a><figcaption><span class="num">14</span><span>Ficha del panel: emprendimiento<small>Etapa, si vende, ventas $0 y «Aún no tengo ganancias».</small></span></figcaption></figure>
+    <figure><a href="capturas/14-celular-impacto.png"><img src="capturas/14-celular-impacto.png" alt="Celular: Impacto con «Sí»" loading="lazy"></a><figcaption><span class="num">15</span><span>Celular: Impacto con «Sí»<small>390 px, sin desplazamiento horizontal.</small></span></figcaption></figure>
+    <figure><a href="capturas/15-celular-inicio.png"><img src="capturas/15-celular-inicio.png" alt="Celular: inicio del formulario" loading="lazy"></a><figcaption><span class="num">16</span><span>Celular: inicio del formulario<small>Pasos 01 a 05.</small></span></figcaption></figure>
+  </div>
+</section>
+
+<section id="pruebas">
+  <div class="sec-head"><h2>Comprobaciones del formulario</h2><p>Resultado de <code>pruebas/formulario.js</code>, leído de <code>capturas/resultados.json</code>.</p></div>
+  <div><details><summary><b>1. Estructura</b><span class="pill ok-p">15 / 15</span></summary><ul class="bat"><li>✓ «priorizada» está en Perfil</li><li>✓ «discapacidad» está en Perfil</li><li>✓ «tipoDiscapacidadField» está en Perfil</li><li>✓ «etapa» está en Emprendimiento</li><li>✓ «financiacion» está en Emprendimiento</li><li>✓ «vendiendo» está en Impacto</li><li>✓ «ventas» está en Impacto</li><li>✓ «rango_ganancias» está en Impacto</li><li>✓ «necesitaChips» está en Impacto</li><li>✓ Ya no existe la sección «Contexto adicional»</li><li>✓ «¿Estás vendiendo?» va justo antes de ventas y ganancia</li><li>✓ «Lo que más necesita» va después de «recursos»</li><li>✓ Etiqueta: «Describe el impacto social y ambiental que genera tu emprendimiento»</li><li>✓ Barra de pasos con 5 secciones (01–05) <code>01 Tus datos · 02 Perfil · 03 Emprendimiento · 04 Impacto · 05 Documentos</code></li><li>✓ Numeración de secciones consecutiva <code>01,02,03,04,05</code></li></ul></details><details><summary><b>2. «¿Estás vendiendo?»</b><span class="pill ok-p">12 / 12</span></summary><ul class="bat"><li>✓ Sin responder: ventas y ganancia ocultas</li><li>✓ Con «Sí»: aparecen ventas y ganancia</li><li>✓ Con «No»: se ocultan</li><li>✓ «Sí» sin promedio de ventas: NO se envía</li><li>✓ El aviso de pendientes nombra el campo y la sección <code>Promedio mensual de ventas · Impacto y ODS</code></li><li>✓ El borrador recupera «Sí» y muestra ventas/ganancia</li><li>✓ El borrador recupera discapacidad y su tipo</li><li>✓ «Sí» completo: se envía</li><li>✓ «No» sin ventas ni ganancia: se envía</li><li>✓ «Sí» guarda las ventas y el rango elegidos <code>2500000 · $500.000 – $1.000.000</code></li><li>✓ «No» guarda ventas 0 y «Aún no tengo ganancias» <code>0 · Aún no tengo ganancias</code></li><li>✓ Los campos movidos llegan a la base <code>Comunidades indígenas · Sí · Discapacidad física · Fortalecimiento — prototipo desarrollado y probado</code></li></ul></details><details><summary><b>3. Una postulación por cédula</b><span class="pill ok-p">3 / 3</span></summary><ul class="bat"><li>✓ La misma cédula no se guarda dos veces</li><li>✓ Mensaje claro: «Ya existe una postulación con ese número de documento» <code>No pudimos enviar tu postulación. Ya existe una postulación con ese número de documento. Cada persona puede postularse u</code></li><li>✓ Sin errores de JavaScript en el formulario</li></ul></details><details><summary><b>4. Seguridad</b><span class="pill ok-p">7 / 7</span></summary><ul class="bat"><li>✓ Archivo de 10,5 MB marcado «supera 10 MB»</li><li>✓ Archivo .exe marcado «formato no permitido»</li><li>✓ Con archivos inválidos NO se envía</li><li>✓ Página web «javascript:» rechazada</li><li>✓ Doble clic en «Postular» crea una sola postulación</li><li>✓ El panel muestra el código malicioso como texto (escapado)</li><li>✓ No se ejecutó ningún script ni alerta</li></ul></details><details><summary><b>5. Panel de administración</b><span class="pill ok-p">7 / 7</span></summary><ul class="bat"><li>✓ La ficha muestra «Población priorizada»</li><li>✓ La ficha muestra «Etapa»</li><li>✓ La ficha muestra «¿Está vendiendo?»</li><li>✓ La ficha muestra «Ventas (promedio mensual)»</li><li>✓ La ficha muestra «Ganancia mensual»</li><li>✓ La ficha muestra «Aún no tengo ganancias» para quien no vende</li><li>✓ Sin errores de JavaScript en el panel</li></ul></details><details><summary><b>6. Celular (390 px)</b><span class="pill ok-p">2 / 2</span></summary><ul class="bat"><li>✓ Sin desplazamiento horizontal <code>ancho=390</code></li><li>✓ Sin errores de JavaScript</li></ul></details></div>
+  <div class="box"><h3>Base de datos</h3><ul>
+    <li><b>Producción, 70/70</b> con <code>supabase/tests/permisos.sql</code> (en una transacción que se deshace). Las 2 postulaciones reales siguen iguales.</li>
+    <li><b>Migraciones desde cero, 28/28</b> con <code>pruebas/flow.js</code>.</li>
+    <li><b>Regla de cédula, 5/5</b> en local: rechaza la misma cédula aunque cambie el correo, tenga espacios o mayúsculas; acepta una distinta.</li>
+    <li><b>Visitante anónimo, 32/33</b>: no lee ni modifica postulaciones, calificaciones, correos ni adjuntos. El caso que falla es el riesgo bajo de <code>documentos</code>.</li>
+  </ul></div>
+</section>
+
+<section id="repetir">
+  <div class="sec-head"><h2>Cómo repetir la revisión</h2></div>
+  <pre>npx serve -l 4180                 # desde la raíz del repo
+cd pruebas && npm install
+node formulario.js                # formulario y capturas
+node flow.js                      # permisos con las migraciones reales</pre>
+  <p>El formulario debe tener <code>POSTULACIONES_ABIERTAS = true</code>. Las pruebas usan el backend simulado (<code>sw-simulado.js</code>) y no tocan producción.</p>
+</section>
+</div>

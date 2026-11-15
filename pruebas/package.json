@@ -1,1 +1,1 @@
-{"name":"innova-harness","private":true,"type":"module","version":"1.0.0","dependencies":{"@electric-sql/pglite":"^0.5.8","playwright":"^1.64.0"}}
+{"name":"innova-harness","private":true,"type":"module","version":"1.0.0","dependencies":{"@electric-sql/pglite":"^0.5.8","@supabase/supabase-js":"^2.119.0","playwright":"^1.64.0"}}

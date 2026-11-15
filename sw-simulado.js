@@ -256,6 +256,8 @@ async function rest(req, url, s, w) {
           { evaluador_id: w.id, registrado_por_email: w.email, updated_at: now() });
       }
       if (tabla === 'postulaciones' && (!w || w.perfil.role !== 'admin') && (b.estado && b.estado !== 'postulado' || b.user_id || b.orden_desempate != null)) return J({ code: '42501', message: 'new row violates row-level security policy for table "postulaciones"' }, 403);
+      const cedula = (v) => String(v || '').trim().toLowerCase();
+      if (tabla === 'postulaciones' && s.postulaciones.some((r) => cedula(r.cedula) === cedula(b.cedula))) return J({ code: '23505', message: 'duplicate key value violates unique constraint "postulaciones_cedula_unica"' }, 409);
       const ex = upsert && s[tabla].find((r) => pk.every((k) => String(r[k]) === String(b[k])));
       if (ex) { Object.assign(ex, b, { updated_at: now() }); out.push(ex); }
       else { const row = { id: uuid(), created_at: now(), updated_at: now(), ...(DEF[tabla] ? DEF[tabla]() : {}), ...b }; s[tabla].push(row); out.push(row); }

@@ -16,6 +16,7 @@ node flow.js      # matriz de flujo y permisos (28 comprobaciones)
 node ataques.js   # pase adversarial: intenta romper el modelo
 node fixtures.js  # exporta lo que ve cada rol a fixtures.json
 node auto.js      # abre el panel real como cada rol y captura (necesita `npx serve -l 4180`)
+node formulario.js # recorre el formulario de postulación y captura (necesita `npx serve -l 4180`)
 ```
 
 ## Las seis cuentas

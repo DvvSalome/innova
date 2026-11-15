@@ -675,7 +675,11 @@
   const vendiendoSelect = $('vendiendo');
   const bloqueVentas = $('bloqueVentas');
   const vende = () => vendiendoSelect.value === 'Sí';
-  function syncVendiendo(){ bloqueVentas.style.display = vende() ? '' : 'none'; }
+  function syncVendiendo(){
+    bloqueVentas.style.display = vende() ? '' : 'none';
+    $('ventas').required = $('rango_ganancias').required = vende();
+  }
+  syncVendiendo();
   vendiendoSelect.addEventListener('change', syncVendiendo);
 
   // ---------- Documento de identidad ----------
