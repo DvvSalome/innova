@@ -1,0 +1,572 @@
+[
+ {
+  "grupo": "1. Estructura",
+  "n": "«priorizada» está en Perfil",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«discapacidad» está en Perfil",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«tipoDiscapacidadField» está en Perfil",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«etapa» está en Emprendimiento",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«financiacion» está en Emprendimiento",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«vendiendo» está en Impacto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«ventas» está en Impacto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«rango_ganancias» está en Impacto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«necesitaChips» está en Impacto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "Ya no existe la sección «Contexto adicional»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«¿Estás vendiendo?» va justo antes de ventas y ganancia",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "«Lo que más necesita» va después de «recursos»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "Etiqueta: «Describe el impacto social y ambiental que genera tu emprendimiento»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "Barra de pasos con 5 secciones (01–05)",
+  "ok": true,
+  "d": "01 Tus datos · 02 Perfil · 03 Emprendimiento · 04 Impacto · 05 Documentos"
+ },
+ {
+  "grupo": "1. Estructura",
+  "n": "Numeración de secciones consecutiva",
+  "ok": true,
+  "d": "01,02,03,04,05"
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "Sin responder: ventas y ganancia ocultas",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "Con «Sí»: aparecen ventas y ganancia",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "Con «No»: se ocultan",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«Sí» sin promedio de ventas: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "El aviso de pendientes nombra el campo y la sección",
+  "ok": true,
+  "d": "Promedio mensual de ventas · Impacto y ODS"
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "El borrador recupera «Sí» y muestra ventas/ganancia",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "El borrador recupera discapacidad y su tipo",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«Sí» completo: se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«No» sin ventas ni ganancia: se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«Sí» guarda las ventas y el rango elegidos",
+  "ok": true,
+  "d": "2500000 · $500.000 – $1.000.000"
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "«No» guarda ventas 0 y «Aún no tengo ganancias»",
+  "ok": true,
+  "d": "0 · Aún no tengo ganancias"
+ },
+ {
+  "grupo": "2. «¿Estás vendiendo?»",
+  "n": "Los campos movidos llegan a la base",
+  "ok": true,
+  "d": "Comunidades indígenas · Sí · Discapacidad física · Fortalecimiento — prototipo desarrollado y probado"
+ },
+ {
+  "grupo": "3. Una postulación por cédula",
+  "n": "La misma cédula no se guarda dos veces",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "3. Una postulación por cédula",
+  "n": "Mensaje claro: «Ya existe una postulación con ese número de documento»",
+  "ok": true,
+  "d": "No pudimos enviar tu postulación. Ya existe una postulación con ese número de documento. Cada persona puede postularse u"
+ },
+ {
+  "grupo": "3. Una postulación por cédula",
+  "n": "Sin errores de JavaScript en el formulario",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Archivo de 10,5 MB marcado «supera 10 MB»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Archivo .exe marcado «formato no permitido»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Con archivos inválidos NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Página web «javascript:» rechazada",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "Doble clic en «Postular» crea una sola postulación",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "El panel muestra el código malicioso como texto (escapado)",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "4. Seguridad",
+  "n": "No se ejecutó ningún script ni alerta",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Población priorizada»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Etapa»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «¿Está vendiendo?»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Ventas (promedio mensual)»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Ganancia mensual»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "La ficha muestra «Aún no tengo ganancias» para quien no vende",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "5. Panel de administración",
+  "n": "Sin errores de JavaScript en el panel",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "La nube de tipología empieza cerrada",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Al pulsar «¿Cuál es la diferencia?» se abre y explica las dos tipologías",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Escape cierra la nube",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Pulsar fuera cierra la nube",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "La nube no empuja a «Tipo de emprendimiento» fuera del formulario (sigue el select)",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Ventas tiene la nota de «lo que facturas»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Ganancia tiene la nota de «lo que te queda» con un ejemplo",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Redes sociales ya no dice «opcional» y pide al menos una",
+  "ok": true,
+  "d": "Redes sociales del emprendimiento * (al menos una, hasta 3)"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Sin ninguna red social NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "El aviso pide agregar al menos una red",
+  "ok": true,
+  "d": "Agrega al menos una red social del emprendimiento (enlace o @usuario)."
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "El resumen de pendientes nombra «Redes sociales»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Una red con formato inválido tampoco deja enviar",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Con una red válida el envío pasa",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "La red se guarda como enlace",
+  "ok": true,
+  "d": "[{\"red\":\"Instagram\",\"url\":\"https://www.instagram.com/minegocio\"}]"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Video: «Máximo 3 minutos» con las tres cosas que debe contar",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Sin errores de JavaScript en el formulario",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Inicio: la cifra destacada es $12M",
+  "ok": true,
+  "d": "$12M en especie por ganador 15 municipios habilitados 6 meses de acompañamiento"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Inicio: «hasta $12.000.000 en especie» y ningún $10.000.000",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Inicio: el requisito de video dice 3 minutos",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "«Ruta del programa» ya no abre ruta.html: lleva a convocatoria.html#etapas",
+  "ok": true,
+  "d": "{\"href\":\"convocatoria.html#etapas\",\"txt\":\"Ruta del programa\\n→\"}"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Al abrirlo, la página queda en la sección «Etapas»",
+  "ok": true,
+  "d": "{\"arriba\":70,\"alto\":900,\"h2\":\"Etapas\"}"
+ },
+ {
+  "grupo": "6. Textos y reglas nuevas",
+  "n": "Convocatoria: el requisito de video dice 3 minutos",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "El soporte de ventas empieza oculto",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Con «Sí» aparecen 4 espacios para documentos",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Explica los tipos válidos: factura electrónica, cuenta de cobro, certificación comercial y contrato",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Solo el primero es obligatorio; los otros dicen «opcional»",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Con «No» el bloque desaparece",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "«Sí» sin ningún documento soporte: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "El aviso nombra «Documento soporte de ventas 1»",
+  "ok": true,
+  "d": "Documento soporte de ventas 1 · Impacto y ODS"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Un soporte .exe en el espacio 2 NO deja enviar",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Un soporte de 10,5 MB NO deja enviar",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Fotos vacío: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Fotos «javascript:»: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Fotos en un sitio que no es una nube de archivos: NO se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Sin enlace de fotos el aviso lo pide",
+  "ok": true,
+  "d": "Pega el enlace de la carpeta de Drive con las fotos."
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "«Sí» con 3 documentos soporte y fotos: se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Guarda cedula, rut, recibo y soporte_ventas_1 a 3",
+  "ok": true,
+  "d": "cedula,recibo_triple_a,rut,soporte_ventas_1,soporte_ventas_2,soporte_ventas_3"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Sube 6 archivos a la carpeta de esa postulación",
+  "ok": true,
+  "d": "6"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Guarda el enlace de fotos de Drive",
+  "ok": true,
+  "d": "https://drive.google.com/drive/folders/abc123?usp=sharing"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Panel: la ficha de quien vende muestra «Soporte de ventas 1», 2 y 3",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Panel: muestra el enlace de fotos como vínculo seguro",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "CSV: incluye la columna fotos_enlace y su valor",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "CSV: la columna documentos lista los soportes",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Sin errores de JavaScript en el panel (quien vende)",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Si cambia a «No» después de elegir archivos, igual se envía",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "…y los soportes NO se suben ni se guardan",
+  "ok": true,
+  "d": "3"
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "…y queda ventas 0 y sin ganancias",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Panel: quien no vende no muestra soportes ni «sin adjunto» de soportes",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "7. Soporte de ventas y fotos",
+  "n": "Sin errores de JavaScript en el panel (quien no vende)",
+  "ok": true,
+  "d": ""
+ },
+ {
+  "grupo": "8. Celular (390 px)",
+  "n": "Sin desplazamiento horizontal",
+  "ok": true,
+  "d": "ancho=390"
+ },
+ {
+  "grupo": "8. Celular (390 px)",
+  "n": "Sin errores de JavaScript",
+  "ok": true,
+  "d": ""
+ }
+]

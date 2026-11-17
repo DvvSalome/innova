@@ -144,6 +144,14 @@
   /* Ayudas y contadores */
   .field .help{ font-size:12px; color:var(--muted); line-height:1.45; background:var(--paper2); border-radius:10px; padding:9px 11px; }
   .field .help b{ color:var(--ink); }
+  .label-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .nube-btn{ font:700 12px "Nunito",sans-serif; color:var(--blue-deep); background:#fff; border:1px solid var(--blue); border-radius:100px; padding:4px 11px; cursor:pointer; }
+  .nube-btn:hover, .nube-btn[aria-expanded="true"]{ background:var(--paper2); }
+  .nube-btn:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
+  .nube{ position:relative; background:var(--paper2); border:1px solid var(--blue); border-radius:18px; padding:12px 16px; font-size:13px; line-height:1.5; color:var(--ink); display:grid; gap:8px; margin:6px 0 4px; }
+  .nube[hidden]{ display:none; }
+  .nube::before{ content:""; position:absolute; top:-8px; left:28px; width:14px; height:14px; background:var(--paper2); border-left:1px solid var(--blue); border-top:1px solid var(--blue); transform:rotate(45deg); }
+  .nube p{ margin:0; }
   .charline{ display:flex; justify-content:space-between; gap:10px; font-size:11.5px; color:var(--muted); }
   .charline .cc{ font-variant-numeric:tabular-nums; white-space:nowrap; }
   .charline .cc.low{ color:#B7353A; font-weight:600; }
@@ -208,8 +216,7 @@
       <a href="#sec-2" data-sec="sec-2" data-no="02">02 Perfil</a>
       <a href="#sec-3" data-sec="sec-3" data-no="03">03 Emprendimiento</a>
       <a href="#sec-4" data-sec="sec-4" data-no="04">04 Impacto</a>
-      <a href="#sec-5" data-sec="sec-5" data-no="05">05 Contexto</a>
-      <a href="#sec-6" data-sec="sec-6" data-no="06">06 Documentos</a>
+      <a href="#sec-6" data-sec="sec-6" data-no="05">05 Documentos</a>
     </nav>
     <div class="progress-bar"><i id="progressFill"></i></div>
     <div class="progress-meta"><span id="progressText">0 % completado</span><span id="draftStatus" aria-live="polite"></span></div>
@@ -316,6 +323,41 @@
           </select>
           <span class="err">Selecciona una opción.</span>
         </div>
+        <div class="field">
+          <label for="priorizada">¿Perteneces a alguna población priorizada? *</label>
+          <select id="priorizada" required>
+            <option value="">Selecciona...</option>
+            <option>Comunidades indígenas</option>
+            <option>Comunidades negras</option>
+            <option>Migrantes y refugiados</option>
+            <option>Raizales</option>
+            <option>Reincorporados</option>
+            <option>Víctimas del conflicto armado interno</option>
+            <option>Zonas apartadas y de difícil acceso</option>
+            <option>No</option>
+            <option>Otro</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="discapacidad">¿Tienes alguna discapacidad? *</label>
+          <select id="discapacidad" required><option value="">Selecciona...</option><option>No</option><option value="tiene_discapacidad">Sí</option></select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field" id="tipoDiscapacidadField" style="display: none;">
+          <label for="tipo_discapacidad">Indica cuál *</label>
+          <select id="tipo_discapacidad">
+            <option value="">Selecciona...</option>
+            <option>Discapacidad física</option>
+            <option>Discapacidad visual</option>
+            <option>Discapacidad auditiva</option>
+            <option>Discapacidad intelectual</option>
+            <option>Discapacidad psicosocial (mental)</option>
+            <option>Discapacidad múltiple</option>
+            <option>Sordoceguera</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
       </div>
     </fieldset>
 
@@ -328,11 +370,17 @@
           <span class="err">Escribe el nombre de tu emprendimiento.</span>
         </div>
         <div class="field" style="grid-column:1/-1;">
-          <label for="tipoemp">Tipo de emprendimiento *</label>
+          <div class="label-row">
+            <label for="tipoemp">Tipo de emprendimiento *</label>
+            <button type="button" class="nube-btn" id="nubeBtn" aria-expanded="false" aria-controls="nubeTipo">¿Cuál es la diferencia?</button>
+          </div>
+          <div class="nube" id="nubeTipo" role="note" hidden>
+            <p><b>Emprendimiento verde:</b> una iniciativa en etapa temprana que ofrece un producto o servicio con impacto ambiental positivo, pero todavía no ha sido verificada.</p>
+            <p><b>Negocio verde:</b> un negocio en operación que ya cumple, o tiene verificados por la autoridad ambiental, los criterios del Plan Nacional de Negocios Verdes.</p>
+          </div>
           <select id="tipoemp" required>
             <option value="">Selecciona...</option><option>Emprendimiento verde</option><option>Negocio verde</option>
           </select>
-          <span class="help"><b>Emprendimiento verde:</b> una iniciativa en etapa temprana que ofrece un producto o servicio con impacto ambiental positivo, pero todavía no ha sido verificada. <b>Negocio verde:</b> un negocio en operación que ya cumple, o tiene verificados por la autoridad ambiental, los criterios del Plan Nacional de Negocios Verdes.</span>
           <span class="err">Selecciona una opción.</span>
         </div>
         <div class="field">
@@ -372,6 +420,19 @@
           <input type="number" id="colaboradores" min="0" step="1" inputmode="numeric" placeholder="Ej: 3" required>
           <span class="hint">Cuenta a las personas que trabajan en el emprendimiento, además de ti. Si trabajas solo, escribe 0.</span>
           <span class="err">Ingresa un número entero (0 o más).</span>
+        </div>
+        <div class="field">
+          <label for="etapa">¿En qué etapa se encuentra tu emprendimiento? *</label>
+          <select id="etapa" required>
+            <option value="">Selecciona...</option>
+            <option>Ideación</option><option>Fortalecimiento — prototipo desarrollado y probado</option><option>Consolidación y expansión</option>
+          </select>
+          <span class="err">Selecciona una opción.</span>
+        </div>
+        <div class="field">
+          <label for="financiacion">¿Has recibido financiación? *</label>
+          <select id="financiacion" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
+          <span class="err">Selecciona una opción.</span>
         </div>
       </div>
     </fieldset>
@@ -416,7 +477,7 @@
         <span class="err">Escribe entre 150 y 600 caracteres sobre el problema que resuelves.</span>
       </div>
       <div class="field">
-        <label for="impacto">Describe el impacto que genera *</label>
+        <label for="impacto">Describe el impacto social y ambiental que genera tu emprendimiento *</label>
         <textarea id="impacto" required data-min="200" data-max="800" maxlength="800"></textarea>
         <div class="charline"><span>Cuántas personas, kilos de residuos o empleos, en qué municipio y desde cuándo.</span><span class="cc" data-cc-for="impacto"></span></div>
         <span class="err">Escribe entre 200 y 800 caracteres sobre tu impacto.</span>
@@ -427,11 +488,16 @@
         <div class="charline"><span>Quiénes te compran hoy y a quién quieres llegar.</span><span class="cc" data-cc-for="clientes"></span></div>
         <span class="err">Escribe entre 100 y 400 caracteres sobre tus clientes.</span>
       </div>
-      <div class="grid2">
+      <div class="field">
+        <label for="vendiendo">¿Estás vendiendo actualmente? *</label>
+        <select id="vendiendo" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
+        <span class="err">Selecciona una opción.</span>
+      </div>
+      <div class="grid2" id="bloqueVentas" style="display:none;">
         <div class="field">
           <label for="ventas">Promedio mensual de ventas en los últimos 6 meses (COP) *</label>
           <input type="text" id="ventas" inputmode="numeric" placeholder="Ej: 1.500.000" required autocomplete="off">
-          <span class="hint">Solo números. Si aún no vendes, escribe 0.</span>
+          <span class="help"><b>Lo que facturas.</b> Es el total que vendiste cada mes, antes de restar costos y gastos. Solo números.</span>
           <span class="err">Ingresa un valor en pesos (solo números).</span>
         </div>
         <div class="field">
@@ -445,14 +511,63 @@
             <option>$3.000.000 – $5.000.000</option>
             <option>Más de $5.000.000</option>
           </select>
+          <span class="help"><b>Lo que te queda.</b> Es lo que sobra después de pagar costos y gastos. No es lo mismo que lo facturado: si vendes $2.000.000 y gastas $1.500.000, tu ganancia es $500.000.</span>
           <span class="err">Selecciona un rango.</span>
         </div>
       </div>
+      <div id="bloqueSoporte" style="display:none;">
+        <div class="field">
+          <label>Documentos que soportan tus ventas *</label>
+          <span class="help"><b>Sube al menos uno.</b> Puede ser una factura electrónica, una cuenta de cobro, una certificación comercial o un contrato. Puedes adjuntar hasta 4 archivos.</span>
+        </div>
+        <div class="grid2">
+        <div class="field">
+          <label>Documento 1 *</label>
+          <label class="file" data-file-for="fSoporte1">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fSoporte1" accept=".pdf,.jpg,.jpeg,.png" data-label="Documento soporte de ventas 1">
+          </label>
+          <div class="file-meta" data-meta-for="fSoporte1"></div>
+          <span class="err">Adjunta al menos un documento que soporte tus ventas (PDF, JPG o PNG de máximo 10 MB).</span>
+        </div>
+        <div class="field">
+          <label>Documento 2 <span class="hint">(opcional)</span></label>
+          <label class="file" data-file-for="fSoporte2">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fSoporte2" accept=".pdf,.jpg,.jpeg,.png" data-label="Documento soporte de ventas 2">
+          </label>
+          <div class="file-meta" data-meta-for="fSoporte2"></div>
+          <span class="err">Revisa este archivo: debe ser PDF, JPG o PNG de máximo 10 MB.</span>
+        </div>
+        <div class="field">
+          <label>Documento 3 <span class="hint">(opcional)</span></label>
+          <label class="file" data-file-for="fSoporte3">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fSoporte3" accept=".pdf,.jpg,.jpeg,.png" data-label="Documento soporte de ventas 3">
+          </label>
+          <div class="file-meta" data-meta-for="fSoporte3"></div>
+          <span class="err">Revisa este archivo: debe ser PDF, JPG o PNG de máximo 10 MB.</span>
+        </div>
+        <div class="field">
+          <label>Documento 4 <span class="hint">(opcional)</span></label>
+          <label class="file" data-file-for="fSoporte4">
+            <span class="ic">📄</span>
+            <span class="tx"><b>Subir documento</b><span>PDF, JPG o PNG, máx. 10 MB</span></span>
+            <input type="file" id="fSoporte4" accept=".pdf,.jpg,.jpeg,.png" data-label="Documento soporte de ventas 4">
+          </label>
+          <div class="file-meta" data-meta-for="fSoporte4"></div>
+          <span class="err">Revisa este archivo: debe ser PDF, JPG o PNG de máximo 10 MB.</span>
+        </div>
+        </div>
+      </div>
       <div class="field">
-        <label>Redes sociales del emprendimiento <span class="hint">(opcional, hasta 3)</span></label>
+        <label>Redes sociales del emprendimiento * <span class="hint">(al menos una, hasta 3)</span></label>
         <div class="redes-list" id="redesList"></div>
         <button type="button" class="add-red" id="addRed">+ Agregar otra red</button>
-        <span class="hint">Pega el enlace o escribe tu @usuario. Si todavía no tienes redes, puedes dejarlo vacío.</span>
+        <span class="hint">Pega el enlace o escribe tu @usuario.</span>
         <span class="err" id="redesErr">Revisa los enlaces marcados: deben ser una dirección web válida o un @usuario.</span>
       </div>
       <div class="field">
@@ -466,66 +581,6 @@
         <div class="charline"><span>Qué comprarías o harías con el capital y qué resultado esperas.</span><span class="cc" data-cc-for="inversion"></span></div>
         <span class="err">Escribe entre 150 y 600 caracteres sobre cómo invertirías el capital.</span>
       </div>
-    </fieldset>
-
-    <fieldset class="fset" id="sec-5" data-title="Contexto adicional">
-      <div class="lg"><span class="no">05</span> Contexto adicional <span class="badge-bad">Incompleta</span></div>
-      <div class="grid2">
-        <div class="field">
-          <label for="priorizada">¿Perteneces a alguna población priorizada? *</label>
-          <select id="priorizada" required>
-            <option value="">Selecciona...</option>
-            <option>Comunidades indígenas</option>
-            <option>Comunidades negras</option>
-            <option>Migrantes y refugiados</option>
-            <option>Raizales</option>
-            <option>Reincorporados</option>
-            <option>Víctimas del conflicto armado interno</option>
-            <option>Zonas apartadas y de difícil acceso</option>
-            <option>No</option>
-            <option>Otro</option>
-          </select>
-          <span class="err">Selecciona una opción.</span>
-        </div>
-        <div class="field">
-          <label for="discapacidad">¿Tienes alguna discapacidad? *</label>
-          <select id="discapacidad" required><option value="">Selecciona...</option><option>No</option><option value="tiene_discapacidad">Sí</option></select>
-          <span class="err">Selecciona una opción.</span>
-        </div>
-        <div class="field" id="tipoDiscapacidadField" style="display: none;">
-          <label for="tipo_discapacidad">Indica cuál *</label>
-          <select id="tipo_discapacidad">
-            <option value="">Selecciona...</option>
-            <option>Discapacidad física</option>
-            <option>Discapacidad visual</option>
-            <option>Discapacidad auditiva</option>
-            <option>Discapacidad intelectual</option>
-            <option>Discapacidad psicosocial (mental)</option>
-            <option>Discapacidad múltiple</option>
-            <option>Sordoceguera</option>
-          </select>
-          <span class="err">Selecciona una opción.</span>
-        </div>
-        <div class="field">
-          <label for="etapa">¿En qué etapa se encuentra tu emprendimiento? *</label>
-          <select id="etapa" required>
-            <option value="">Selecciona...</option>
-            <option>Ideación</option><option>Fortalecimiento — prototipo desarrollado y probado</option><option>Consolidación y expansión</option>
-          </select>
-          <span class="err">Selecciona una opción.</span>
-        </div>
-        <div class="field">
-          <label for="financiacion">¿Has recibido financiación? *</label>
-          <select id="financiacion" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
-          <span class="err">Selecciona una opción.</span>
-        </div>
-        <div class="field">
-          <label for="vendiendo">¿Estás vendiendo actualmente? *</label>
-          <select id="vendiendo" required><option value="">Selecciona...</option><option>Sí</option><option>No</option></select>
-          <span class="err">Selecciona una opción.</span>
-        </div>
-      </div>
-
       <div class="field">
         <label>¿Qué es lo que más necesita tu emprendimiento? <span class="hint">(máximo 3) *</span></label>
         <div class="chips" id="necesitaChips">
@@ -547,7 +602,7 @@
     </fieldset>
 
     <fieldset class="fset" id="sec-6" data-title="Documentos habilitantes">
-      <div class="lg"><span class="no">06</span> Documentos habilitantes <span class="badge-bad">Incompleta</span></div>
+      <div class="lg"><span class="no">05</span> Documentos habilitantes <span class="badge-bad">Incompleta</span></div>
       <div class="grid2">
         <div class="field">
           <label>Copia de documento de identidad *</label>
@@ -583,8 +638,15 @@
       <div class="field">
         <label for="videoEnlace">Enlace del video del emprendimiento *</label>
         <input type="text" id="videoEnlace" inputmode="url" placeholder="https://youtube.com/watch?v=..." required>
-        <span class="hint">Máximo 90 segundos. Súbelo a YouTube, Google Drive o Vimeo y verifica que sea público o que cualquier persona con el enlace pueda verlo.</span>
+        <span class="help"><b>Máximo 3 minutos.</b> Cuéntanos tres cosas: que tu emprendimiento existe, cuál es tu propuesta de valor y por qué deberías ser elegido en esta versión de Innova Social.</span>
+        <span class="hint">Súbelo a YouTube, Google Drive o Vimeo y verifica que sea público o que cualquier persona con el enlace pueda verlo.</span>
         <span class="err">Pega un enlace de YouTube, Google Drive o Vimeo.</span>
+      </div>
+      <div class="field">
+        <label for="fotosEnlace">Fotos de tu servicio o productos *</label>
+        <input type="text" id="fotosEnlace" inputmode="url" placeholder="https://drive.google.com/drive/folders/..." required>
+        <span class="help"><b>Habilita el acceso para que todos puedan verlas.</b> Sube las fotos a una carpeta de Google Drive y, en «Compartir», elige «Cualquier persona con el enlace». Si queda restringida, no podremos abrirla.</span>
+        <span class="err">Pega el enlace de la carpeta de Drive con las fotos.</span>
       </div>
       <p class="hint" style="margin:6px 0 0; font-size:11.5px; color:var(--muted);">Por seguridad, los documentos adjuntos no se guardan en el borrador: si recargas la página, tendrás que volver a subirlos.</p>
     </fieldset>
@@ -624,7 +686,7 @@
 (function(){
   'use strict';
   // Cambia a true el día que abran las postulaciones.
-  const POSTULACIONES_ABIERTAS = false;
+  const POSTULACIONES_ABIERTAS = true;
   const $ = (id) => document.getElementById(id);
   if (!POSTULACIONES_ABIERTAS) {
     document.documentElement.classList.add('postulaciones-cerradas');
@@ -636,7 +698,7 @@
   const DRAFT_KEY = 'innova5_postulacion_borrador_v1';
   const MAX_FILE = 10 * 1024 * 1024;
   const FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
-  const SECTIONS = ['sec-1', 'sec-2', 'sec-3', 'sec-4', 'sec-5', 'sec-6'];
+  const SECTIONS = ['sec-1', 'sec-2', 'sec-3', 'sec-4', 'sec-6'];
 
   function onlyDigits(v){ return String(v || '').replace(/\D/g, ''); }
   function labelOf(el){
@@ -677,6 +739,26 @@
     if (!tiene) tipoDiscapacidadInput.value = '';
   }
   discapacidadSelect.addEventListener('change', syncDiscapacidad);
+
+  // ---------- Nube: tipología de negocios ----------
+  const nubeBtn = $('nubeBtn'), nubeTipo = $('nubeTipo');
+  function nube(abrir){ nubeTipo.hidden = !abrir; nubeBtn.setAttribute('aria-expanded', String(abrir)); }
+  nubeBtn.addEventListener('click', () => nube(nubeTipo.hidden));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !nubeTipo.hidden) { nube(false); nubeBtn.focus(); } });
+  document.addEventListener('click', (e) => { if (!nubeTipo.hidden && !nubeTipo.contains(e.target) && e.target !== nubeBtn) nube(false); });
+
+  // ---------- ¿Estás vendiendo? ----------
+  // Ventas y ganancia solo se piden (y se exigen) a quien vende hoy.
+  const vendiendoSelect = $('vendiendo');
+  const bloqueVentas = $('bloqueVentas');
+  const vende = () => vendiendoSelect.value === 'Sí';
+  function syncVendiendo(){
+    bloqueVentas.style.display = vende() ? '' : 'none';
+    $('bloqueSoporte').style.display = vende() ? '' : 'none';
+    $('ventas').required = $('rango_ganancias').required = vende();
+  }
+  syncVendiendo();
+  vendiendoSelect.addEventListener('change', syncVendiendo);
 
   // ---------- Documento de identidad ----------
   const DOC_RULES = {
@@ -835,6 +917,15 @@
     try { return VIDEO_HOSTS.test(new URL(href).hostname) ? href : false; } catch (e) { return false; }
   }
 
+  // Fotos: enlace a una carpeta compartida (Drive, o las nubes más comunes).
+  const FOTOS_OBLIGATORIAS = true;
+  const FOTOS_HOSTS = /(^|\.)(drive\.google\.com|docs\.google\.com|photos\.google\.com|photos\.app\.goo\.gl|dropbox\.com|1drv\.ms|onedrive\.live\.com)$/i;
+  function fotosUrl(){
+    const href = normalizeUrl($('fotosEnlace').value);
+    if (!href) return href;
+    try { return FOTOS_HOSTS.test(new URL(href).hostname) ? href : false; } catch (e) { return false; }
+  }
+
   // ---------- Adjuntos ----------
   function fmtSize(b){ return b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
   function fileProblem(input){
@@ -861,6 +952,8 @@
     meta.classList.add('on');
   }
   const fileInputs = [...form.querySelectorAll('.file input[type=file]')];
+  const soporteInputs = fileInputs.filter(i => i.closest('#bloqueSoporte'));
+  const docInputs = fileInputs.filter(i => !i.closest('#bloqueSoporte'));
   fileInputs.forEach(input => input.addEventListener('change', () => { renderFileMeta(input); onChange(); }));
 
   // ---------- Reglas (validación, progreso y resumen salen de aquí) ----------
@@ -875,22 +968,29 @@
     { sec:'sec-1', el:nacimiento, label:'Fecha de nacimiento', test: () => { const a = edad(nacimiento.value); return a >= 18 && a <= 100; },
       msg: () => { const a = edad(nacimiento.value); return isNaN(a) ? 'Ingresa tu fecha de nacimiento.' : 'Debes ser mayor de edad para postularte.'; } },
     req('municipio', 'sec-2'), req('estrato', 'sec-2'), req('educacion', 'sec-2'), req('empleo', 'sec-2'),
+    req('priorizada', 'sec-2'), req('discapacidad', 'sec-2'),
+    { sec:'sec-2', el:tipoDiscapacidadInput, label:'Tipo de discapacidad', countIf: () => tipoDiscapacidadInput.required, test: () => !tipoDiscapacidadInput.required || tipoDiscapacidadInput.value !== '' },
     req('empnombre', 'sec-3'), req('tipoemp', 'sec-3'), req('formalizacion', 'sec-3'), req('categoria', 'sec-3'),
     { sec:'sec-3', el:subcategoria, label:'Subcategoría', test: () => !subcategoria.disabled && subcategoria.value !== '' },
     req('dedicacion', 'sec-3'),
+    req('etapa', 'sec-3'), req('financiacion', 'sec-3'),
     { sec:'sec-3', el:$('colaboradores'), label:'N° de colaboradores/empleados', test: () => /^\d{1,5}$/.test($('colaboradores').value.trim()) },
     { sec:'sec-4', el:$('odsChips'), label:'ODS alineados', test: () => { const n = odsChips.boxes.filter(b => b.checked).length; return n >= 1 && n <= 3; } },
     ...textareas.filter(t => t.closest('#sec-4')).map(ta => ({ sec:'sec-4', el:ta, label:labelOf(ta), test: () => { const n = ta.value.trim().length; return n >= +ta.dataset.min && n <= +ta.dataset.max; } })),
-    { sec:'sec-4', el:ventas, label:'Promedio mensual de ventas', test: () => ventasNumero() !== null },
-    req('rango_ganancias', 'sec-4'),
-    { sec:'sec-4', el:redesList, label:'Redes sociales', optional:true, test: () => redesValues().every(r => normalizeRed(r.red, r.raw) !== false) },
+    req('vendiendo', 'sec-4'),
+    { sec:'sec-4', el:ventas, label:'Promedio mensual de ventas', countIf: vende, test: () => !vende() || ventasNumero() !== null },
+    { sec:'sec-4', el:$('rango_ganancias'), label:'Ganancia mensual promedio', countIf: vende, test: () => !vende() || $('rango_ganancias').value !== '' },
+    { sec:'sec-4', el:redesList, label:'Redes sociales', test: () => { const v = redesValues().map(r => normalizeRed(r.red, r.raw)); return v.some(x => x) && v.every(x => x !== false); },
+      msg: () => redesValues().some(r => r.raw.trim()) ? 'Revisa los enlaces marcados: deben ser una dirección web válida o un @usuario.' : 'Agrega al menos una red social del emprendimiento (enlace o @usuario).' },
     { sec:'sec-4', el:$('web'), label:'Página web', optional:true, test: () => normalizeUrl($('web').value) !== false },
-    req('priorizada', 'sec-5'), req('discapacidad', 'sec-5'),
-    { sec:'sec-5', el:tipoDiscapacidadInput, label:'Tipo de discapacidad', countIf: () => tipoDiscapacidadInput.required, test: () => !tipoDiscapacidadInput.required || tipoDiscapacidadInput.value !== '' },
-    req('etapa', 'sec-5'), req('financiacion', 'sec-5'), req('vendiendo', 'sec-5'),
-    { sec:'sec-5', el:$('necesitaChips'), label:'Lo que más necesita tu emprendimiento', test: () => { const n = necesitaChips.boxes.filter(b => b.checked).length; return n >= 1 && n <= 3; } },
-    ...fileInputs.map(input => ({ sec:'sec-6', el:input, label:input.dataset.label, test: () => fileProblem(input) === null })),
+    { sec:'sec-4', el:$('necesitaChips'), label:'Lo que más necesita tu emprendimiento', test: () => { const n = necesitaChips.boxes.filter(b => b.checked).length; return n >= 1 && n <= 3; } },
+    ...soporteInputs.map((input, i) => i === 0
+      ? { sec:'sec-4', el:input, label:input.dataset.label, countIf: vende, test: () => !vende() || fileProblem(input) === null }
+      : { sec:'sec-4', el:input, label:input.dataset.label, optional:true, test: () => !vende() || !input.files[0] || fileProblem(input) === null }),
+    ...docInputs.map(input => ({ sec:'sec-6', el:input, label:input.dataset.label, test: () => fileProblem(input) === null })),
     { sec:'sec-6', el:$('videoEnlace'), label:'Enlace del video', test: () => !!videoUrl() },
+    { sec:'sec-6', el:$('fotosEnlace'), label:'Fotos de tu servicio o productos', optional: !FOTOS_OBLIGATORIAS, test: () => FOTOS_OBLIGATORIAS ? !!fotosUrl() : fotosUrl() !== false,
+      msg: () => $('fotosEnlace').value.trim() ? 'Pega un enlace de Google Drive (o de Dropbox, OneDrive o Google Fotos).' : 'Pega el enlace de la carpeta de Drive con las fotos.' },
     { sec:'sec-7', el:$('terminos'), label:'Aceptación de términos y condiciones', test: () => $('terminos').checked },
     { sec:'sec-7', el:$('datos'), label:'Autorización de tratamiento de datos', test: () => $('datos').checked },
   ];
@@ -978,7 +1078,8 @@
     set('tipo_documento'); syncTipoDocumento(false);
     set('categoria'); fillSubcats();
     set('discapacidad'); syncDiscapacidad();
-    fieldEls().forEach(el => { if (!['tipo_documento', 'categoria', 'discapacidad'].includes(el.id)) set(el.id); });
+    set('vendiendo'); syncVendiendo();
+    fieldEls().forEach(el => { if (!['tipo_documento', 'categoria', 'discapacidad', 'vendiendo'].includes(el.id)) set(el.id); });
     odsChips.boxes.forEach(b => { b.checked = (data.ods || []).includes(b.value); }); odsChips.update();
     necesitaChips.boxes.forEach(b => { b.checked = (data.necesita || []).includes(b.value); }); necesitaChips.update();
     if (Array.isArray(data.redes) && data.redes.length) {
@@ -1054,11 +1155,11 @@
       descripcion_problema: $('problema').value.trim(),
       descripcion_impacto: $('impacto').value.trim(),
       descripcion_clientes: $('clientes').value.trim(),
-      promedio_ventas_6_meses: ventasNumero(),
+      promedio_ventas_6_meses: vende() ? ventasNumero() : 0,
       redes_sociales: redes.map(r => r.red + ': ' + r.url).join(' · ') || null,
       redes: redes,
       pagina_web: web,
-      rango_ganancias: $('rango_ganancias').value,
+      rango_ganancias: vende() ? $('rango_ganancias').value : 'Aún no tengo ganancias',
       uso_recurso: $('inversion').value.trim(),
       poblacion_priorizada: $('priorizada').value,
       discapacidad: tieneDisc ? 'Sí' : 'No',
@@ -1068,6 +1169,7 @@
       esta_vendiendo: siNo($('vendiendo').value),
       necesidades: necesitaChips.boxes.filter(b => b.checked).map(b => b.value),
       video_url: videoUrl(),
+      fotos_enlace: fotosUrl() || null,
       documentos: documentos,
     };
   }
@@ -1102,7 +1204,9 @@
     try {
       const documentos = {};
       const DOCS = [['cedula', 'fCedula'], ['rut', 'fRut'], ['recibo_triple_a', 'fRecibo']];
-      for (const [key, inputId] of DOCS) {
+      // Los soportes de ventas solo viajan si responde que vende (si cambió a «No», se descartan).
+      const soportes = vende() ? soporteInputs.map((inp, i) => ['soporte_ventas_' + (i + 1), inp.id]).filter(([, inpId]) => $(inpId).files[0]) : [];
+      for (const [key, inputId] of DOCS.concat(soportes)) {
         const file = $(inputId).files[0];
         const path = id + '/' + key + '.' + extOf(file);
         submitBtn.querySelector('span').textContent = 'Subiendo documentos…';
@@ -1134,8 +1238,11 @@
     } catch (err) {
       console.error('[postulación] fallo en', err && err.stage, err && err.error ? err.error : err);
       const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+      const repetida = err && err.stage === 'postulacion' && err.error && err.error.code === '23505';
       showSendError(offline
         ? 'Parece que no tienes conexión a internet. Conéctate e intenta de nuevo.'
+        : repetida
+        ? 'Ya existe una postulación con ese número de documento. Cada persona puede postularse una sola vez; si crees que es un error, escríbenos.'
         : (err && err.stage === 'documentos'
           ? 'No pudimos subir tus documentos. Intenta de nuevo en unos minutos; si el problema sigue, escríbenos.'
           : 'El sistema no pudo guardar tu postulación. Intenta de nuevo en unos minutos; si el problema sigue, escríbenos.'));

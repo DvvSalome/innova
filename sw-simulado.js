@@ -228,6 +228,8 @@ async function rest(req, url, s, w) {
     const total = rows.length;
     if (p.get('limit')) rows = rows.slice(0, Number(p.get('limit')));
     rows = embebidos(s, tabla, rows, p.get('select'), w);
+    // La base devuelve todas las columnas en todas las filas (también la nueva, aunque sea null).
+    if (tabla === 'postulaciones' && p.get('select') === '*') rows = rows.map((r) => ({ fotos_enlace: null, ...r }));
     if (metodo === 'HEAD') return new Response(null, { status: 200, headers: { 'content-range': '*/' + total, 'access-control-allow-origin': '*' } });
     if (/count=exact/.test(prefer)) return J(uno ? rows[0] : rows, 200, { 'content-range': '0-' + Math.max(rows.length - 1, 0) + '/' + total });
     return responder(rows);
@@ -256,6 +258,9 @@ async function rest(req, url, s, w) {
           { evaluador_id: w.id, registrado_por_email: w.email, updated_at: now() });
       }
       if (tabla === 'postulaciones' && (!w || w.perfil.role !== 'admin') && (b.estado && b.estado !== 'postulado' || b.user_id || b.orden_desempate != null)) return J({ code: '42501', message: 'new row violates row-level security policy for table "postulaciones"' }, 403);
+      if (tabla === 'postulaciones' && b.fotos_enlace != null && !(String(b.fotos_enlace).length <= 500 && /^https?:\/\/\S+$/i.test(String(b.fotos_enlace)))) return J({ code: '23514', message: 'new row for relation "postulaciones" violates check constraint "postulaciones_fotos_enlace_valido"' }, 400);
+      const cedula = (v) => String(v || '').trim().toLowerCase();
+      if (tabla === 'postulaciones' && s.postulaciones.some((r) => cedula(r.cedula) === cedula(b.cedula))) return J({ code: '23505', message: 'duplicate key value violates unique constraint "postulaciones_cedula_unica"' }, 409);
       const ex = upsert && s[tabla].find((r) => pk.every((k) => String(r[k]) === String(b[k])));
       if (ex) { Object.assign(ex, b, { updated_at: now() }); out.push(ex); }
       else { const row = { id: uuid(), created_at: now(), updated_at: now(), ...(DEF[tabla] ? DEF[tabla]() : {}), ...b }; s[tabla].push(row); out.push(row); }
@@ -383,6 +388,8 @@ async function manejar(req) {
       const rest2 = path.replace('/storage/v1/object/', '');
       const bucket = rest2.split('/')[0], name = rest2.slice(bucket.length + 1);
       const ct = req.headers.get('content-type') || '';
+      // Misma regla que la política de la base: <id>/cedula|rut|recibo_triple_a|soporte_ventas_1..4.<ext>
+      if (bucket === 'postulaciones' && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(cedula|rut|recibo_triple_a|soporte_ventas_[1-4])\.(pdf|jpg|jpeg|png)$/.test(name)) return J({ statusCode: '403', error: 'Unauthorized', message: 'new row violates row-level security policy' }, 403);
       s.storage.push({ bucket, name, ct, size: Number(req.headers.get('content-length') || 0), created_at: now() });
       await save(s);
       return J({ Key: rest2, Id: uuid() });

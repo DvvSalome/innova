@@ -31,7 +31,7 @@ const antes = await db.query(`select id, puntaje_global from public.ranking_post
 console.log('ANTES  ranking_postulaciones ->', antes);
 
 // Correr el archivo combinado tal cual se lo entregamos.
-let sql = readFileSync('/home/dvv-salom3/dev/freelance/inngenios/INNOOVASOCIAL/supabase/APLICAR-EN-PRODUCCION.sql','utf8');
+let sql = readFileSync(new URL('../supabase/APLICAR-EN-PRODUCCION.sql', import.meta.url),'utf8');
 try { await db.exec(sql); console.log('ARCHIVO COMBINADO -> aplicado sin error'); }
 catch (e) { console.log('ARCHIVO COMBINADO -> FALLO:', e.message.split('\n')[0]); process.exit(1); }
 
