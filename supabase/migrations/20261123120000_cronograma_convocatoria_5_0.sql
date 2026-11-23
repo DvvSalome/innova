@@ -1,15 +1,15 @@
 -- ============================================================================
 -- Innova Social — cronograma de la convocatoria 5.0
 --
--- Alinea la línea de tiempo (tabla etapas_convocatoria) con los PDF oficiales
--- «Términos de Referencia» (secciones 11 y 12) y «Preguntas Frecuentes» (pregunta 8):
+-- Actualiza la línea de tiempo (tabla etapas_convocatoria) con las fechas que dio
+-- el equipo el 23 nov (reemplazan las de los PDF oficiales, que traían otras):
 --
---   1  Lanzamiento y convocatoria   18 – 30 nov           (lanzamiento 18 nov, cierre 30 nov de 2026)
---   2  Preselección                 30 nov – 5 dic        (proceso de selección y evaluación)
---   3  Bootcamps y encuentros       Por definir           (bootcamp híbrido de 8 h, fecha por definir)
---   4  Presentación Pitch           Por definir
---   5  Ceremonia de ganadores       14 ene 2027           (jueves 14 de enero de 2027)
---   6  Incubación y plan de inv.    15 ene – 15 jul 2027
+--   1  Lanzamiento y convocatoria   4 – 18 dic            (lanzamiento 4 dic, cierre 18 dic de 2026)
+--   2  Preselección                 21 – 23 dic           (evaluación)
+--   3  Bootcamps y encuentros       12 – 15 ene 2027      (bootcamp y pitch comparten el rango)
+--   4  Presentación Pitch           12 – 15 ene 2027
+--   5  Ceremonia de ganadores       19 ene 2027           (premiación)
+--   6  Incubación y plan de inv.    Por definir           (sin fechas todavía; las del PDF empezaban antes de la premiación)
 --
 -- La página convocatoria.html lee esta tabla (el HTML es solo respaldo) y los
 -- correos de confirmación también, así que sin esto se siguen viendo las fechas
@@ -42,12 +42,12 @@ end
 $chk$;
 
 update public.etapas_convocatoria set fechas_texto = case orden
-  when 1 then '18 – 30 nov'
-  when 2 then '30 nov – 5 dic'
-  when 3 then 'Por definir'
-  when 4 then 'Por definir'
-  when 5 then '14 ene 2027'
-  when 6 then '15 ene – 15 jul 2027'
+  when 1 then '4 – 18 dic'
+  when 2 then '21 – 23 dic'
+  when 3 then '12 – 15 ene 2027'
+  when 4 then '12 – 15 ene 2027'
+  when 5 then '19 ene 2027'
+  when 6 then 'Por definir'
 end
 where orden between 1 and 6;
 
