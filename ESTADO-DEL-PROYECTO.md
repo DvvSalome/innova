@@ -9,10 +9,12 @@ Este documento resume qué está hecho y qué falta. El detalle de cada prueba e
 - **Formulario abierto** en los tres dominios (interruptor `POSTULACIONES_ABIERTAS` en `postular.html`). Hay 2 postulaciones reales (16 y 22 oct) con sus documentos y correos enviados.
 - **Dominio:** `innovasocial.co` (A → 216.198.79.1) y `www` (CNAME → cname.vercel-dns.com) apuntan a Vercel desde el 10 nov; el DNS sigue en Hostinger.
 - **Supabase Auth:** URL permitidas de `acceso.html` en los tres dominios y registro público cerrado. `site_url` ahora es `https://www.innovasocial.co`.
-- **Rotos:** los PDFs de `files_web/` (términos de referencia, política de datos, preguntas frecuentes y resumen PNNV) dan 404 desde que el dominio apunta a Vercel; hay que subirlos al repo.
+- **Rotos (parcial):** los PDFs de `files_web/` daban 404 desde que el dominio apunta a Vercel; ya están los términos y las preguntas frecuentes (ver más abajo), faltan la política de datos y el resumen PNNV.
 - **Publicado el 16 nov (commit `b164bfb`)** y verificado en `www.innovasocial.co`: secciones del formulario reorganizadas («Contexto adicional» desaparece; «¿Estás vendiendo?» decide si se piden ventas y ganancia), documentos soporte de ventas (hasta 4; el primero es obligatorio si vende), fotos con enlace de Drive (obligatorias; para hacerlas opcionales, `FOTOS_OBLIGATORIAS` en `postular.html`), nube de tipología, redes obligatorias, video de 3 minutos, notas de ventas y ganancia, beneficio de $12M y «Ruta del programa» hacia `convocatoria.html#etapas`. El panel y el CSV muestran los campos nuevos.
 - **Base de datos:** el 16 nov se aplicó `supabase/APLICAR-EN-SQL-EDITOR.sql` (cédula única, `fotos_enlace` y subida de `soporte_ventas_1` a 4). Permisos: 70 de 70 contra producción.
-- **Pendientes de la reunión:** enlace al PNNV, texto de política de datos y galería. Y los 4 PDFs de `files_web/` (404).
+- **PDFs de `files_web/`:** subidos los términos de referencia y las preguntas frecuentes (versión oficial 5.0, 18 nov). Siguen en 404 `politica-de-tratamiento-de-datos-innova-social.pdf` y `Resumen_Ejecutivo_PNNV_2022_2030.pdf`.
+- **Cronograma alineado con esos PDF (23 nov):** lanzamiento 18 nov, cierre 30 nov, selección 30 nov – 5 dic, bootcamp y pitch por definir, premiación 14 ene 2027, incubación 15 ene – 15 jul 2027. El HTML y `seed.sql` ya están. **La página y los correos leen la tabla `etapas_convocatoria`: falta ejecutar `supabase/migrations/20261123120000_cronograma_convocatoria_5_0.sql` en el SQL Editor.** El informe «Así fue la edición 4.0» (`ruta.html`) conserva sus fechas a propósito: es historia de la edición anterior.
+- **Pendientes de la reunión:** enlace al PNNV, texto de política de datos y galería.
 
 ---
 
@@ -89,7 +91,7 @@ Los cambios de todas las migraciones de `supabase/migrations/` están en producc
 - **Dominio:** `innovasociall.co` no está registrado. Si se compra, hay que agregarlo en Vercel y actualizar `SITE_URL` y las direcciones permitidas de Supabase.
 - **WhatsApp:** la confirmación por WhatsApp necesita una cuenta de WhatsApp Business; hoy solo se confirma por correo.
 - **Pesos del puntaje** (40 / 30 / 30 por defecto), si la población priorizada suma puntos y si «Ninguna» formalización suma 0.
-- **Cronograma 5.0** definitivo y fecha del Pitch Day.
+- **Fechas del bootcamp y del Pitch Day:** los PDF oficiales las dejan «por definir». Cuando se fijen, editarlas en el panel (Etapas) o con un `update` a `etapas_convocatoria`.
 - **Contenido por aclarar (C1–C6 del informe):** 6 o 9 meses de acompañamiento; nombre comercial de «Manteca de Cerdo»; «1,6 toneladas» mensual o única; facturas en los requisitos; fecha del momento «De camino al Pitch Day»; cifras que no coinciden entre el inicio ($95.705.000 y 87 %) y los casos ($99.888.140 y 66 %).
 
 ### Mejoras sugeridas (no bloquean)
