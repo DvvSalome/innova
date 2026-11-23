@@ -92,7 +92,7 @@ Los cambios de todas las migraciones de `supabase/migrations/` están en producc
 - **WhatsApp:** la confirmación por WhatsApp necesita una cuenta de WhatsApp Business; hoy solo se confirma por correo.
 - **Pesos del puntaje** (40 / 30 / 30 por defecto), si la población priorizada suma puntos y si «Ninguna» formalización suma 0.
 - **Fechas del bootcamp y del Pitch Day:** los PDF oficiales las dejan «por definir». Cuando se fijen, editarlas en el panel (Etapas) o con un `update` a `etapas_convocatoria`.
-- **Contenido por aclarar (C1–C6 del informe):** 6 o 9 meses de acompañamiento; nombre comercial de «Manteca de Cerdo»; «1,6 toneladas» mensual o única; facturas en los requisitos; fecha del momento «De camino al Pitch Day»; cifras que no coinciden entre el inicio ($95.705.000 y 87 %) y los casos ($99.888.140 y 66 %).
+- **Contenido por aclarar (C1–C6 del informe):** 6 o 9 meses de acompañamiento; nombre comercial de «Manteca de Cerdo»; «1,6 toneladas» mensual o única; facturas en los requisitos; fecha del momento «De camino al Pitch Day»; crecimiento en ventas que no coincide entre el inicio (87 %) y los casos (66 %). El capital entregado ya coincide: $99.888.140 en el inicio, en los casos y en «Así fue la edición 4.0» (23 nov; es la suma del capital de los 10 casos del Informe Final).
 
 ### Mejoras sugeridas (no bloquean)
 - Si Resend falla al enviar, no se reintenta solo: hay que reenviar desde «Correos enviados».
