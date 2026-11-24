@@ -112,11 +112,11 @@ values (
 -- Etapas de la convocatoria (línea de tiempo del programa).
 
 insert into public.etapas_convocatoria (nombre, fechas_texto, orden) values
-  ('Lanzamiento y Convocatoria', '4 – 18 dic', 1),
-  ('Preselección', '21 – 23 dic', 2),
-  ('Bootcamps + Encuentros híbridos', '12 – 15 ene 2027', 3),
-  ('Presentación Pitch', '12 – 15 ene 2027', 4),
-  ('Ceremonia de ganadores', '19 ene 2027', 5),
+  ('Lanzamiento y Convocatoria', '4 – 18 dic (cierre por confirmar)', 1),
+  ('Preselección', '21 – 22 dic (propuesta)', 2),
+  ('Bootcamps + Encuentros híbridos', '11 – 15 ene 2027', 3),
+  ('Presentación Pitch', '11 – 15 ene 2027', 4),
+  ('Ceremonia de ganadores', 'Semana del 18 ene 2027 (por confirmar)', 5),
   ('Incubación – plan de inversión', 'Por definir', 6);
 
 -- Resultados del programa: ciclo actual (4.0) vs. histórico acumulado.

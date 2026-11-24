@@ -2,14 +2,14 @@
 -- Innova Social — cronograma de la convocatoria 5.0
 --
 -- Actualiza la línea de tiempo (tabla etapas_convocatoria) con las fechas que dio
--- el equipo el 23 nov (reemplazan las de los PDF oficiales, que traían otras):
+-- el equipo el 24 nov (reemplazan las de los PDF oficiales y las del 23 nov):
 --
---   1  Lanzamiento y convocatoria   4 – 18 dic            (lanzamiento 4 dic, cierre 18 dic de 2026)
---   2  Preselección                 21 – 23 dic           (evaluación)
---   3  Bootcamps y encuentros       12 – 15 ene 2027      (bootcamp y pitch comparten el rango)
---   4  Presentación Pitch           12 – 15 ene 2027
---   5  Ceremonia de ganadores       19 ene 2027           (premiación)
---   6  Incubación y plan de inv.    Por definir           (sin fechas todavía; las del PDF empezaban antes de la premiación)
+--   1  Lanzamiento y convocatoria   4 – 18 dic (cierre por confirmar)         (apertura 4 dic; cierre propuesto 18 dic)
+--   2  Preselección                 21 – 22 dic (propuesta)                   (selección propuesta 21 y 22 dic)
+--   3  Bootcamps y encuentros       11 – 15 ene 2027                          (bootcamp y pitch: semana del 11 al 15 ene)
+--   4  Presentación Pitch           11 – 15 ene 2027
+--   5  Ceremonia de ganadores       Semana del 18 ene 2027 (por confirmar)    (semana siguiente al pitch)
+--   6  Incubación y plan de inv.    Por definir                               (sin fechas todavía)
 --
 -- La página convocatoria.html lee esta tabla (el HTML es solo respaldo) y los
 -- correos de confirmación también, así que sin esto se siguen viendo las fechas
@@ -42,11 +42,11 @@ end
 $chk$;
 
 update public.etapas_convocatoria set fechas_texto = case orden
-  when 1 then '4 – 18 dic'
-  when 2 then '21 – 23 dic'
-  when 3 then '12 – 15 ene 2027'
-  when 4 then '12 – 15 ene 2027'
-  when 5 then '19 ene 2027'
+  when 1 then '4 – 18 dic (cierre por confirmar)'
+  when 2 then '21 – 22 dic (propuesta)'
+  when 3 then '11 – 15 ene 2027'
+  when 4 then '11 – 15 ene 2027'
+  when 5 then 'Semana del 18 ene 2027 (por confirmar)'
   when 6 then 'Por definir'
 end
 where orden between 1 and 6;
