@@ -16,6 +16,8 @@
 -- correos de confirmación también, así que sin esto se siguen viendo las fechas
 -- de la edición anterior.
 --
+-- APLICADA en producción el 25 nov 2026 desde el SQL Editor (sin errores).
+--
 -- Pegar COMPLETO en Supabase → SQL Editor del proyecto yivyqorgcagwykedngjv y
 -- ejecutar. Va en una transacción: entra todo o no entra nada. Solo cambia
 -- fechas_texto de las etapas 1 a 6 (no toca nombres, iconos ni orden).
